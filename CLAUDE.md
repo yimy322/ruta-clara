@@ -5,7 +5,7 @@ Los pasajeros reportan en tiempo real dónde vienen las unidades, la espera en p
 
 ## Stack
 - React Native + Expo (SDK 57) con TypeScript estricto
-- Navegación: Expo Router (rutas por carpetas en /app)
+- Navegación: Expo Router (rutas en /src/app; no existe /app en la raíz)
 - Estilos: StyleSheet de React Native + tokens en /src/theme (nada de colores o tamaños sueltos)
 - Backend (fase posterior): Supabase (PostgreSQL + PostGIS, Auth, Realtime)
 
@@ -26,6 +26,6 @@ Los pasajeros reportan en tiempo real dónde vienen las unidades, la espera en p
 ## Reglas de trabajo
 - Textos de la interfaz en español peruano, tal como aparecen en Figma.
 - Componentes funcionales con hooks; un componente por archivo en /src/components.
-- No instalar librerías nuevas sin preguntar antes.
+- No instalar librerías nuevas sin preguntar antes. Aprobado como herramienta de desarrollo: ESLint (eslint + eslint-config-expo, config en eslint.config.js).
 - Trabajar una pantalla o componente a la vez y explicar brevemente qué cambió.
 - Usar datos de prueba en /src/mocks hasta que se conecte Supabase.

@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { Bell, Bus, MapPin, Search, Share2, ShieldAlert, Star, TrafficCone, Users } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   BottomNav,
@@ -25,11 +26,15 @@ export default function Index() {
   const [alertsOn, setAlertsOn] = useState(true);
   const [shareOn, setShareOn] = useState(false);
   const [tab, setTab] = useState<BottomNavTab>("inicio");
+  const insets = useSafeAreaInsets();
 
   return (
     <>
       <Stack.Screen options={{ title: "Componentes" }} />
-      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.lg + insets.bottom }]}
+      >
         <Section title="Button">
           <Variant label="Primary">
             <Button label="Buscar ruta" onPress={noop} fullWidth />
@@ -50,12 +55,12 @@ export default function Index() {
 
         <Section title="Chip">
           <View style={styles.row}>
-            <Chip label="La 50" />
-            <Chip label="Paradero Puente Nuevo" state="selected" onPress={noop} />
+            <Chip label="La 50" onPress={noop} />
+            <Chip label="Paradero Puente Nuevo" state="selected" />
             <Chip label="En vivo · 4 min" state="live" />
             <Chip label="Seguridad / Peligro" state="alert" />
           </View>
-          <Text style={styles.caption}>Default · Selected · Live · Alert</Text>
+          <Text style={styles.caption}>Default (presionable) · Selected · Live · Alert</Text>
         </Section>
 
         <Section title="Icon Button">
@@ -89,8 +94,9 @@ export default function Index() {
             <Tile label="Lleno" icon={<Users />} onPress={noop} />
             <Tile label="Tráfico" icon={<TrafficCone />} state="selected" onPress={noop} />
             <Tile label="Seguridad / Peligro" icon={<ShieldAlert />} state="danger" onPress={noop} />
+            <Tile label="Otro" onPress={noop} />
           </View>
-          <Text style={styles.caption}>Default · Selected · Danger</Text>
+          <Text style={styles.caption}>Default · Selected · Danger · Sin ícono</Text>
         </Section>
 
         <Section title="List Item">
