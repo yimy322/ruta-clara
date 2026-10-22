@@ -12,6 +12,7 @@ export default function Inicio() {
       actions={[
         { label: "Buscar destino", onPress: () => router.push("/buscar") },
         { label: "Ver catálogo", variant: "tertiary", onPress: () => router.push("/dev/catalogo") },
+        { label: "Ver datos", variant: "tertiary", onPress: () => router.push("/dev/datos") },
       ]}
     />
   );

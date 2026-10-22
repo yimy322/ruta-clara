@@ -40,10 +40,18 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F1_09 · En tránsito (a bordo) | viaje/a-bordo.tsx | /viaje/a-bordo | Stack |
 | F1_10 · Finalización del viaje | viaje/fin.tsx | /viaje/fin | Modal fullScreenModal |
 | — Catálogo de componentes (dev) | dev/catalogo.tsx | /dev/catalogo | Stack |
+| — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
 Camino feliz: Inicio → buscar → rutas → ruta/La50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
 Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez para regenerar `.expo/types/router.d.ts`.
+
+## Datos
+- Tipos del dominio en /src/types (Linea, Paradero, Reporte, OpcionRuta…).
+- Datos de prueba en /src/mocks (sacados del prototipo de Figma; lo que no está en Figma va marcado `// supuesto`).
+- Acceso a datos solo por /src/data/repositorio.ts: funciones async con retraso simulado de 300–600 ms. En la Fase 5 se reemplaza por Supabase sin cambiar las firmas.
+- **Regla: las pantallas y componentes importan de `@/data/repositorio`, nunca de `@/mocks`.** Única excepción: `dev/catalogo.tsx` con `mocks/catalog.ts`.
+- Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 
 ## Reglas de trabajo
 - Textos de la interfaz en español peruano, tal como aparecen en Figma.
