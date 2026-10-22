@@ -1,8 +1,7 @@
-import { Stack } from "expo-router";
 import { Bell, Bus, MapPin, Search, Share2, ShieldAlert, Star, TrafficCone, Users } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   BottomNav,
@@ -18,23 +17,19 @@ import {
 import { catalogHeader, catalogRoutes } from "@/mocks/catalog";
 import { colors, radii, spacing, typography } from "@/theme";
 
-// Pantalla TEMPORAL: catálogo de componentes base con todas sus variantes,
-// como la sección "Componentes" de Figma. Se reemplaza por F1_04 en la fase 3.
+// Pantalla de desarrollo: catálogo de componentes base con todas sus variantes,
+// como la sección "Componentes" de Figma. Se abre desde "Ver catálogo" en Inicio.
 const noop = () => {};
 
-export default function Index() {
+export default function Catalogo() {
   const [alertsOn, setAlertsOn] = useState(true);
   const [shareOn, setShareOn] = useState(false);
   const [tab, setTab] = useState<BottomNavTab>("inicio");
-  const insets = useSafeAreaInsets();
 
   return (
-    <>
-      <Stack.Screen options={{ title: "Componentes" }} />
-      <ScrollView
-        style={styles.screen}
-        contentContainerStyle={[styles.content, { paddingBottom: spacing.lg + insets.bottom }]}
-      >
+    <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
+      <Header title="Catálogo de componentes" />
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <Section title="Button">
           <Variant label="Primary">
             <Button label="Buscar ruta" onPress={noop} fullWidth />
@@ -138,7 +133,7 @@ export default function Index() {
           </View>
         </Section>
       </ScrollView>
-    </>
+    </SafeAreaView>
   );
 }
 

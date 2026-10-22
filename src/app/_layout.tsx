@@ -30,10 +30,15 @@ export default function RootLayout() {
     return null;
   }
 
+  // Sin header nativo: cada pantalla usa nuestro componente Header.
   return (
     <>
       <StatusBar style="dark" />
-      <Stack />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="viaje/fin" options={{ presentation: "fullScreenModal" }} />
+        <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
+      </Stack>
     </>
   );
 }

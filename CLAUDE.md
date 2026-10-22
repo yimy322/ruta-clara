@@ -23,6 +23,28 @@ Los pasajeros reportan en tiempo real dónde vienen las unidades, la espera en p
 - F3_01–F3_07: favoritos, notificaciones y alertas
 - Barra inferior: Inicio (F1_04), Favoritos (F3_01), Reportar (F2_01), Alertas (F3_04), Perfil (F2_09)
 
+## Rutas (Expo Router, en /src/app)
+Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan BottomNav como tabBar.
+
+| Figma | Archivo | URL | Tipo |
+|---|---|---|---|
+| F1_04 · Inicio — Principal | (tabs)/index.tsx | / | Tab |
+| F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
+| F2_01 · Panel de reporte rápido | reporte.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía) |
+| F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab |
+| F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
+| F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
+| F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
+| F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/La50 | Stack |
+| F1_08 · Monitoreo en vivo | viaje/espera.tsx | /viaje/espera | Stack |
+| F1_09 · En tránsito (a bordo) | viaje/a-bordo.tsx | /viaje/a-bordo | Stack |
+| F1_10 · Finalización del viaje | viaje/fin.tsx | /viaje/fin | Modal fullScreenModal |
+| — Catálogo de componentes (dev) | dev/catalogo.tsx | /dev/catalogo | Stack |
+
+Camino feliz: Inicio → buscar → rutas → ruta/La50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
+SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
+Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez para regenerar `.expo/types/router.d.ts`.
+
 ## Reglas de trabajo
 - Textos de la interfaz en español peruano, tal como aparecen en Figma.
 - Componentes funcionales con hooks; un componente por archivo en /src/components.

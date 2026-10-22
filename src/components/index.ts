@@ -4,5 +4,6 @@ export { Chip, type ChipState } from "./Chip";
 export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
+export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Tile, type TileState } from "./Tile";
 export { Toggle } from "./Toggle";

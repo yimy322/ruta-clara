@@ -19,7 +19,7 @@ const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
   { key: "perfil", label: "Perfil", Icon: CircleUser },
 ];
 
-// Navegación inferior de 5 ítems. Solo visual por ahora; en la fase 3 se
+// Navegación inferior de 5 ítems. Es solo visual: (tabs)/_layout.tsx la
 // conecta a las Tabs de Expo Router. Respeta el borde seguro inferior.
 export function BottomNav({ active, onSelect }: BottomNavProps) {
   const insets = useSafeAreaInsets();
