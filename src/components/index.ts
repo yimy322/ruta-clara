@@ -1,9 +1,11 @@
 export { BottomNav, type BottomNavTab } from "./BottomNav";
 export { Button, type ButtonVariant } from "./Button";
+export { CardParadero, type DatosCardParadero } from "./CardParadero";
 export { Chip, type ChipState } from "./Chip";
 export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
+export { Mapa } from "./Mapa";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Tile, type TileState } from "./Tile";
 export { Toggle } from "./Toggle";

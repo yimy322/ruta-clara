@@ -42,6 +42,15 @@ export const sizes = {
   badge: 36,
   navHeight: 64,
   navIcon: 22,
+  chipIcon: 14,
+  searchHeight: 44,
+  cardPadding: 14,
+  badgeDot: 10,
+  // Mapa provisional (F1_04)
+  mapStop: 20,
+  mapUser: 16,
+  mapUserHalo: 36,
+  mapRoad: 10,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

@@ -12,6 +12,7 @@ export const reportes: Reporte[] = [
     paraderoId: "puente-nuevo",
     lat: -12.0436,
     lng: -76.9988,
+    ocupacion: "lleno", // supuesto: F1_04 muestra "Lleno" en la card
     nota: "Mucha gente esperando",
     creadoEn: haceMin(4),
     confirmaciones: 3,

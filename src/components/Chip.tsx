@@ -1,12 +1,15 @@
+import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { borderWidths, colors, minTouch, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { withIconDefaults } from "@/utils/icons";
 
 export type ChipState = "default" | "selected" | "live" | "alert";
 
 type ChipProps = {
   label: string;
   state?: ChipState;
+  icon?: ReactNode;
   onPress?: () => void;
 };
 
@@ -15,15 +18,18 @@ const verticalSlop = (minTouch - sizes.chipHeight) / 2;
 const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 
 // Chip 32 pt. Live = unidad en vivo (amarillo), Alert = seguridad (rojo).
-export function Chip({ label, state = "default", onPress }: ChipProps) {
-  const text = (
-    <Text style={[typography.caption, labelStyles[state]]} numberOfLines={1}>
-      {label}
-    </Text>
+export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
+  const content = (
+    <>
+      {icon != null && withIconDefaults(icon, { color: labelStyles[state].color, size: sizes.chipIcon })}
+      <Text style={[typography.caption, labelStyles[state]]} numberOfLines={1}>
+        {label}
+      </Text>
+    </>
   );
 
   if (!onPress) {
-    return <View style={[styles.base, containerStyles[state]]}>{text}</View>;
+    return <View style={[styles.base, containerStyles[state]]}>{content}</View>;
   }
 
   return (
@@ -38,7 +44,7 @@ export function Chip({ label, state = "default", onPress }: ChipProps) {
         pressed && styles.pressed,
       ]}
     >
-      {text}
+      {content}
     </Pressable>
   );
 }
@@ -49,6 +55,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: radii.pill,
     borderWidth: borderWidths.hairline,
+    flexDirection: "row",
+    gap: spacing.xs,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-start",

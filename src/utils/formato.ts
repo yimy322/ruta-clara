@@ -1,4 +1,5 @@
 // Formato de textos de la interfaz.
+import type { Ocupacion } from "@/types";
 
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
@@ -17,3 +18,19 @@ export function haceCuanto(fechaISO: string) {
 
 // 8 → "8 min"; si es estimado, 20 → "~20 min"
 export const formatearEta = (minutos: number, estimado = false) => `${estimado ? "~" : ""}${minutos} min`;
+
+// 183 → "180 m"; 1400 → "1.4 km"
+export function formatearDistancia(metros: number) {
+  if (metros < 1000) {
+    return `${Math.round(metros / 10) * 10} m`;
+  }
+  return `${(metros / 1000).toFixed(1)} km`;
+}
+
+const OCUPACION: Record<Ocupacion, string> = {
+  sentados: "Sentados",
+  lleno: "Lleno",
+  sopa: "Sopa",
+};
+
+export const etiquetaOcupacion = (ocupacion: Ocupacion) => OCUPACION[ocupacion];

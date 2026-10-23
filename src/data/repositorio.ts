@@ -5,7 +5,19 @@ import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
-import type { Destino, Linea, LugarGuardado, OpcionRuta, Paradero, Reporte } from "@/types";
+import { ubicacionUsuario } from "@/mocks/usuario";
+import type {
+  Coordenada,
+  Destino,
+  Linea,
+  LugarGuardado,
+  OpcionRuta,
+  Paradero,
+  Reporte,
+  ResumenParadero,
+  UnidadEnVivo,
+} from "@/types";
+import { distanciaMetros } from "@/utils/geo";
 
 // Un reporte deja de contar como activo después de este tiempo
 const VIGENCIA_REPORTE_MIN = 30;
@@ -23,16 +35,6 @@ const normalizar = (texto: string) =>
     .trim();
 
 const minutosDesde = (fechaISO: string) => Math.floor((Date.now() - new Date(fechaISO).getTime()) / 60_000);
-
-// Distancia en metros entre dos coordenadas (haversine)
-function distanciaMetros(lat1: number, lng1: number, lat2: number, lng2: number) {
-  const R = 6_371_000;
-  const rad = (grados: number) => (grados * Math.PI) / 180;
-  const dLat = rad(lat2 - lat1);
-  const dLng = rad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
 
 export async function getLineas(): Promise<Linea[]> {
   await esperar();
@@ -112,4 +114,45 @@ export async function getReportesCercanos(lat: number, lng: number): Promise<Rep
 export async function getLugaresGuardados(): Promise<LugarGuardado[]> {
   await esperar();
   return lugaresGuardados;
+}
+
+// Fase 6: se reemplaza por la ubicación real del celular.
+export async function getUbicacionUsuario(): Promise<Coordenada> {
+  await esperar();
+  return ubicacionUsuario;
+}
+
+export async function getParaderosCercanos(lat: number, lng: number): Promise<Paradero[]> {
+  await esperar();
+  return paraderos.filter((paradero) => distanciaMetros(lat, lng, paradero.lat, paradero.lng) <= RADIO_CERCANO_M);
+}
+
+// Última ubicación reportada de cada línea cerca del punto.
+export async function getUnidadesEnVivo(lat: number, lng: number): Promise<UnidadEnVivo[]> {
+  await esperar();
+  const unidades: UnidadEnVivo[] = [];
+  const vigentes = reportes
+    .filter((reporte) => reporte.tipo === "ubicacion" && minutosDesde(reporte.creadoEn) <= VIGENCIA_REPORTE_MIN)
+    .filter((reporte) => distanciaMetros(lat, lng, reporte.lat, reporte.lng) <= RADIO_CERCANO_M)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
+  for (const reporte of vigentes) {
+    const linea = lineas.find((l) => l.id === reporte.lineaId);
+    if (linea && !unidades.some((u) => u.linea.id === linea.id)) {
+      unidades.push({ linea, lat: reporte.lat, lng: reporte.lng });
+    }
+  }
+  return unidades;
+}
+
+// Cada confirmación cuenta como un reporte más del mismo hecho.
+export async function getResumenParadero(paraderoId: string): Promise<ResumenParadero> {
+  await esperar();
+  const vigentes = reportes
+    .filter((reporte) => reporte.paraderoId === paraderoId && minutosDesde(reporte.creadoEn) <= VIGENCIA_REPORTE_MIN)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
+  return {
+    reportesActivos: vigentes.reduce((total, reporte) => total + reporte.confirmaciones, 0),
+    ultimoReporte: vigentes[0]?.creadoEn ?? null,
+    ocupacion: vigentes.find((reporte) => reporte.ocupacion)?.ocupacion,
+  };
 }

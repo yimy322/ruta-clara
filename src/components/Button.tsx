@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, typography } from "@/theme";
+import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { withIconDefaults } from "@/utils/icons";
 
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
 
@@ -10,6 +12,9 @@ type ButtonProps = {
   variant?: ButtonVariant;
   fullWidth?: boolean;
   disabled?: boolean;
+  icon?: ReactNode;
+  // Bordes de píldora, para botones flotantes (FAB)
+  pill?: boolean;
 };
 
 // Botón 52 pt. Primary = acción principal, Secondary = alternativa,
@@ -20,6 +25,8 @@ export function Button({
   variant = "primary",
   fullWidth = false,
   disabled = false,
+  icon,
+  pill = false,
 }: ButtonProps) {
   return (
     <Pressable
@@ -31,10 +38,13 @@ export function Button({
         styles.base,
         containerStyles[variant],
         fullWidth && styles.fullWidth,
+        pill && styles.pill,
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
     >
+      {icon != null &&
+        withIconDefaults(icon, { color: labelStyles[variant].color, size: sizes.iconGlyph })}
       <Text style={[typography.button, labelStyles[variant]]} numberOfLines={1}>
         {label}
       </Text>
@@ -47,12 +57,17 @@ const styles = StyleSheet.create({
     height: sizes.buttonHeight,
     paddingHorizontal: sizes.buttonPaddingX,
     borderRadius: radii.lg,
+    flexDirection: "row",
+    gap: spacing.sm,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-start",
   },
   fullWidth: {
     alignSelf: "stretch",
+  },
+  pill: {
+    borderRadius: radii.pill,
   },
   pressed: {
     opacity: opacity.pressed,

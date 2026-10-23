@@ -79,3 +79,23 @@ export type LugarGuardado = {
   lat: number;
   lng: number;
 };
+
+export type Coordenada = {
+  lat: number;
+  lng: number;
+};
+
+// Unidad en vivo en el mapa (F1_04), según el último reporte de ubicación
+export type UnidadEnVivo = {
+  linea: Linea;
+  lat: number;
+  lng: number;
+};
+
+// Estado de un paradero según sus reportes vigentes (card de F1_04)
+export type ResumenParadero = {
+  reportesActivos: number;
+  // Fecha ISO del reporte más reciente; null si no hay reportes vigentes
+  ultimoReporte: string | null;
+  ocupacion?: Ocupacion;
+};
