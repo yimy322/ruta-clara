@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     paddingTop: spacing.sm,
     backgroundColor: colors.surface,
-    borderTopWidth: borderWidths.hairline,
+    borderTopWidth: borderWidths.thin,
     borderTopColor: colors.line,
   },
   tab: {

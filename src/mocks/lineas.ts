@@ -88,9 +88,9 @@ export type RutaMock = {
 export const rutasPorDestino: Record<string, RutaMock[]> = {
   // F1_06: La 50 · 8 min · 12 reportes; El Chosicano · 14 min · 7 reportes; Anconero · ~20 min
   "jockey-plaza": [
-    { lineaId: "anconero", etaMin: 20, trafico: "medio", reportesActivos: 0 },
-    { lineaId: "la-50", etaMin: 8, trafico: "medio", reportesActivos: 12, ocupacion: "lleno" },
-    { lineaId: "el-chosicano", etaMin: 14, trafico: "alto", reportesActivos: 7, ocupacion: "sentados" },
+    { lineaId: "anconero", etaMin: 20, trafico: "bajo", reportesActivos: 0 },
+    { lineaId: "la-50", etaMin: 8, trafico: "medio", reportesActivos: 12, ocupacion: "sentados" },
+    { lineaId: "el-chosicano", etaMin: 14, trafico: "alto", reportesActivos: 7, ocupacion: "lleno" },
   ],
   gamarra: [
     { lineaId: "la-73", etaMin: 11, trafico: "alto", reportesActivos: 4, ocupacion: "sopa" },

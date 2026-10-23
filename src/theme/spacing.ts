@@ -20,9 +20,12 @@ export const radii = {
 // Área táctil mínima
 export const minTouch = 44;
 
+// Grosores de borde (Figma): thin = chips y divisores, regular = controles y
+// cards, thick = card recomendada
 export const borderWidths = {
-  hairline: 1,
-  strong: 1.5,
+  thin: 1,
+  regular: 1.5,
+  thick: 2.5,
 } as const;
 
 // Medidas de los componentes base (Figma)
@@ -44,6 +47,11 @@ export const sizes = {
   navIcon: 22,
   chipIcon: 14,
   searchHeight: 44,
+  // Campos origen/destino (F1_05)
+  fieldHeight: 40,
+  fieldDot: 8,
+  // Mini-mapa de resultados (F1_06)
+  miniMap: 120,
   cardPadding: 14,
   badgeDot: 10,
   // Mapa provisional (F1_04)

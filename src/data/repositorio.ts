@@ -1,5 +1,6 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
+import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
 import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
@@ -22,6 +23,8 @@ import { distanciaMetros } from "@/utils/geo";
 // Un reporte deja de contar como activo después de este tiempo
 const VIGENCIA_REPORTE_MIN = 30;
 const RADIO_CERCANO_M = 2000;
+// Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
+const RADIO_LUGAR_M = 5000;
 
 // Simula la latencia de red (300–600 ms)
 const esperar = () => new Promise<void>((resolve) => setTimeout(resolve, 300 + Math.random() * 300));
@@ -71,10 +74,47 @@ export async function buscarDestinos(texto: string): Promise<Destino[]> {
   return destinos.filter((destino) => normalizar(destino.nombre).includes(consulta));
 }
 
+const porIds = (ids: string[]) => ids.flatMap((id) => destinos.find((destino) => destino.id === id) ?? []);
+
+export async function getDestinosRecientes(): Promise<Destino[]> {
+  await esperar();
+  return porIds(destinosRecientes);
+}
+
+export async function getDestinosComunes(): Promise<Destino[]> {
+  await esperar();
+  return porIds(destinosComunes);
+}
+
+// Nombre de destino o de lugar guardado (Casa, Trabajo, U) → destino conocido.
+// Un lugar guardado se resuelve por sus coordenadas al destino más cercano.
+function resolverDestino(nombre: string): Destino | null {
+  const consulta = normalizar(nombre);
+  const destino = destinos.find((d) => normalizar(d.nombre) === consulta);
+  if (destino) {
+    return destino;
+  }
+
+  const lugar = lugaresGuardados.find((l) => normalizar(l.nombre) === consulta);
+  if (!lugar) {
+    return null;
+  }
+  let cercano: Destino | null = null;
+  let menor = RADIO_LUGAR_M;
+  for (const d of destinos) {
+    const distancia = distanciaMetros(lugar.lat, lugar.lng, d.lat, d.lng);
+    if (distancia <= menor) {
+      menor = distancia;
+      cercano = d;
+    }
+  }
+  return cercano;
+}
+
 // `origen` todavía no se usa: por ahora siempre es "Mi ubicación".
 export async function buscarRutas(origen: string, destino: string): Promise<OpcionRuta[]> {
   await esperar();
-  const encontrado = destinos.find((d) => normalizar(d.nombre) === normalizar(destino));
+  const encontrado = resolverDestino(destino);
   if (!encontrado) {
     return [];
   }

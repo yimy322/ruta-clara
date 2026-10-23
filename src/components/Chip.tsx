@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     height: sizes.chipHeight,
     paddingHorizontal: spacing.md,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.hairline,
+    borderWidth: borderWidths.thin,
     flexDirection: "row",
     gap: spacing.xs,
     alignItems: "center",

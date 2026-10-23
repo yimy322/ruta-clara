@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     paddingVertical: sizes.tilePaddingY,
     gap: spacing.sm,
     borderRadius: radii.lg,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     alignItems: "center",
   },
   label: {

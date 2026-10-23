@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: sizes.cardPadding,
     borderRadius: radii.lg,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
     backgroundColor: colors.surface,
   },

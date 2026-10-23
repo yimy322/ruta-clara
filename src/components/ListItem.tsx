@@ -5,16 +5,19 @@ import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from
 import { withIconDefaults } from "@/utils/icons";
 
 type ListItemProps = {
-  title: string;
+  // Puede llevar <Text> anidados (p. ej. para resaltar parte del título)
+  title: ReactNode;
   subtitle?: string;
   badge?: string | ReactNode;
   trailing?: string | ReactNode;
   onPress?: () => void;
+  // Fondo amarillo suave: la opción sugerida
+  destacado?: boolean;
 };
 
 // Fila de lista: badge (número de ruta o ícono), título, subtítulo y texto
 // final. Si recibe onPress se vuelve presionable.
-export function ListItem({ title, subtitle, badge, trailing, onPress }: ListItemProps) {
+export function ListItem({ title, subtitle, badge, trailing, onPress, destacado = false }: ListItemProps) {
   const content = (
     <>
       {badge != null && (
@@ -49,14 +52,14 @@ export function ListItem({ title, subtitle, badge, trailing, onPress }: ListItem
   );
 
   if (!onPress) {
-    return <View style={styles.base}>{content}</View>;
+    return <View style={[styles.base, destacado && styles.destacado]}>{content}</View>;
   }
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.base, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.base, destacado && styles.destacado, pressed && styles.pressed]}
     >
       {content}
     </Pressable>
@@ -71,14 +74,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     backgroundColor: colors.surface,
-    borderBottomWidth: borderWidths.hairline,
+    borderBottomWidth: borderWidths.thin,
     borderBottomColor: colors.line,
+  },
+  destacado: {
+    backgroundColor: colors.yellowSoft,
   },
   badge: {
     width: sizes.badge,
     height: sizes.badge,
     borderRadius: radii.md,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
     alignItems: "center",
     justifyContent: "center",

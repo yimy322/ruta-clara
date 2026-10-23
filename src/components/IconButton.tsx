@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     width: sizes.iconButton,
     height: sizes.iconButton,
     borderRadius: radii.md,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
     backgroundColor: colors.surface,
     alignItems: "center",

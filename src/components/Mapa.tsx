@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     height: sizes.mapStop,
     borderRadius: radii.pill,
     backgroundColor: colors.surface,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
     alignItems: "center",
     justifyContent: "center",
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     height: sizes.mapUser,
     borderRadius: radii.pill,
     backgroundColor: colors.blue,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.surface,
   },
   unidad: {

@@ -1,6 +1,7 @@
 export { BottomNav, type BottomNavTab } from "./BottomNav";
 export { Button, type ButtonVariant } from "./Button";
 export { CardParadero, type DatosCardParadero } from "./CardParadero";
+export { CardRuta } from "./CardRuta";
 export { Chip, type ChipState } from "./Chip";
 export { Header } from "./Header";
 export { IconButton } from "./IconButton";

@@ -38,9 +38,9 @@ const styles = StyleSheet.create({
     width: sizes.toggleWidth,
     height: sizes.toggleHeight,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     justifyContent: "center",
-    paddingHorizontal: sizes.toggleInset - borderWidths.strong,
+    paddingHorizontal: sizes.toggleInset - borderWidths.regular,
   },
   trackOn: {
     backgroundColor: colors.ink,

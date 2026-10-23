@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: radii.md,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
     backgroundColor: colors.surface,
   },

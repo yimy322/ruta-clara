@@ -83,7 +83,7 @@ const containerStyles = StyleSheet.create({
   },
   secondary: {
     backgroundColor: colors.surface,
-    borderWidth: borderWidths.strong,
+    borderWidth: borderWidths.regular,
     borderColor: colors.ink,
   },
   tertiary: {
