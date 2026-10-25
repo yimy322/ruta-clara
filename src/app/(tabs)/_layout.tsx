@@ -14,7 +14,7 @@ const ROUTE_TO_TAB: Record<string, BottomNavTab> = {
 
 // Adapta el tabBar de Expo Router a BottomNav. Emite tabPress igual que la
 // barra por defecto, para que los listeners puedan hacer preventDefault.
-function TabBar({ state, navigation }: BottomTabBarProps) {
+function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const activeRoute = state.routes[state.index];
 
   const handleSelect = (tab: BottomNavTab) => {
@@ -22,9 +22,9 @@ function TabBar({ state, navigation }: BottomTabBarProps) {
     if (!route) {
       return;
     }
-    const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
+    const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
     if (route.key !== activeRoute.key && !event.defaultPrevented) {
-      navigation.navigate(route.name, route.params);
+      navigateToTab(route.key);
     }
   };
 
