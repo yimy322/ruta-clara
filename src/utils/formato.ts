@@ -1,5 +1,5 @@
 // Formato de textos de la interfaz.
-import type { NivelTrafico, Ocupacion, Sentido, TipoUnidad } from "@/types";
+import type { NivelTrafico, Ocupacion, Sentido, TipoUnidad, Velocidad } from "@/types";
 
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
@@ -17,6 +17,25 @@ export function haceMinutos(minutos: number) {
     return `hace ${minutos} min`;
   }
   return `hace ${Math.floor(minutos / 60)} h`;
+}
+
+// 40 → "hace 40 s"; 0 → "ahora"; 300 → "hace 5 min"
+export function haceSegundos(segundos: number) {
+  if (segundos < 1) {
+    return "ahora";
+  }
+  if (segundos < 60) {
+    return `hace ${segundos} s`;
+  }
+  return haceMinutos(Math.floor(segundos / 60));
+}
+
+// Fecha ISO → "7:52 AM"
+export function formatearHora(fechaISO: string) {
+  const fecha = new Date(fechaISO);
+  const horas = fecha.getHours();
+  const minutos = String(fecha.getMinutes()).padStart(2, "0");
+  return `${horas % 12 || 12}:${minutos} ${horas < 12 ? "AM" : "PM"}`;
 }
 
 // 8 → "8 min"; si es estimado, 20 → "~20 min"
@@ -44,6 +63,14 @@ const OCUPACION: Record<Ocupacion, string> = {
 };
 
 export const etiquetaOcupacion = (ocupacion: Ocupacion) => OCUPACION[ocupacion];
+
+const VELOCIDAD: Record<Velocidad, string> = {
+  normal: "Normal",
+  lento: "Lento",
+  chanteando: "Chanteando",
+};
+
+export const etiquetaVelocidad = (velocidad: Velocidad) => VELOCIDAD[velocidad];
 
 const TRAFICO: Record<NivelTrafico, string> = {
   bajo: "Tráfico bajo",

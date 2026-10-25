@@ -16,11 +16,13 @@ type HeaderProps = {
   right?: ReactNode;
   // Título en H2, para pantallas de detalle (F1_07)
   large?: boolean;
+  // Reemplaza el botón atrás (p. ej. el indicador "a bordo" de F1_09)
+  leading?: ReactNode;
 };
 
 // Header con botón atrás. Va en la parte superior de la pantalla y respeta
 // el borde seguro del celular (notch / barra de estado).
-export function Header({ title, eyebrow, subtitle, onBack, right, large = false }: HeaderProps) {
+export function Header({ title, eyebrow, subtitle, onBack, right, large = false, leading }: HeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -34,7 +36,7 @@ export function Header({ title, eyebrow, subtitle, onBack, right, large = false 
 
   return (
     <View style={[styles.base, { paddingTop: insets.top + spacing.sm }]}>
-      <IconButton icon={<ArrowLeft />} onPress={handleBack} accessibilityLabel="Volver" />
+      {leading ?? <IconButton icon={<ArrowLeft />} onPress={handleBack} accessibilityLabel="Volver" />}
       <View style={styles.text}>
         {eyebrow != null && (
           <Text style={[typography.overline, styles.muted]} numberOfLines={1}>

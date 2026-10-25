@@ -15,7 +15,8 @@ type ViajeContextValue = {
 
 const ViajeContext = createContext<ViajeContextValue | null>(null);
 
-const idsRecorrido = (viaje: Viaje) =>
+// Ids de paraderos del sentido elegido; `paraderoActual` es un índice aquí
+export const idsRecorrido = (viaje: Viaje) =>
   viaje.sentido === "ida" ? viaje.linea.recorridoIda : viaje.linea.recorridoVuelta;
 
 // Estado del viaje activo, compartido por Detalle de ruta y las pantallas de
@@ -61,7 +62,7 @@ export function ViajeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const finalizar = useCallback(() => {
-    setViaje((actual) => actual && { ...actual, estado: "finalizado" });
+    setViaje((actual) => actual && { ...actual, estado: "finalizado", finEn: new Date().toISOString() });
   }, []);
 
   const limpiar = useCallback(() => setViaje(null), []);

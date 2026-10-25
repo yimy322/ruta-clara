@@ -15,6 +15,8 @@ type ButtonProps = {
   icon?: ReactNode;
   // Bordes de píldora, para botones flotantes (FAB)
   pill?: boolean;
+  // 56 pt: acción urgente que debe encontrarse rápido (F1_09)
+  large?: boolean;
 };
 
 // Botón 52 pt. Primary = acción principal, Secondary = alternativa,
@@ -27,6 +29,7 @@ export function Button({
   disabled = false,
   icon,
   pill = false,
+  large = false,
 }: ButtonProps) {
   return (
     <Pressable
@@ -39,6 +42,7 @@ export function Button({
         containerStyles[variant],
         fullWidth && styles.fullWidth,
         pill && styles.pill,
+        large && styles.large,
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
@@ -68,6 +72,9 @@ const styles = StyleSheet.create({
   },
   pill: {
     borderRadius: radii.pill,
+  },
+  large: {
+    height: sizes.buttonHeightLarge,
   },
   pressed: {
     opacity: opacity.pressed,

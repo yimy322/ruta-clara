@@ -70,6 +70,16 @@ export const sizes = {
   statPadding: 10,
   chartHeight: 44,
   chartBarMax: 40,
+  // Viaje en vivo (F1_08–F1_10)
+  buttonHeightLarge: 56,
+  grabberWidth: 40,
+  grabberHeight: 4,
+  mapDash: 6,
+  progressHeight: 6,
+  timelineDot: 18,
+  timelineRowPaddingY: 10,
+  successIcon: 80,
+  successGlyph: 32,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

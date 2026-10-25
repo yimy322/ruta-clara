@@ -116,4 +116,29 @@ export type Viaje = {
   // Índice en el recorrido del sentido elegido
   paraderoActual: number;
   avisarParaBajar: boolean;
+  // Fecha ISO; se llena al finalizar el viaje
+  finEn?: string;
+};
+
+// Unidad que se acerca al paradero de espera (F1_08), según su último
+// reporte de ubicación
+export type UnidadEnCamino = {
+  linea: Linea;
+  lat: number;
+  lng: number;
+  distanciaM: number;
+  etaMin: number;
+  ocupacion?: Ocupacion;
+  velocidad?: Velocidad;
+  // Pasajeros que confirmaron la ubicación
+  pasajeros: number;
+  // Fecha ISO del reporte
+  actualizadoEn: string;
+};
+
+// Paradero del tramo de viaje, con los minutos estimados desde el paradero
+// de espera (F1_09)
+export type ParaderoTramo = {
+  paradero: Paradero;
+  minutos: number;
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
@@ -10,6 +10,9 @@ type UnidadMapa = {
   linea: Linea;
   lat: number;
   lng: number;
+  // Texto del chip; por defecto el nombre de la línea
+  etiqueta?: string;
+  icono?: ReactNode;
 };
 
 type MapaProps = {
@@ -20,6 +23,10 @@ type MapaProps = {
   recorrido?: boolean;
   // Rótulo en la esquina superior izquierda (p. ej. "Recorrido Ate → Surco")
   etiqueta?: string;
+  // Rótulo bajo el punto del usuario (p. ej. "Tú · paradero")
+  etiquetaUsuario?: string;
+  // Une cada unidad con el usuario con una línea punteada (unidad en camino, F1_08)
+  seguimiento?: boolean;
   // Espacio tapado por controles flotantes: los puntos se acomodan fuera de él
   margen?: Insets;
   estilo?: StyleProp<ViewStyle>;
@@ -45,6 +52,8 @@ export function Mapa({
   unidades = [],
   recorrido = false,
   etiqueta,
+  etiquetaUsuario,
+  seguimiento = false,
   margen,
   estilo,
 }: MapaProps) {
@@ -74,6 +83,15 @@ export function Mapa({
         ))}
 
       {proyectar &&
+        usuario &&
+        seguimiento &&
+        unidades.flatMap((unidad) =>
+          trazosPunteados(proyectar(unidad), proyectar(usuario)).map(([a, b], i) => (
+            <View key={`s${unidad.linea.id}-${i}`} style={[styles.tramo, estiloTramo(a, b)]} />
+          )),
+        )}
+
+      {proyectar &&
         paraderos.map((paradero) => (
           <View
             key={paradero.id}
@@ -90,10 +108,18 @@ export function Mapa({
         </View>
       )}
 
+      {proyectar && usuario && etiquetaUsuario != null && (
+        <View style={[styles.marcador, styles.etiquetaUsuario, proyectar(usuario)]}>
+          <Text style={[typography.caption, styles.etiquetaTexto]} numberOfLines={1}>
+            {etiquetaUsuario}
+          </Text>
+        </View>
+      )}
+
       {proyectar &&
         unidades.map((unidad) => (
           <View key={unidad.linea.id} style={[styles.marcador, styles.unidad, proyectar(unidad)]}>
-            <Chip label={unidad.linea.nombre} state="live" />
+            <Chip label={unidad.etiqueta ?? unidad.linea.nombre} icon={unidad.icono} state="live" />
           </View>
         ))}
 
@@ -121,6 +147,21 @@ function estiloTramo(a: Punto, b: Punto): ViewStyle {
     width: Math.hypot(dx, dy),
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }, { rotate: `${Math.atan2(dy, dx)}rad` }],
   };
+}
+
+// Divide el segmento a→b en trazos de `sizes.mapDash` separados por huecos
+// del mismo largo (línea punteada)
+function trazosPunteados(a: Punto, b: Punto): [Punto, Punto][] {
+  const largo = Math.hypot(b.left - a.left, b.top - a.top);
+  const cantidad = Math.floor(largo / (sizes.mapDash * 2));
+  const enPunto = (distancia: number): Punto => ({
+    left: a.left + ((b.left - a.left) * distancia) / largo,
+    top: a.top + ((b.top - a.top) * distancia) / largo,
+  });
+  return Array.from({ length: cantidad }, (_, i) => [
+    enPunto(i * sizes.mapDash * 2),
+    enPunto(i * sizes.mapDash * 2 + sizes.mapDash),
+  ]);
 }
 
 // Devuelve una función lat/lng → posición (left/top) dentro del recuadro, o
@@ -239,5 +280,16 @@ const styles = StyleSheet.create({
   },
   etiquetaTexto: {
     color: colors.inkMuted,
+  },
+  // Debajo del halo del usuario: se baja medio halo más un margen
+  etiquetaUsuario: {
+    marginTop: sizes.mapUserHalo / 2 + spacing.xs,
+    transform: [{ translateX: "-50%" }],
+    paddingHorizontal: sizes.mapLabelPaddingX,
+    paddingVertical: sizes.mapLabelPaddingY,
+    borderRadius: radii.xs,
+    borderWidth: borderWidths.thin,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
 });

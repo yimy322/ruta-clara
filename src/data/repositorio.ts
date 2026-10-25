@@ -1,5 +1,6 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
+import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
 import { lineasFavoritas } from "@/mocks/favoritos";
@@ -15,9 +16,11 @@ import type {
   LugarGuardado,
   OpcionRuta,
   Paradero,
+  ParaderoTramo,
   Reporte,
   ResumenParadero,
   Sentido,
+  UnidadEnCamino,
   UnidadEnVivo,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
@@ -38,6 +41,9 @@ const normalizar = (texto: string) =>
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .trim();
+
+// Minutos que tarda una unidad en recorrer la distancia, a velocidad media
+const minutosEnRecorrer = (metros: number) => metros / ((VELOCIDAD_MEDIA_KMH * 1000) / 60);
 
 const minutosDesde = (fechaISO: string) => Math.floor((Date.now() - new Date(fechaISO).getTime()) / 60_000);
 
@@ -228,4 +234,73 @@ export async function getResumenParadero(paraderoId: string): Promise<ResumenPar
     ultimoReporte: vigentes[0]?.creadoEn ?? null,
     ocupacion: vigentes.find((reporte) => reporte.ocupacion)?.ocupacion,
   };
+}
+
+// Unidad de la línea más próxima al paradero, según su último reporte de
+// ubicación vigente; null si no hay. La ETA sale de la distancia en línea
+// recta a velocidad media.
+export async function getUnidadEnCamino(lineaId: string, paraderoId: string): Promise<UnidadEnCamino | null> {
+  await esperar();
+  const linea = lineas.find((l) => l.id === lineaId);
+  const paradero = paraderos.find((p) => p.id === paraderoId);
+  const reporte = reportes
+    .filter((r) => r.tipo === "ubicacion" && r.lineaId === lineaId && minutosDesde(r.creadoEn) <= VIGENCIA_REPORTE_MIN)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))[0];
+  if (!linea || !paradero || !reporte) {
+    return null;
+  }
+  const distanciaM = distanciaMetros(reporte.lat, reporte.lng, paradero.lat, paradero.lng);
+  return {
+    linea,
+    lat: reporte.lat,
+    lng: reporte.lng,
+    distanciaM,
+    etaMin: Math.max(Math.round(minutosEnRecorrer(distanciaM)), 1),
+    ocupacion: reporte.ocupacion,
+    velocidad: reporte.velocidad,
+    pasajeros: reporte.confirmaciones,
+    actualizadoEn: reporte.creadoEn,
+  };
+}
+
+// Paraderos desde el de espera hasta el de bajada (ambos incluidos), con los
+// minutos acumulados a velocidad media. Se baja en el paradero del recorrido
+// más cercano al destino; si el destino no se conoce, en el último.
+export async function getTramoViaje(
+  lineaId: string,
+  sentido: Sentido,
+  paraderoEsperaId: string,
+  destino: string,
+): Promise<ParaderoTramo[]> {
+  await esperar();
+  const linea = lineas.find((l) => l.id === lineaId);
+  if (!linea) {
+    return [];
+  }
+  const ids = sentido === "ida" ? linea.recorridoIda : linea.recorridoVuelta;
+  const restantes = ids
+    .slice(Math.max(ids.indexOf(paraderoEsperaId), 0))
+    .flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
+
+  let fin = restantes.length - 1;
+  const lugar = resolverDestino(destino);
+  if (lugar) {
+    let menor = Infinity;
+    restantes.forEach((paradero, i) => {
+      const distancia = distanciaMetros(lugar.lat, lugar.lng, paradero.lat, paradero.lng);
+      // Desde 1: no se baja en el mismo paradero donde sube
+      if (i > 0 && distancia < menor) {
+        menor = distancia;
+        fin = i;
+      }
+    });
+  }
+
+  let metros = 0;
+  return restantes.slice(0, fin + 1).map((paradero, i, tramo) => {
+    if (i > 0) {
+      metros += distanciaMetros(tramo[i - 1].lat, tramo[i - 1].lng, paradero.lat, paradero.lng);
+    }
+    return { paradero, minutos: Math.round(minutosEnRecorrer(metros)) };
+  });
 }
