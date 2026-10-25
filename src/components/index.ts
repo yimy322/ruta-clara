@@ -8,6 +8,7 @@ export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
 export { Mapa } from "./Mapa";
+export { PantallaCarga } from "./PantallaCarga";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Segmented } from "./Segmented";
 export { TarjetaDato } from "./TarjetaDato";

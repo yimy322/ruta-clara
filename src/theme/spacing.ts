@@ -7,6 +7,7 @@ export const spacing = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  xxxl: 40,
 } as const;
 
 export const radii = {
@@ -15,6 +16,7 @@ export const radii = {
   md: 10,
   lg: 14,
   xl: 20,
+  xxl: 24,
   pill: 999,
 } as const;
 
@@ -80,6 +82,10 @@ export const sizes = {
   timelineRowPaddingY: 10,
   successIcon: 80,
   successGlyph: 32,
+  // Splash / Carga (F1_01)
+  isotipo: 96,
+  progressTrack: 220,
+  progressFill: 120,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

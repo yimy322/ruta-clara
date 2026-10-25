@@ -28,6 +28,8 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 
 | Figma | Archivo | URL | Tipo |
 |---|---|---|---|
+| F1_01 · Splash / Carga | components/PantallaCarga.tsx | — | No es ruta: la muestra _layout mientras cargan fuentes y preferencias (mín. 1,5 s) |
+| — Onboarding (provisional) | onboarding.tsx | /onboarding | Stack, solo accesible si no se vio el onboarding |
 | F1_04 · Inicio — Principal | (tabs)/index.tsx | / | Tab |
 | F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
 | F2_01 · Panel de reporte rápido | reporte.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía) |
@@ -42,6 +44,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | — Catálogo de componentes (dev) | dev/catalogo.tsx | /dev/catalogo | Stack |
 | — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
+Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext). Toda ruta nueva debe declararse dentro del grupo protegido.
 Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
 Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez para regenerar `.expo/types/router.d.ts`.
@@ -51,6 +54,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Datos de prueba en /src/mocks (sacados del prototipo de Figma; lo que no está en Figma va marcado `// supuesto`).
 - Acceso a datos solo por /src/data/repositorio.ts: funciones async con retraso simulado de 300–600 ms. En la Fase 5 se reemplaza por Supabase sin cambiar las firmas.
 - **Regla: las pantallas y componentes importan de `@/data/repositorio`, nunca de `@/mocks`.** Única excepción: `dev/catalogo.tsx` con `mocks/catalog.ts`.
+- Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 
 ## Reglas de trabajo
