@@ -1,4 +1,5 @@
 export { BottomNav, type BottomNavTab } from "./BottomNav";
+export { BannerUbicacion } from "./BannerUbicacion";
 export { Button, type ButtonVariant } from "./Button";
 export { CardParadero, type DatosCardParadero } from "./CardParadero";
 export { CardRuta } from "./CardRuta";
@@ -8,6 +9,7 @@ export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
 export { Mapa } from "./Mapa";
+export { Paginador } from "./Paginador";
 export { PantallaCarga } from "./PantallaCarga";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Segmented } from "./Segmented";

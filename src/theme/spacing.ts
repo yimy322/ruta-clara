@@ -17,6 +17,8 @@ export const radii = {
   lg: 14,
   xl: 20,
   xxl: 24,
+  // Ilustraciones del onboarding (F1_02–F1_03)
+  art: 16,
   pill: 999,
 } as const;
 
@@ -86,6 +88,13 @@ export const sizes = {
   isotipo: 96,
   progressTrack: 220,
   progressFill: 120,
+  // Onboarding (F1_02–F1_03)
+  onboardingArt: 260,
+  onboardingArtCompact: 240,
+  dot: 6,
+  dotActive: 24,
+  dotGap: 6,
+  prePermisoIcon: 32,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

@@ -36,7 +36,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "RutaClara usa tu ubicación para mostrarte paraderos y combis cerca."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

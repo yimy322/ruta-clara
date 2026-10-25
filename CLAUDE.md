@@ -29,7 +29,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | Figma | Archivo | URL | Tipo |
 |---|---|---|---|
 | F1_01 · Splash / Carga | components/PantallaCarga.tsx | — | No es ruta: la muestra _layout mientras cargan fuentes y preferencias (mín. 1,5 s) |
-| — Onboarding (provisional) | onboarding.tsx | /onboarding | Stack, solo accesible si no se vio el onboarding |
+| F1_02–F1_03 · Onboarding | onboarding.tsx | /onboarding | Stack, solo accesible si no se vio el onboarding |
 | F1_04 · Inicio — Principal | (tabs)/index.tsx | / | Tab |
 | F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
 | F2_01 · Panel de reporte rápido | reporte.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía) |
@@ -55,6 +55,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Acceso a datos solo por /src/data/repositorio.ts: funciones async con retraso simulado de 300–600 ms. En la Fase 5 se reemplaza por Supabase sin cambiar las firmas.
 - **Regla: las pantallas y componentes importan de `@/data/repositorio`, nunca de `@/mocks`.** Única excepción: `dev/catalogo.tsx` con `mocks/catalog.ts`.
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
+- Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 
 ## Reglas de trabajo

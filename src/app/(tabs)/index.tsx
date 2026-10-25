@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, CardParadero, Chip, IconButton, Mapa, type DatosCardParadero } from "@/components";
+import { BannerUbicacion, Button, CardParadero, Chip, IconButton, Mapa, type DatosCardParadero } from "@/components";
 import {
   getLugaresGuardados,
   getParaderoCercano,
@@ -24,6 +24,7 @@ import {
   getUbicacionUsuario,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
+import { usePermisoUbicacion } from "@/hooks/usePermisoUbicacion";
 import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, LugarGuardado, Paradero, UnidadEnVivo } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
@@ -38,6 +39,7 @@ const ICONO_LUGAR: Record<LugarGuardado["nombre"], LucideIcon> = {
 export default function Inicio() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const permiso = usePermisoUbicacion();
 
   const [usuario, setUsuario] = useState<Coordenada>();
   const [paraderos, setParaderos] = useState<Paradero[]>([]);
@@ -168,6 +170,9 @@ export default function Inicio() {
               <Button label="Reportar" variant="danger" pill icon={<Plus />} onPress={() => router.push("/reporte")} />
             </View>
           </View>
+          {!permiso.concedido && (
+            <BannerUbicacion puedePedir={permiso.puedePedir} onPress={permiso.activar} />
+          )}
           {cercano !== null && (
             <CardParadero
               datos={cercano ?? null}
