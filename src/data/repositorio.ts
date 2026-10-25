@@ -2,6 +2,7 @@
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
+import { lineasFavoritas } from "@/mocks/favoritos";
 import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { paraderos } from "@/mocks/paraderos";
@@ -16,6 +17,7 @@ import type {
   Paradero,
   Reporte,
   ResumenParadero,
+  Sentido,
   UnidadEnVivo,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
@@ -52,6 +54,37 @@ export async function getLinea(id: string): Promise<Linea | null> {
 export async function getParadero(id: string): Promise<Paradero | null> {
   await esperar();
   return paraderos.find((paradero) => paradero.id === id) ?? null;
+}
+
+// Paraderos de la línea en orden de recorrido para el sentido indicado.
+export async function getRecorrido(lineaId: string, sentido: Sentido): Promise<Paradero[]> {
+  await esperar();
+  const linea = lineas.find((l) => l.id === lineaId);
+  if (!linea) {
+    return [];
+  }
+  const ids = sentido === "ida" ? linea.recorridoIda : linea.recorridoVuelta;
+  return ids.flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
+}
+
+// Favoritas en memoria: duran mientras la app está abierta.
+// Fase 5: se guardan por usuario en Supabase.
+const favoritas = new Set(lineasFavoritas);
+
+export async function esFavorita(lineaId: string): Promise<boolean> {
+  await esperar();
+  return favoritas.has(lineaId);
+}
+
+// Marca o desmarca la línea y devuelve el estado nuevo (true = favorita).
+export async function alternarFavorita(lineaId: string): Promise<boolean> {
+  await esperar();
+  if (favoritas.has(lineaId)) {
+    favoritas.delete(lineaId);
+    return false;
+  }
+  favoritas.add(lineaId);
+  return true;
 }
 
 export async function getParaderoCercano(lat: number, lng: number): Promise<Paradero | null> {

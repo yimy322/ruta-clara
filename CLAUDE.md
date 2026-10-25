@@ -35,14 +35,14 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
 | F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
-| F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/La50 | Stack |
+| F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/la-50 | Stack |
 | F1_08 · Monitoreo en vivo | viaje/espera.tsx | /viaje/espera | Stack |
 | F1_09 · En tránsito (a bordo) | viaje/a-bordo.tsx | /viaje/a-bordo | Stack |
 | F1_10 · Finalización del viaje | viaje/fin.tsx | /viaje/fin | Modal fullScreenModal |
 | — Catálogo de componentes (dev) | dev/catalogo.tsx | /dev/catalogo | Stack |
 | — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
-Camino feliz: Inicio → buscar → rutas → ruta/La50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
+Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
 Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez para regenerar `.expo/types/router.d.ts`.
 

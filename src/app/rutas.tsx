@@ -109,7 +109,7 @@ export default function Rutas() {
         key={opcion.linea.id}
         opcion={opcion}
         recomendada={opcion.linea.id === recomendadaId}
-        onPress={() => router.push({ pathname: "/ruta/[id]", params: { id: opcion.linea.id } })}
+        onPress={() => router.push({ pathname: "/ruta/[id]", params: { id: opcion.linea.id, destino } })}
       />
     ));
   };

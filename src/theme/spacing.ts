@@ -10,6 +10,7 @@ export const spacing = {
 } as const;
 
 export const radii = {
+  xs: 4,
   sm: 6,
   md: 10,
   lg: 14,
@@ -59,6 +60,16 @@ export const sizes = {
   mapUser: 16,
   mapUserHalo: 36,
   mapRoad: 10,
+  // Detalle de ruta (F1_07)
+  segmentedHeight: 40,
+  segmentedRadius: 12,
+  routeMap: 140,
+  mapRoute: 3,
+  mapLabelPaddingX: 6,
+  mapLabelPaddingY: 3,
+  statPadding: 10,
+  chartHeight: 44,
+  chartBarMax: 40,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

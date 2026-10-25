@@ -14,11 +14,13 @@ type HeaderProps = {
   subtitle?: string;
   onBack?: () => void;
   right?: ReactNode;
+  // Título en H2, para pantallas de detalle (F1_07)
+  large?: boolean;
 };
 
 // Header con botón atrás. Va en la parte superior de la pantalla y respeta
 // el borde seguro del celular (notch / barra de estado).
-export function Header({ title, eyebrow, subtitle, onBack, right }: HeaderProps) {
+export function Header({ title, eyebrow, subtitle, onBack, right, large = false }: HeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -39,7 +41,7 @@ export function Header({ title, eyebrow, subtitle, onBack, right }: HeaderProps)
             {eyebrow}
           </Text>
         )}
-        <Text style={[typography.title, styles.ink]} numberOfLines={1} accessibilityRole="header">
+        <Text style={[large ? typography.h2 : typography.title, styles.ink]} numberOfLines={1} accessibilityRole="header">
           {title}
         </Text>
         {subtitle != null && (

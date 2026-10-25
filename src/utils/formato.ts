@@ -1,5 +1,5 @@
 // Formato de textos de la interfaz.
-import type { NivelTrafico, Ocupacion, TipoUnidad } from "@/types";
+import type { NivelTrafico, Ocupacion, Sentido, TipoUnidad } from "@/types";
 
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
@@ -22,12 +22,19 @@ export function haceMinutos(minutos: number) {
 // 8 → "8 min"; si es estimado, 20 → "~20 min"
 export const formatearEta = (minutos: number, estimado = false) => `${estimado ? "~" : ""}${minutos} min`;
 
-// 183 → "180 m"; 1400 → "1.4 km"
+// 183 → "180 m"; 4321 → "4,3 km" (coma decimal, como se escribe en Perú)
 export function formatearDistancia(metros: number) {
-  if (metros < 1000) {
-    return `${Math.round(metros / 10) * 10} m`;
+  const redondeado = Math.round(metros / 10) * 10;
+  if (redondeado < 1000) {
+    return `${redondeado} m`;
   }
-  return `${(metros / 1000).toFixed(1)} km`;
+  return `${(metros / 1000).toFixed(1).replace(".", ",")} km`;
+}
+
+// ("Ate – Surco", "vuelta") → "Recorrido Surco → Ate"
+export function textoRecorrido(tramo: string, sentido: Sentido) {
+  const extremos = tramo.split(" – ");
+  return `Recorrido ${(sentido === "ida" ? extremos : [...extremos].reverse()).join(" → ")}`;
 }
 
 const OCUPACION: Record<Ocupacion, string> = {

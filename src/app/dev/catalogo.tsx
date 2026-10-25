@@ -10,8 +10,10 @@ import {
   Header,
   IconButton,
   ListItem,
+  Segmented,
   Tile,
   Toggle,
+  useToast,
   type BottomNavTab,
 } from "@/components";
 import { catalogHeader, catalogRoutes } from "@/mocks/catalog";
@@ -25,6 +27,8 @@ export default function Catalogo() {
   const [alertsOn, setAlertsOn] = useState(true);
   const [shareOn, setShareOn] = useState(false);
   const [tab, setTab] = useState<BottomNavTab>("inicio");
+  const [sentido, setSentido] = useState<"ida" | "vuelta">("ida");
+  const { mostrar } = useToast();
 
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
@@ -125,6 +129,21 @@ export default function Catalogo() {
               right={<IconButton icon={<Star />} onPress={noop} accessibilityLabel="Agregar a favoritos" />}
             />
           </View>
+        </Section>
+
+        <Section title="Segmented">
+          <Segmented
+            opciones={[
+              { valor: "ida", label: "Ida" },
+              { valor: "vuelta", label: "Vuelta" },
+            ]}
+            valor={sentido}
+            onChange={setSentido}
+          />
+        </Section>
+
+        <Section title="Toast">
+          <Button label="Mostrar toast" variant="secondary" onPress={() => mostrar("Guardado en Favoritos")} />
         </Section>
 
         <Section title="Bottom Nav">

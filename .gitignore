@@ -1,43 +1,58 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# ── Dependencias ──────────────────────────────
 node_modules/
 
-# Expo
+# ── Expo ──────────────────────────────────────
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+app-example/
 
-# Native
-.kotlin/
-*.orig.*
+# Carpetas nativas generadas (Expo las crea con "npx expo prebuild")
+/ios
+/android
+
+# ── Metro (bundler) ───────────────────────────
+.metro-health-check*
+
+# ── Credenciales y firmas (nunca subir) ───────
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
+*.pem
 *.mobileprovision
+google-services.json
+GoogleService-Info.plist
 
-# Metro
-.metro-health-check*
+# ── Variables de entorno ──────────────────────
+# Se suben solo las plantillas (.env.example)
+.env
+.env.*
+!.env.example
 
-# debug
+# ── TypeScript ────────────────────────────────
+*.tsbuildinfo
+
+# ── Logs y depuración ─────────────────────────
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
+coverage/
 
-# macOS
+# ── Claude Code ───────────────────────────────
+.claude/settings.local.json
+
+# ── Editores y sistema operativo ──────────────
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
 .DS_Store
-*.pem
+Thumbs.db
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-example
-
-# generated native folders
-/ios
-/android
+# ── Varios ────────────────────────────────────
+*.orig.*
+.kotlin/

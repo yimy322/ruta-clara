@@ -99,3 +99,21 @@ export type ResumenParadero = {
   ultimoReporte: string | null;
   ocupacion?: Ocupacion;
 };
+
+export type Sentido = "ida" | "vuelta";
+
+export type EstadoViaje = "esperando" | "a_bordo" | "finalizado";
+
+// Viaje activo del usuario (F1_08–F1_10)
+export type Viaje = {
+  linea: Linea;
+  sentido: Sentido;
+  paraderoEspera: Paradero;
+  destino: string;
+  estado: EstadoViaje;
+  // Fecha ISO
+  inicioEn: string;
+  // Índice en el recorrido del sentido elegido
+  paraderoActual: number;
+  avisarParaBajar: boolean;
+};

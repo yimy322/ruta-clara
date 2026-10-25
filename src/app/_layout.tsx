@@ -10,6 +10,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { ToastProvider } from "@/components";
+import { ViajeProvider } from "@/context/ViajeContext";
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,13 +35,15 @@ export default function RootLayout() {
 
   // Sin header nativo: cada pantalla usa nuestro componente Header.
   return (
-    <>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="viaje/fin" options={{ presentation: "fullScreenModal" }} />
-        <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
-      </Stack>
-    </>
+    <ViajeProvider>
+      <ToastProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="viaje/fin" options={{ presentation: "fullScreenModal" }} />
+          <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
+        </Stack>
+      </ToastProvider>
+    </ViajeProvider>
   );
 }

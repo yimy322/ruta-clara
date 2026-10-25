@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { StyleSheet, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
-import { borderWidths, colors, radii, sizes, spacing } from "@/theme";
+import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, Linea, Paradero } from "@/types";
 
 import { Chip } from "./Chip";
@@ -16,6 +16,10 @@ type MapaProps = {
   usuario?: Coordenada;
   paraderos?: Paradero[];
   unidades?: UnidadMapa[];
+  // Une los paraderos en el orden recibido con una línea (recorrido de la ruta)
+  recorrido?: boolean;
+  // Rótulo en la esquina superior izquierda (p. ej. "Recorrido Ate → Surco")
+  etiqueta?: string;
   // Espacio tapado por controles flotantes: los puntos se acomodan fuera de él
   margen?: Insets;
   estilo?: StyleProp<ViewStyle>;
@@ -35,7 +39,15 @@ const CALLES_VERTICALES = [0.33, 0.72];
 // Mapa PROVISIONAL que imita los wireframes: fondo plano, calles fijas y los
 // puntos ubicados con una proyección simple que encuadra todo lo recibido.
 // Fase 6: se reemplaza por un mapa real con las mismas props.
-export function Mapa({ usuario, paraderos = [], unidades = [], margen, estilo }: MapaProps) {
+export function Mapa({
+  usuario,
+  paraderos = [],
+  unidades = [],
+  recorrido = false,
+  etiqueta,
+  margen,
+  estilo,
+}: MapaProps) {
   const [tamano, setTamano] = useState({ ancho: 0, alto: 0 });
 
   const handleLayout = (e: LayoutChangeEvent) => {
@@ -54,6 +66,12 @@ export function Mapa({ usuario, paraderos = [], unidades = [], margen, estilo }:
       {CALLES_VERTICALES.map((x) => (
         <View key={`v${x}`} style={[styles.calle, styles.calleVertical, { left: `${x * 100}%` }]} />
       ))}
+
+      {proyectar &&
+        recorrido &&
+        paraderos.slice(1).map((paradero, i) => (
+          <View key={`r${paraderos[i].id}`} style={[styles.tramo, estiloTramo(proyectar(paraderos[i]), proyectar(paradero))]} />
+        ))}
 
       {proyectar &&
         paraderos.map((paradero) => (
@@ -78,8 +96,31 @@ export function Mapa({ usuario, paraderos = [], unidades = [], margen, estilo }:
             <Chip label={unidad.linea.nombre} state="live" />
           </View>
         ))}
+
+      {etiqueta != null && (
+        <View style={styles.etiqueta}>
+          <Text style={[typography.overline, styles.etiquetaTexto]} numberOfLines={1}>
+            {etiqueta}
+          </Text>
+        </View>
+      )}
     </View>
   );
+}
+
+type Punto = { left: number; top: number };
+
+// Segmento recto entre dos puntos: una barra centrada en el punto medio,
+// del largo de la distancia y girada según el ángulo entre ambos
+function estiloTramo(a: Punto, b: Punto): ViewStyle {
+  const dx = b.left - a.left;
+  const dy = b.top - a.top;
+  return {
+    left: (a.left + b.left) / 2,
+    top: (a.top + b.top) / 2,
+    width: Math.hypot(dx, dy),
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }, { rotate: `${Math.atan2(dy, dx)}rad` }],
+  };
 }
 
 // Devuelve una función lat/lng → posición (left/top) dentro del recuadro, o
@@ -178,5 +219,25 @@ const styles = StyleSheet.create({
   },
   unidad: {
     alignItems: "center",
+  },
+  tramo: {
+    position: "absolute",
+    height: sizes.mapRoute,
+    borderRadius: radii.pill,
+    backgroundColor: colors.ink,
+  },
+  etiqueta: {
+    position: "absolute",
+    top: spacing.sm,
+    left: spacing.sm,
+    paddingHorizontal: sizes.mapLabelPaddingX,
+    paddingVertical: sizes.mapLabelPaddingY,
+    borderRadius: radii.xs,
+    borderWidth: borderWidths.thin,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+  },
+  etiquetaTexto: {
+    color: colors.inkMuted,
   },
 });
