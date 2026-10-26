@@ -95,6 +95,15 @@ export const sizes = {
   dotActive: 24,
   dotGap: 6,
   prePermisoIcon: 32,
+  // Reporte de ubicación (F2_04, F2_08)
+  stepPillPaddingY: 6,
+  stepPillRadius: 12,
+  pinHalo: 96,
+  pinStem: 22,
+  pinStemWidth: 2,
+  successHalo: 128,
+  successIconLarge: 100,
+  successGlyphLarge: 40,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

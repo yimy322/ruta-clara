@@ -13,3 +13,6 @@ export const INTERVALO_PARADERO_MS = 4000;
 // Calle donde está el usuario (F1_05, F2_01). Fase 6: dirección real a partir
 // de la ubicación del celular.
 export const CALLE_USUARIO = "Av. Javier Prado";
+
+// Precisión del GPS al confirmar un reporte (F2_04). Fase 6: sale del celular.
+export const PRECISION_GPS_M = 15; // supuesto

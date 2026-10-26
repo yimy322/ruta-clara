@@ -1,11 +1,12 @@
 import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { Angry, Check, Frown, Laugh, Meh, Smile, X, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, Chip, IconButton, Tile, useToast } from "@/components";
+import { Button, Chip, IconButton, Tile } from "@/components";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
+import { crearReporte } from "@/data/repositorio";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import { formatearEta, formatearHora, formatearPasaje } from "@/utils/formato";
 
@@ -22,11 +23,11 @@ const ETIQUETAS = ["Llegó rápido", "Lleno", "Conductor prudente", "Cobrador am
 // F1_10 · Finalización del viaje
 export default function FinViaje() {
   const router = useRouter();
-  const { mostrar } = useToast();
   const { viaje, limpiar } = useViaje();
 
   const [valoracion, setValoracion] = useState<number>();
   const [etiquetas, setEtiquetas] = useState<string[]>([]);
+  const [enviando, setEnviando] = useState(false);
 
   // Cierra el modal y todo el stack del viaje, vuelve a Inicio y recién
   // entonces borra el viaje (así las pantallas de abajo no redirigen solas).
@@ -63,10 +64,35 @@ export default function FinViaje() {
       actuales.includes(etiqueta) ? actuales.filter((e) => e !== etiqueta) : [...actuales, etiqueta],
     );
 
-  const enviar = () => {
-    // TODO F2_08: guardar la valoración y sumar los puntos al perfil (Fase 4)
-    mostrar("¡Gracias! Ganaste 5 pts");
-    cerrar();
+  // Al terminar se cierra el viaje y se abre F2_08 sobre Inicio
+  const enviar = async () => {
+    setEnviando(true);
+    try {
+      const resultado = await crearReporte({
+        tipo: "valoracion",
+        modo: "ubicacion",
+        lineaId: viaje.linea.id,
+        valoracion,
+        etiquetas,
+        compartirEnVivo: false,
+      });
+      cerrar();
+      router.push({
+        pathname: "/reporte/gracias",
+        params: {
+          puntos: resultado.puntosGanados,
+          total: resultado.usuario.puntos,
+          personas: resultado.personasQueLoVen,
+        },
+      });
+    } catch {
+      Alert.alert("No se pudo enviar", "Revisa tu conexión e inténtalo otra vez.", [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Reintentar", onPress: enviar },
+      ]);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -132,7 +158,12 @@ export default function FinViaje() {
       </ScrollView>
 
       <View style={styles.pie}>
-        <Button label="Enviar valoración · +5 pts" onPress={enviar} disabled={valoracion === undefined} fullWidth />
+        <Button
+          label={enviando ? "Enviando…" : "Enviar valoración · +5 pts"}
+          onPress={enviar}
+          disabled={valoracion === undefined || enviando}
+          fullWidth
+        />
         <Button label="Cerrar" variant="secondary" onPress={cerrar} fullWidth />
       </View>
     </SafeAreaView>

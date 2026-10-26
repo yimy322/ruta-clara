@@ -38,6 +38,9 @@ export function formatearHora(fechaISO: string) {
   return `${horas % 12 || 12}:${minutos} ${horas < 12 ? "AM" : "PM"}`;
 }
 
+// 1240 → "1,240"
+export const formatearPuntos = (puntos: number) => puntos.toLocaleString("es-PE");
+
 // 8 → "8 min"; si es estimado, 20 → "~20 min"
 export const formatearEta = (minutos: number, estimado = false) => `${estimado ? "~" : ""}${minutos} min`;
 

@@ -46,6 +46,9 @@ export type Reporte = {
   ocupacion?: Ocupacion;
   velocidad?: Velocidad;
   nota?: string;
+  // 1–5, solo en valoraciones (F1_10)
+  valoracion?: number;
+  etiquetas?: string[];
   // Fecha ISO
   creadoEn: string;
   confirmaciones: number;
@@ -182,6 +185,9 @@ export type BorradorReporte = {
   // Punto marcado en el mapa; si falta, se usa la ubicación del usuario
   posicion?: Coordenada;
   compartirEnVivo: boolean;
+  // Valoración del viaje (F1_10)
+  valoracion?: number;
+  etiquetas?: string[];
 };
 
 // Línea para elegir al reportar (F2_02)

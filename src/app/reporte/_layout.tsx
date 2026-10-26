@@ -12,7 +12,10 @@ export default function ReporteLayout() {
 
   return (
     <ReporteProvider onCerrar={cerrar}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* El reporte ya se envió: no se vuelve atrás con el gesto */}
+        <Stack.Screen name="gracias" options={{ gestureEnabled: false }} />
+      </Stack>
     </ReporteProvider>
   );
 }

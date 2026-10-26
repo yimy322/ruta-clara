@@ -385,6 +385,8 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     lng,
     ocupacion: borrador.ocupacion,
     velocidad: borrador.velocidad,
+    valoracion: borrador.valoracion,
+    etiquetas: borrador.etiquetas,
     creadoEn: new Date().toISOString(),
     confirmaciones: 1,
   };

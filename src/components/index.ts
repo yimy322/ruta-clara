@@ -11,6 +11,7 @@ export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
 export { Mapa } from "./Mapa";
 export { Paginador } from "./Paginador";
+export { PinUnidad } from "./PinUnidad";
 export { PantallaCarga } from "./PantallaCarga";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Segmented } from "./Segmented";

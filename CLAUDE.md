@@ -34,10 +34,12 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
 | F2_01 · Panel de reporte rápido | reporte/index.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía). reporte/_layout.tsx: Stack sin header + ReporteProvider |
 | F2_02 · Ubicación de unidad — Línea | reporte/linea.tsx | /reporte/linea | Paso del modal |
-| F2_03 · Estado del carro | reporte/estado.tsx | /reporte/estado | Paso del modal (provisional) |
+| F2_03 · Estado del carro | reporte/estado.tsx | /reporte/estado | Paso del modal |
+| F2_04 · Confirmar ubicación | reporte/ubicacion.tsx | /reporte/ubicacion | Paso del modal |
 | F2_05 · Espera en paradero | reporte/paradero.tsx | /reporte/paradero | Paso del modal (provisional) |
 | F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
 | F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal (provisional) |
+| F2_08 · Confirmación y agradecimiento | reporte/gracias.tsx | /reporte/gracias | Paso del modal, sin gesto atrás. Recibe `puntos`, `total`, `personas` por params (también se abre desde F1_10) |
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
