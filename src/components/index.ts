@@ -1,5 +1,6 @@
 export { BottomNav, type BottomNavTab } from "./BottomNav";
 export { BannerUbicacion } from "./BannerUbicacion";
+export { BarraProgreso } from "./BarraProgreso";
 export { Button, type ButtonVariant } from "./Button";
 export { CardParadero, type DatosCardParadero } from "./CardParadero";
 export { CardRuta } from "./CardRuta";

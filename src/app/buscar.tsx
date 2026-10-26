@@ -13,6 +13,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, View } from
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Chip, IconButton, ListItem } from "@/components";
+import { CALLE_USUARIO } from "@/config/simulacion";
 import { buscarDestinos, getDestinosComunes, getDestinosRecientes, getLugaresGuardados } from "@/data/repositorio";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Destino, LugarGuardado } from "@/types";
@@ -25,8 +26,6 @@ const ICONO_LUGAR: Record<LugarGuardado["nombre"], LucideIcon> = {
 };
 
 const ORIGEN = "Mi ubicación";
-// Fase 6: dirección real a partir de la ubicación del celular
-const DIRECCION_ORIGEN = "Av. Javier Prado";
 const DEBOUNCE_MS = 250;
 
 type Resultado = {
@@ -131,7 +130,7 @@ export default function Buscar() {
           <View style={[styles.campo, styles.campoOrigen]} accessibilityLabel={`Origen: ${ORIGEN}`}>
             <View style={[styles.punto, styles.puntoOrigen]} />
             <Text style={[typography.caption, styles.ink]} numberOfLines={1}>
-              {ORIGEN} · {DIRECCION_ORIGEN}
+              {ORIGEN} · {CALLE_USUARIO}
             </Text>
           </View>
           <View style={[styles.campo, styles.campoDestino]}>

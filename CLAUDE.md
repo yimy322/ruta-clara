@@ -32,7 +32,12 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F1_02–F1_03 · Onboarding | onboarding.tsx | /onboarding | Stack, solo accesible si no se vio el onboarding |
 | F1_04 · Inicio — Principal | (tabs)/index.tsx | / | Tab |
 | F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
-| F2_01 · Panel de reporte rápido | reporte.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía) |
+| F2_01 · Panel de reporte rápido | reporte/index.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía). reporte/_layout.tsx: Stack sin header + ReporteProvider |
+| F2_02 · Ubicación de unidad — Línea | reporte/linea.tsx | /reporte/linea | Paso del modal |
+| F2_03 · Estado del carro | reporte/estado.tsx | /reporte/estado | Paso del modal (provisional) |
+| F2_05 · Espera en paradero | reporte/paradero.tsx | /reporte/paradero | Paso del modal (provisional) |
+| F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
+| F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal (provisional) |
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
@@ -45,6 +50,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
 Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext). Toda ruta nueva debe declararse dentro del grupo protegido.
+Cerrar el modal de reporte desde cualquier paso: `cerrar()` de `useReporte()` (`router.dismissAll()` solo vuelve al primer paso del stack anidado).
 Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
 Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez para regenerar `.expo/types/router.d.ts`.

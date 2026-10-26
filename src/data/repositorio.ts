@@ -1,5 +1,6 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
+import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
@@ -8,20 +9,24 @@ import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
-import { ubicacionUsuario } from "@/mocks/usuario";
+import { ubicacionUsuario, usuario } from "@/mocks/usuario";
 import type {
+  BorradorReporte,
   Coordenada,
   Destino,
   Linea,
+  LineaSugerida,
   LugarGuardado,
   OpcionRuta,
   Paradero,
   ParaderoTramo,
   Reporte,
+  ResultadoReporte,
   ResumenParadero,
   Sentido,
   UnidadEnCamino,
   UnidadEnVivo,
+  Usuario,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
@@ -93,8 +98,7 @@ export async function alternarFavorita(lineaId: string): Promise<boolean> {
   return true;
 }
 
-export async function getParaderoCercano(lat: number, lng: number): Promise<Paradero | null> {
-  await esperar();
+function paraderoMasCercano(lat: number, lng: number): Paradero | null {
   let cercano: Paradero | null = null;
   let menor = Infinity;
   for (const paradero of paraderos) {
@@ -105,6 +109,11 @@ export async function getParaderoCercano(lat: number, lng: number): Promise<Para
     }
   }
   return cercano;
+}
+
+export async function getParaderoCercano(lat: number, lng: number): Promise<Paradero | null> {
+  await esperar();
+  return paraderoMasCercano(lat, lng);
 }
 
 export async function buscarDestinos(texto: string): Promise<Destino[]> {
@@ -303,4 +312,96 @@ export async function getTramoViaje(
     }
     return { paradero, minutos: Math.round(minutosEnRecorrer(metros)) };
   });
+}
+
+// Usuario en memoria: los puntos ganados duran mientras la app está abierta.
+// Fase 5: sale del perfil del usuario autenticado en Supabase.
+let usuarioActual: Usuario = { ...usuario };
+
+export async function getUsuario(): Promise<Usuario> {
+  await esperar();
+  return usuarioActual;
+}
+
+const esDeHoy = (fechaISO: string) => new Date(fechaISO).toDateString() === new Date().toDateString();
+
+// Distancia al paradero más cercano del recorrido y reportes de hoy de la línea
+function sugerir(linea: Linea, lat: number, lng: number): LineaSugerida {
+  const distancias = linea.recorridoIda.flatMap((id) => {
+    const paradero = paraderos.find((p) => p.id === id);
+    return paradero ? [distanciaMetros(lat, lng, paradero.lat, paradero.lng)] : [];
+  });
+  const reportesHoy = reportes
+    .filter((reporte) => reporte.lineaId === linea.id && esDeHoy(reporte.creadoEn))
+    .reduce((total, reporte) => total + reporte.confirmaciones, 0);
+  return { linea, distanciaM: Math.min(...distancias), reportesHoy };
+}
+
+// Primero las líneas que pasan cerca, de la más activa hoy a la menos; luego
+// el resto, de la más cercana a la más lejana.
+export async function getLineasSugeridas(lat: number, lng: number): Promise<LineaSugerida[]> {
+  await esperar();
+  const cerca = (s: LineaSugerida) => s.distanciaM <= RADIO_CERCANO_M;
+  return lineas
+    .map((linea) => sugerir(linea, lat, lng))
+    .sort((a, b) => {
+      if (cerca(a) !== cerca(b)) {
+        return cerca(a) ? -1 : 1;
+      }
+      if (cerca(a) && a.reportesHoy !== b.reportesHoy) {
+        return b.reportesHoy - a.reportesHoy;
+      }
+      return a.distanciaM - b.distanciaM;
+    });
+}
+
+// Por código, nombre o empresa, sin importar tildes ni mayúsculas.
+export async function buscarLineas(texto: string): Promise<LineaSugerida[]> {
+  await esperar();
+  const consulta = normalizar(texto);
+  return lineas
+    .filter((linea) => [linea.codigo, linea.nombre, linea.empresa].some((campo) => normalizar(campo).includes(consulta)))
+    .map((linea) => sugerir(linea, ubicacionUsuario.lat, ubicacionUsuario.lng));
+}
+
+// Tipos de reporte que se asocian al paradero más cercano
+const TIPOS_EN_PARADERO: Reporte["tipo"][] = ["paradero", "seguridad"];
+
+// Guarda el reporte en memoria y suma los puntos al usuario.
+export async function crearReporte(borrador: BorradorReporte): Promise<ResultadoReporte> {
+  await esperar();
+  const { tipo } = borrador;
+  if (!tipo) {
+    throw new Error("El reporte no tiene tipo");
+  }
+  const { lat, lng } = borrador.posicion ?? ubicacionUsuario;
+
+  const reporte: Reporte = {
+    id: `r${Date.now()}`,
+    tipo,
+    lineaId: borrador.lineaId,
+    paraderoId: TIPOS_EN_PARADERO.includes(tipo) ? paraderoMasCercano(lat, lng)?.id : undefined,
+    lat,
+    lng,
+    ocupacion: borrador.ocupacion,
+    velocidad: borrador.velocidad,
+    creadoEn: new Date().toISOString(),
+    confirmaciones: 1,
+  };
+  reportes.push(reporte);
+
+  const puntosGanados = PUNTOS_POR_TIPO[tipo];
+  usuarioActual = {
+    ...usuarioActual,
+    puntos: usuarioActual.puntos + puntosGanados,
+    reportesMes: usuarioActual.reportesMes + 1,
+  };
+
+  return {
+    reporte,
+    puntosGanados,
+    usuario: usuarioActual,
+    // supuesto: hasta tener Realtime, un número creíble de pasajeros cerca
+    personasQueLoVen: 20 + Math.floor(Math.random() * 41),
+  };
 }

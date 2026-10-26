@@ -34,7 +34,7 @@ export type Linea = {
   afluencia: number[];
 };
 
-export type TipoReporte = "ubicacion" | "paradero" | "transito" | "seguridad" | "desvio";
+export type TipoReporte = "ubicacion" | "paradero" | "transito" | "seguridad" | "desvio" | "valoracion";
 
 export type Reporte = {
   id: string;
@@ -141,4 +141,62 @@ export type UnidadEnCamino = {
 export type ParaderoTramo = {
   paradero: Paradero;
   minutos: number;
+};
+
+export type Usuario = {
+  id: string;
+  nombre: string;
+  puntos: number;
+  reportesMes: number;
+  // 0–100: reportes del mes que otros pasajeros confirmaron
+  porcentajeConfirmados: number;
+};
+
+export type Rango = {
+  nombre: string;
+  puntosMinimos: number;
+};
+
+// Rango del usuario según sus puntos (F2_09)
+export type ProgresoRango = {
+  actual: Rango;
+  // null en el rango más alto
+  siguiente: Rango | null;
+  puntosFaltantes: number;
+};
+
+// Ubicación de una unidad o desvío de su ruta: comparten el paso de elegir línea
+export type ModoReporte = "ubicacion" | "desvio";
+
+// Dónde está quien reporta respecto a la unidad
+export type EnUnidad = "a_bordo" | "paradero";
+
+// Reporte en armado a lo largo de los pasos del Flujo 2 (F2_01–F2_08)
+export type BorradorReporte = {
+  tipo?: TipoReporte;
+  modo: ModoReporte;
+  lineaId?: string;
+  enUnidad?: EnUnidad;
+  ocupacion?: Ocupacion;
+  velocidad?: Velocidad;
+  // Punto marcado en el mapa; si falta, se usa la ubicación del usuario
+  posicion?: Coordenada;
+  compartirEnVivo: boolean;
+};
+
+// Línea para elegir al reportar (F2_02)
+export type LineaSugerida = {
+  linea: Linea;
+  // Distancia al paradero más cercano de su recorrido
+  distanciaM: number;
+  // Reportes de hoy sobre la línea, contando confirmaciones
+  reportesHoy: number;
+};
+
+export type ResultadoReporte = {
+  reporte: Reporte;
+  puntosGanados: number;
+  // Usuario con los puntos ya sumados
+  usuario: Usuario;
+  personasQueLoVen: number;
 };

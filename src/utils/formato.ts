@@ -1,5 +1,5 @@
 // Formato de textos de la interfaz.
-import type { NivelTrafico, Ocupacion, Sentido, TipoUnidad, Velocidad } from "@/types";
+import type { LineaSugerida, NivelTrafico, Ocupacion, Sentido, TipoUnidad, Velocidad } from "@/types";
 
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
@@ -92,6 +92,15 @@ export const etiquetaTipo = (tipo: TipoUnidad) => TIPO[tipo];
 export function textoReportes(reportesActivos: number, ultimoReporteMin: number | null) {
   const cantidad = `${reportesActivos} ${reportesActivos === 1 ? "reporte activo" : "reportes activos"}`;
   return ultimoReporteMin === null ? cantidad : `${cantidad} · último ${haceMinutos(ultimoReporteMin)}`;
+}
+
+// "Custer · Ate – Surco · 12 reportes hoy"; sin reportes, solo tipo y tramo
+export function textoLineaSugerida({ linea, reportesHoy }: LineaSugerida) {
+  const base = `${etiquetaTipo(linea.tipo)} · ${linea.tramo}`;
+  if (reportesHoy === 0) {
+    return base;
+  }
+  return `${base} · ${reportesHoy} ${reportesHoy === 1 ? "reporte" : "reportes"} hoy`;
 }
 
 // Minúsculas y sin tildes, igual que la búsqueda del repositorio
