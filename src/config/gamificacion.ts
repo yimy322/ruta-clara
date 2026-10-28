@@ -12,7 +12,7 @@ export const PUNTOS_POR_TIPO: Record<TipoReporte, number> = {
 
 // De menor a mayor
 export const RANGOS: Rango[] = [
-  { nombre: "Pasajero Junior", puntosMinimos: 0 },
-  { nombre: "Cazador de Combis", puntosMinimos: 1000 },
-  { nombre: "Rey del Paradero", puntosMinimos: 1500 },
+  { nombre: "Pasajero Junior", nombreCorto: "Pasajero Junior", puntosMinimos: 0 },
+  { nombre: "Cazador de Combis", nombreCorto: "Cazador", puntosMinimos: 1000 },
+  { nombre: "Rey del Paradero", nombreCorto: "Rey del Paradero", puntosMinimos: 1500 },
 ];

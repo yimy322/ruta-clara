@@ -5,8 +5,11 @@ import type {
   NivelCongestion,
   NivelTrafico,
   Ocupacion,
+  ReporteHistorial,
   Sentido,
   TiempoEspera,
+  TipoReporte,
+  TipoSeguridad,
   TipoUnidad,
   Velocidad,
   Via,
@@ -47,6 +50,22 @@ export function formatearHora(fechaISO: string) {
   const horas = fecha.getHours();
   const minutos = String(fecha.getMinutes()).padStart(2, "0");
   return `${horas % 12 || 12}:${minutos} ${horas < 12 ? "AM" : "PM"}`;
+}
+
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
+
+// Fecha ISO → "Hoy 7:16 AM", "Ayer 6:40 PM", "12 oct 6:40 PM"
+export function formatearDia(fechaISO: string) {
+  const fecha = new Date(fechaISO);
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  let dia = `${fecha.getDate()} ${MESES[fecha.getMonth()]}`;
+  if (fecha.toDateString() === new Date().toDateString()) {
+    dia = "Hoy";
+  } else if (fecha.toDateString() === ayer.toDateString()) {
+    dia = "Ayer";
+  }
+  return `${dia} ${formatearHora(fechaISO)}`;
 }
 
 // 1240 → "1,240"
@@ -129,6 +148,36 @@ const CAUSA: Record<CausaTransito, string> = {
 };
 
 export const etiquetaCausa = (causa: CausaTransito) => CAUSA[causa];
+
+const SEGURIDAD: Record<TipoSeguridad, string> = {
+  paradero_peligroso: "Paradero peligroso",
+  robo: "Robo en unidad",
+  acoso: "Acoso",
+  conductor_imprudente: "Conductor imprudente",
+};
+
+export const etiquetaSeguridad = (seguridad: TipoSeguridad) => SEGURIDAD[seguridad];
+
+const TIPO_REPORTE: Record<TipoReporte, string> = {
+  ubicacion: "Ubicación",
+  paradero: "Paradero",
+  transito: "Tránsito",
+  seguridad: "Seguridad",
+  desvio: "Desvío",
+  valoracion: "Valoración",
+};
+
+// "Ubicación · La 50", "Trancadera · Evitamiento", "Robo en unidad"
+export function tituloHistorial({ reporte, linea }: ReporteHistorial) {
+  let tipo = TIPO_REPORTE[reporte.tipo];
+  if (reporte.congestion) {
+    tipo = etiquetaCongestion(reporte.congestion);
+  } else if (reporte.seguridad) {
+    tipo = etiquetaSeguridad(reporte.seguridad);
+  }
+  const donde = linea?.nombre ?? reporte.via;
+  return donde ? `${tipo} · ${donde}` : tipo;
+}
 
 // "Vía Evitamiento · altura Ate"
 export const textoVia = (via: Via) => `${via.nombre} · ${via.referencia}`;

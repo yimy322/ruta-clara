@@ -116,6 +116,12 @@ export const sizes = {
   congestionPaddingX: 6,
   congestionPaddingY: 10,
   photoThumb: 72, // supuesto: Figma no muestra la miniatura
+  // Reporte de seguridad (F2_07)
+  optionHeightLarge: 56,
+  radio: 24,
+  radioDot: 10, // supuesto: Figma lo dibuja como imagen
+  // Perfil (F2_09)
+  avatar: 64,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

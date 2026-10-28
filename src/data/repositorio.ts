@@ -5,6 +5,7 @@ import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
 import { lineasFavoritas } from "@/mocks/favoritos";
+import { insignias } from "@/mocks/insignias";
 import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { paraderos } from "@/mocks/paraderos";
@@ -15,6 +16,7 @@ import type {
   BorradorReporte,
   Coordenada,
   Destino,
+  Insignia,
   Linea,
   LineaSugerida,
   LugarGuardado,
@@ -22,6 +24,7 @@ import type {
   Paradero,
   ParaderoTramo,
   Reporte,
+  ReporteHistorial,
   ResultadoReporte,
   ResumenParadero,
   Sentido,
@@ -401,6 +404,7 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
   const reporte: Reporte = {
     id: `r${Date.now()}`,
     tipo,
+    usuarioId: usuarioActual.id,
     lineaId: borrador.lineaId,
     paraderoId: TIPOS_EN_PARADERO.includes(tipo)
       ? (borrador.paraderoId ?? paraderoMasCercano(lat, lng)?.id)
@@ -415,6 +419,9 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     congestion: borrador.congestion,
     causas: borrador.causas,
     via: borrador.via,
+    seguridad: borrador.seguridad,
+    urgente: borrador.urgente,
+    anonimo: borrador.anonimo,
     nota: borrador.nota,
     // Fase 5: se sube a Supabase Storage y se guarda la URL
     fotoUri: borrador.fotoUri,
@@ -437,4 +444,33 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     // supuesto: hasta tener Realtime, un número creíble de pasajeros cerca
     personasQueLoVen: 20 + Math.floor(Math.random() * 41),
   };
+}
+
+// Reportes de seguridad de las últimas `horas`, del más reciente al más
+// antiguo (mapa de seguridad, F3_06). Los anónimos no dicen quién los envió.
+export async function getReportesSeguridad(horas: number): Promise<Reporte[]> {
+  await esperar();
+  return reportes
+    .filter((reporte) => reporte.tipo === "seguridad" && minutosDesde(reporte.creadoEn) <= horas * 60)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
+    .map((reporte) => (reporte.anonimo ? { ...reporte, usuarioId: undefined } : reporte));
+}
+
+// Reportes del usuario, del más reciente al más antiguo (F2_09).
+export async function getHistorialReportes(): Promise<ReporteHistorial[]> {
+  await esperar();
+  return reportes
+    .filter((reporte) => reporte.usuarioId === usuarioActual.id)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
+    .map((reporte) => ({
+      reporte,
+      linea: lineas.find((l) => l.id === reporte.lineaId),
+      puntos: PUNTOS_POR_TIPO[reporte.tipo],
+      vencido: minutosDesde(reporte.creadoEn) > VIGENCIA_REPORTE_MIN,
+    }));
+}
+
+export async function getInsignias(): Promise<Insignia[]> {
+  await esperar();
+  return insignias;
 }

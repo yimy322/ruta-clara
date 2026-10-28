@@ -38,10 +38,11 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_04 · Confirmar ubicación | reporte/ubicacion.tsx | /reporte/ubicacion | Paso del modal |
 | F2_05 · Espera en paradero | reporte/paradero.tsx | /reporte/paradero | Paso del modal (provisional) |
 | F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
-| F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal (provisional) |
+| F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal |
 | F2_08 · Confirmación y agradecimiento | reporte/gracias.tsx | /reporte/gracias | Paso del modal, sin gesto atrás. Recibe `puntos`, `total`, `personas` por params (también se abre desde F1_10) |
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
+| F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (provisional, desde ⚙ en Mi perfil) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
 | F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
 | F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/la-50 | Stack |

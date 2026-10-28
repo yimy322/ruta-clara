@@ -11,6 +11,8 @@ export const colors = {
   yellowSoft: "#FFF6D1",
   red: "#D9412E",
   redSoft: "#FDECEA",
+  // Relleno de ALERTA URGENTE mientras se mantiene presionado (F2_07) // supuesto
+  redDeep: "#A62F20",
   blue: "#2B78D9",
   blueHalo: "rgba(43, 120, 217, 0.22)",
   amber: "#F2A93B",

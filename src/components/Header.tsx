@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colors, opacity, spacing, typography } from "@/theme";
+import { borderWidths, colors, opacity, spacing, typography } from "@/theme";
 
 import { IconButton } from "./IconButton";
 
@@ -21,6 +21,8 @@ type HeaderProps = {
   // Vuelve presionable el título (p. ej. para editar la vía en F2_06)
   onPressTitle?: () => void;
   titleHint?: string;
+  // Fondo rojo suave y eyebrow en rojo (F2_07)
+  tono?: "seguridad";
 };
 
 // Header con botón atrás. Va en la parte superior de la pantalla y respeta
@@ -35,6 +37,7 @@ export function Header({
   leading,
   onPressTitle,
   titleHint,
+  tono,
 }: HeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -50,7 +53,7 @@ export function Header({
   const textos = (
     <>
       {eyebrow != null && (
-        <Text style={[typography.overline, styles.muted]} numberOfLines={1}>
+        <Text style={[typography.overline, tono === "seguridad" ? styles.red : styles.muted]} numberOfLines={1}>
           {eyebrow}
         </Text>
       )}
@@ -66,7 +69,7 @@ export function Header({
   );
 
   return (
-    <View style={[styles.base, { paddingTop: insets.top + spacing.sm }]}>
+    <View style={[styles.base, tono === "seguridad" && styles.seguridad, { paddingTop: insets.top + spacing.sm }]}>
       {leading ?? <IconButton icon={<ArrowLeft />} onPress={handleBack} accessibilityLabel="Volver" />}
       {onPressTitle ? (
         <Pressable
@@ -93,6 +96,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
+  seguridad: {
+    backgroundColor: colors.redSoft,
+    borderBottomWidth: borderWidths.regular,
+    borderBottomColor: colors.red,
+  },
   text: {
     flex: 1,
     gap: spacing.xxs,
@@ -105,5 +113,8 @@ const styles = StyleSheet.create({
   },
   muted: {
     color: colors.inkMuted,
+  },
+  red: {
+    color: colors.red,
   },
 });

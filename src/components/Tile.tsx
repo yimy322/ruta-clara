@@ -13,11 +13,13 @@ type TileProps = {
   onPress: () => void;
   // Ocupa el ancho disponible en vez de 104 pt, para repartirse una fila (F1_10)
   fill?: boolean;
+  // Gris pero presionable, p. ej. una insignia bloqueada (F2_09)
+  atenuado?: boolean;
 };
 
 // Tile de selección con icono (104 pt de ancho). Selected = estado activo
 // (amarillo), Danger = seguridad/urgencia (rojo).
-export function Tile({ label, icon, state = "default", onPress, fill = false }: TileProps) {
+export function Tile({ label, icon, state = "default", onPress, fill = false, atenuado = false }: TileProps) {
   const color = state === "danger" ? colors.red : colors.ink;
 
   return (
@@ -26,7 +28,13 @@ export function Tile({ label, icon, state = "default", onPress, fill = false }: 
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: state === "selected" }}
-      style={({ pressed }) => [styles.base, fill && styles.fill, containerStyles[state], pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.base,
+        fill && styles.fill,
+        containerStyles[state],
+        atenuado && styles.atenuado,
+        pressed && styles.pressed,
+      ]}
     >
       {icon != null && withIconDefaults(icon, { color, size: sizes.tileIcon })}
       <Text style={[typography.caption, styles.label, { color }]} numberOfLines={2}>
@@ -53,6 +61,9 @@ const styles = StyleSheet.create({
   },
   label: {
     textAlign: "center",
+  },
+  atenuado: {
+    opacity: opacity.disabled,
   },
   pressed: {
     opacity: opacity.pressed,

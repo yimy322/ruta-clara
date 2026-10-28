@@ -16,6 +16,9 @@ export type NivelCongestion = "fluido" | "moderado" | "pesado" | "trancadera";
 
 export type CausaTransito = "obras" | "choque" | "semaforo" | "marcha" | "fiscalizacion" | "inundacion";
 
+// Qué pasó, en un reporte de seguridad (F2_07)
+export type TipoSeguridad = "paradero_peligroso" | "robo" | "acoso" | "conductor_imprudente";
+
 // Vía (avenida, carretera) donde se reporta el tránsito; se muestra como
 // "Vía Evitamiento · altura Ate"
 export type Via = {
@@ -57,6 +60,9 @@ export type TipoReporte = "ubicacion" | "paradero" | "transito" | "seguridad" | 
 export type Reporte = {
   id: string;
   tipo: TipoReporte;
+  // Quién lo envió. Falta en los reportes de otros pasajeros y, al leerlos
+  // de otros, en los anónimos
+  usuarioId?: string;
   lineaId?: string;
   paraderoId?: string;
   lat: number;
@@ -73,6 +79,10 @@ export type Reporte = {
   congestion?: NivelCongestion;
   causas?: CausaTransito[];
   via?: string;
+  // Reporte de seguridad (F2_07). Urgente = se mantuvo presionado ALERTA URGENTE
+  seguridad?: TipoSeguridad;
+  urgente?: boolean;
+  anonimo?: boolean;
   // URI local de la foto. Fase 5: URL en Supabase Storage
   fotoUri?: string;
   // Fecha ISO
@@ -183,6 +193,8 @@ export type Usuario = {
 
 export type Rango = {
   nombre: string;
+  // En la escala de rangos de F2_09 ("Cazador")
+  nombreCorto: string;
   puntosMinimos: number;
 };
 
@@ -222,6 +234,10 @@ export type BorradorReporte = {
   congestion?: NivelCongestion;
   causas?: CausaTransito[];
   via?: string;
+  seguridad?: TipoSeguridad;
+  urgente?: boolean;
+  // Si falta, la alerta es anónima
+  anonimo?: boolean;
   nota?: string;
   fotoUri?: string;
 };
@@ -241,4 +257,21 @@ export type ResultadoReporte = {
   // Usuario con los puntos ya sumados
   usuario: Usuario;
   personasQueLoVen: number;
+};
+
+// Logro del usuario (F2_09)
+export type Insignia = {
+  id: string;
+  nombre: string;
+  requisito: string;
+  obtenida: boolean;
+};
+
+// Reporte propio en el historial (F2_09)
+export type ReporteHistorial = {
+  reporte: Reporte;
+  linea?: Linea;
+  puntos: number;
+  // Ya no cuenta como activo
+  vencido: boolean;
 };

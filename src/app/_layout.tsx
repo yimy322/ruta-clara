@@ -72,6 +72,7 @@ function RootNavigator() {
           <Stack.Screen name="viaje/a-bordo" />
           <Stack.Screen name="viaje/fin" options={{ presentation: "fullScreenModal" }} />
           <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
+          <Stack.Screen name="ajustes" />
           <Stack.Screen name="dev/catalogo" />
           <Stack.Screen name="dev/datos" />
         </Stack.Protected>

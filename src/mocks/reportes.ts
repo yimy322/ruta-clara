@@ -3,8 +3,17 @@ import type { Reporte } from "@/types";
 // Fecha ISO de hace n minutos, relativa a cuando se carga el módulo.
 const haceMin = (n: number) => new Date(Date.now() - n * 60_000).toISOString();
 
+// Fecha ISO de ayer a la hora indicada
+function ayerALas(horas: number, minutos: number) {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() - 1);
+  fecha.setHours(horas, minutos, 0, 0);
+  return fecha.toISOString();
+}
+
 // Reportes de ejemplo (F1_04, F1_06, F1_08, F3_04). Anconero no tiene
-// reportes a propósito: sale como "estimado" en la búsqueda.
+// reportes a propósito: sale como "estimado" en la búsqueda. Los de u1 son
+// del usuario de prueba (historial de F2_09).
 export const reportes: Reporte[] = [
   {
     id: "r1",
@@ -64,10 +73,36 @@ export const reportes: Reporte[] = [
     id: "r6",
     tipo: "seguridad",
     paraderoId: "angamos",
+    seguridad: "robo", // supuesto
+    anonimo: true, // supuesto
     lat: -12.1112,
     lng: -77.0115,
     nota: "Robo reportado",
     creadoEn: haceMin(25),
     confirmaciones: 4,
+  },
+  {
+    id: "r7",
+    tipo: "ubicacion",
+    usuarioId: "u1",
+    lineaId: "la-50",
+    lat: -12.0448,
+    lng: -76.9985, // supuesto
+    ocupacion: "lleno", // supuesto
+    // supuesto: Figma dice "Hoy 7:16" a las 7:20; queda un minuto antes que r2
+    // para que la unidad en vivo de La 50 siga siendo la de F1_08
+    creadoEn: haceMin(6),
+    confirmaciones: 6,
+  },
+  {
+    id: "r8",
+    tipo: "transito",
+    usuarioId: "u1",
+    lat: -12.0512,
+    lng: -76.9895, // supuesto
+    congestion: "trancadera",
+    via: "Evitamiento",
+    creadoEn: ayerALas(18, 40),
+    confirmaciones: 1, // supuesto
   },
 ];
