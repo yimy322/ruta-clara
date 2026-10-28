@@ -10,6 +10,7 @@ export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ListItem } from "./ListItem";
 export { Mapa } from "./Mapa";
+export { OpcionGrande } from "./OpcionGrande";
 export { Paginador } from "./Paginador";
 export { PinUnidad } from "./PinUnidad";
 export { PantallaCarga } from "./PantallaCarga";

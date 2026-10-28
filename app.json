@@ -42,6 +42,13 @@
         {
           "locationWhenInUsePermission": "RutaClara usa tu ubicación para mostrarte paraderos y combis cerca."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "RutaClara usa tus fotos para adjuntarlas a tus reportes.",
+          "cameraPermission": "RutaClara usa la cámara para que tomes una foto de lo que reportas."
+        }
       ]
     ],
     "experiments": {

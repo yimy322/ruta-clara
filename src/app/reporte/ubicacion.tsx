@@ -1,13 +1,14 @@
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Chip, IconButton, Mapa, PinUnidad, Toggle } from "@/components";
 import { CALLE_USUARIO, PRECISION_GPS_M } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
-import { crearReporte, getLinea, getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
+import { getLinea, getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
+import { useEnviarReporte } from "@/hooks/useEnviarReporte";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Linea, Paradero } from "@/types";
 import { etiquetaOcupacion, etiquetaVelocidad } from "@/utils/formato";
@@ -20,7 +21,7 @@ export default function ConfirmarUbicacion() {
 
   const [linea, setLinea] = useState<Linea | null>();
   const [paradero, setParadero] = useState<Paradero | null>();
-  const [enviando, setEnviando] = useState(false);
+  const { enviar, enviando } = useEnviarReporte();
 
   useEffect(() => {
     if (!borrador.lineaId) {
@@ -51,28 +52,6 @@ export default function ConfirmarUbicacion() {
 
   const aBordo = borrador.enUnidad === "a_bordo";
   const enVivo = aBordo && borrador.compartirEnVivo;
-
-  const enviar = async () => {
-    setEnviando(true);
-    try {
-      const resultado = await crearReporte({ ...borrador, compartirEnVivo: enVivo });
-      router.push({
-        pathname: "/reporte/gracias",
-        params: {
-          puntos: resultado.puntosGanados,
-          total: resultado.usuario.puntos,
-          personas: resultado.personasQueLoVen,
-        },
-      });
-    } catch {
-      Alert.alert("No se pudo enviar", "Revisa tu conexión e inténtalo otra vez.", [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Reintentar", onPress: enviar },
-      ]);
-    } finally {
-      setEnviando(false);
-    }
-  };
 
   return (
     <View style={styles.screen}>
@@ -128,7 +107,7 @@ export default function ConfirmarUbicacion() {
 
           <Button
             label={enviando ? "Enviando…" : enVivo ? "Confirmar y enviar en tiempo real" : "Confirmar y enviar"}
-            onPress={enviar}
+            onPress={() => enviar({ ...borrador, compartirEnVivo: enVivo })}
             disabled={enviando}
             fullWidth
           />

@@ -31,6 +31,8 @@ export const borderWidths = {
   thin: 1,
   regular: 1.5,
   thick: 2.5,
+  // Nivel de congestión elegido (F2_06)
+  medium: 2,
 } as const;
 
 // Medidas de los componentes base (Figma)
@@ -104,6 +106,16 @@ export const sizes = {
   successHalo: 128,
   successIconLarge: 100,
   successGlyphLarge: 40,
+  // Reportes de paradero y tránsito (F2_05–F2_06)
+  optionHeight: 48,
+  optionRadius: 12,
+  paraderoMap: 84,
+  noteHeight: 96,
+  congestionBar: 6,
+  congestionGap: 6,
+  congestionPaddingX: 6,
+  congestionPaddingY: 10,
+  photoThumb: 72, // supuesto: Figma no muestra la miniatura
 } as const;
 
 // Feedback al presionar y estado deshabilitado

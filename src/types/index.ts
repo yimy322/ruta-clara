@@ -8,6 +8,24 @@ export type Velocidad = "normal" | "lento" | "chanteando";
 
 export type NivelTrafico = "bajo" | "medio" | "alto";
 
+// Cuánto lleva esperando quien reporta un paradero (F2_05)
+export type TiempoEspera = "5_10" | "15_20" | "mas_30";
+
+// Nivel de congestión de un reporte de tránsito (F2_06)
+export type NivelCongestion = "fluido" | "moderado" | "pesado" | "trancadera";
+
+export type CausaTransito = "obras" | "choque" | "semaforo" | "marcha" | "fiscalizacion" | "inundacion";
+
+// Vía (avenida, carretera) donde se reporta el tránsito; se muestra como
+// "Vía Evitamiento · altura Ate"
+export type Via = {
+  id: string;
+  nombre: string;
+  referencia: string;
+  lat: number;
+  lng: number;
+};
+
 export type Paradero = {
   id: string;
   nombre: string;
@@ -49,6 +67,14 @@ export type Reporte = {
   // 1–5, solo en valoraciones (F1_10)
   valoracion?: number;
   etiquetas?: string[];
+  // Reporte de paradero (F2_05)
+  espera?: TiempoEspera;
+  // Reporte de tránsito (F2_06)
+  congestion?: NivelCongestion;
+  causas?: CausaTransito[];
+  via?: string;
+  // URI local de la foto. Fase 5: URL en Supabase Storage
+  fotoUri?: string;
   // Fecha ISO
   creadoEn: string;
   confirmaciones: number;
@@ -180,6 +206,8 @@ export type BorradorReporte = {
   modo: ModoReporte;
   lineaId?: string;
   enUnidad?: EnUnidad;
+  // En F2_05 guarda el estado del paradero: Tranquilo = sentados, Lleno =
+  // lleno, Desbordado = sopa
   ocupacion?: Ocupacion;
   velocidad?: Velocidad;
   // Punto marcado en el mapa; si falta, se usa la ubicación del usuario
@@ -188,6 +216,14 @@ export type BorradorReporte = {
   // Valoración del viaje (F1_10)
   valoracion?: number;
   etiquetas?: string[];
+  // Paradero elegido (F2_05); si falta, se usa el más cercano a la posición
+  paraderoId?: string;
+  espera?: TiempoEspera;
+  congestion?: NivelCongestion;
+  causas?: CausaTransito[];
+  via?: string;
+  nota?: string;
+  fotoUri?: string;
 };
 
 // Línea para elegir al reportar (F2_02)

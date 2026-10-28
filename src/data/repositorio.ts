@@ -10,6 +10,7 @@ import { lugaresGuardados } from "@/mocks/lugares";
 import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
 import { ubicacionUsuario, usuario } from "@/mocks/usuario";
+import { vias } from "@/mocks/vias";
 import type {
   BorradorReporte,
   Coordenada,
@@ -27,6 +28,7 @@ import type {
   UnidadEnCamino,
   UnidadEnVivo,
   Usuario,
+  Via,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
@@ -98,22 +100,38 @@ export async function alternarFavorita(lineaId: string): Promise<boolean> {
   return true;
 }
 
-function paraderoMasCercano(lat: number, lng: number): Paradero | null {
-  let cercano: Paradero | null = null;
+function masCercano<T extends Coordenada>(lat: number, lng: number, lugares: T[]): T | null {
+  let cercano: T | null = null;
   let menor = Infinity;
-  for (const paradero of paraderos) {
-    const distancia = distanciaMetros(lat, lng, paradero.lat, paradero.lng);
+  for (const lugar of lugares) {
+    const distancia = distanciaMetros(lat, lng, lugar.lat, lugar.lng);
     if (distancia < menor) {
       menor = distancia;
-      cercano = paradero;
+      cercano = lugar;
     }
   }
   return cercano;
 }
 
+const paraderoMasCercano = (lat: number, lng: number) => masCercano(lat, lng, paraderos);
+
 export async function getParaderoCercano(lat: number, lng: number): Promise<Paradero | null> {
   await esperar();
   return paraderoMasCercano(lat, lng);
+}
+
+// Líneas que pasan por el paradero en cualquiera de los dos sentidos
+export async function getLineasPorParadero(paraderoId: string): Promise<Linea[]> {
+  await esperar();
+  return lineas.filter(
+    (linea) => linea.recorridoIda.includes(paraderoId) || linea.recorridoVuelta.includes(paraderoId),
+  );
+}
+
+// Fase 6: geocodificación inversa de la ubicación real.
+export async function getViaCercana(lat: number, lng: number): Promise<Via | null> {
+  await esperar();
+  return masCercano(lat, lng, vias);
 }
 
 export async function buscarDestinos(texto: string): Promise<Destino[]> {
@@ -210,9 +228,13 @@ export async function getUbicacionUsuario(): Promise<Coordenada> {
   return ubicacionUsuario;
 }
 
+// Del más cercano al más lejano
 export async function getParaderosCercanos(lat: number, lng: number): Promise<Paradero[]> {
   await esperar();
-  return paraderos.filter((paradero) => distanciaMetros(lat, lng, paradero.lat, paradero.lng) <= RADIO_CERCANO_M);
+  const distancia = (paradero: Paradero) => distanciaMetros(lat, lng, paradero.lat, paradero.lng);
+  return paraderos
+    .filter((paradero) => distancia(paradero) <= RADIO_CERCANO_M)
+    .sort((a, b) => distancia(a) - distancia(b));
 }
 
 // Última ubicación reportada de cada línea cerca del punto.
@@ -380,13 +402,22 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     id: `r${Date.now()}`,
     tipo,
     lineaId: borrador.lineaId,
-    paraderoId: TIPOS_EN_PARADERO.includes(tipo) ? paraderoMasCercano(lat, lng)?.id : undefined,
+    paraderoId: TIPOS_EN_PARADERO.includes(tipo)
+      ? (borrador.paraderoId ?? paraderoMasCercano(lat, lng)?.id)
+      : undefined,
     lat,
     lng,
     ocupacion: borrador.ocupacion,
     velocidad: borrador.velocidad,
     valoracion: borrador.valoracion,
     etiquetas: borrador.etiquetas,
+    espera: borrador.espera,
+    congestion: borrador.congestion,
+    causas: borrador.causas,
+    via: borrador.via,
+    nota: borrador.nota,
+    // Fase 5: se sube a Supabase Storage y se guarda la URL
+    fotoUri: borrador.fotoUri,
     creadoEn: new Date().toISOString(),
     confirmaciones: 1,
   };

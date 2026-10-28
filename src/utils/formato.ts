@@ -1,5 +1,16 @@
 // Formato de textos de la interfaz.
-import type { LineaSugerida, NivelTrafico, Ocupacion, Sentido, TipoUnidad, Velocidad } from "@/types";
+import type {
+  CausaTransito,
+  LineaSugerida,
+  NivelCongestion,
+  NivelTrafico,
+  Ocupacion,
+  Sentido,
+  TiempoEspera,
+  TipoUnidad,
+  Velocidad,
+  Via,
+} from "@/types";
 
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
@@ -90,6 +101,37 @@ const TIPO: Record<TipoUnidad, string> = {
 };
 
 export const etiquetaTipo = (tipo: TipoUnidad) => TIPO[tipo];
+
+const ESPERA: Record<TiempoEspera, string> = {
+  "5_10": "Esperando 5–10 min",
+  "15_20": "15–20 min",
+  mas_30: "Más de 30 min",
+};
+
+export const etiquetaEspera = (espera: TiempoEspera) => ESPERA[espera];
+
+const CONGESTION: Record<NivelCongestion, string> = {
+  fluido: "Fluido",
+  moderado: "Moderado",
+  pesado: "Pesado",
+  trancadera: "Trancadera",
+};
+
+export const etiquetaCongestion = (congestion: NivelCongestion) => CONGESTION[congestion];
+
+const CAUSA: Record<CausaTransito, string> = {
+  obras: "Obras en la pista",
+  choque: "Choque",
+  semaforo: "Semáforo malogrado",
+  marcha: "Marcha / paro",
+  fiscalizacion: "Fiscalización",
+  inundacion: "Pista inundada",
+};
+
+export const etiquetaCausa = (causa: CausaTransito) => CAUSA[causa];
+
+// "Vía Evitamiento · altura Ate"
+export const textoVia = (via: Via) => `${via.nombre} · ${via.referencia}`;
 
 // "12 reportes activos · último hace 5 min"
 export function textoReportes(reportesActivos: number, ultimoReporteMin: number | null) {
