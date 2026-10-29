@@ -31,7 +31,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F1_01 · Splash / Carga | components/PantallaCarga.tsx | — | No es ruta: la muestra _layout mientras cargan fuentes y preferencias (mín. 1,5 s) |
 | F1_02–F1_03 · Onboarding | onboarding.tsx | /onboarding | Stack, solo accesible si no se vio el onboarding |
 | F1_04 · Inicio — Principal | (tabs)/index.tsx | / | Tab |
-| F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab |
+| F3_01 · Favoritos | (tabs)/favoritos.tsx | /favoritos | Tab. Recarga al recibir foco |
 | F2_01 · Panel de reporte rápido | reporte/index.tsx | /reporte | Modal (tab "Reportar" lo abre; (tabs)/reportar.tsx es una ruta vacía). reporte/_layout.tsx: Stack sin header + ReporteProvider |
 | F2_02 · Ubicación de unidad — Línea | reporte/linea.tsx | /reporte/linea | Paso del modal |
 | F2_03 · Estado del carro | reporte/estado.tsx | /reporte/estado | Paso del modal |
@@ -40,7 +40,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
 | F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal |
 | F2_08 · Confirmación y agradecimiento | reporte/gracias.tsx | /reporte/gracias | Paso del modal, sin gesto atrás. Recibe `puntos`, `total`, `personas` por params (también se abre desde F1_10) |
-| F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab |
+| F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab. Recarga al recibir foco; el punto rojo de la tab sale de `useNotificaciones()` |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F3_02 · Detalle de paradero | paradero/[id].tsx | /paradero/puente-nuevo | Stack (desde la card de Inicio). Recarga al recibir foco |
 | F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
@@ -65,6 +65,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Datos de prueba en /src/mocks (sacados del prototipo de Figma; lo que no está en Figma va marcado `// supuesto`).
 - Acceso a datos solo por /src/data/repositorio.ts: funciones async con retraso simulado de 300–600 ms. En la Fase 5 se reemplaza por Supabase sin cambiar las firmas.
 - **Regla: las pantallas y componentes importan de `@/data/repositorio`, nunca de `@/mocks`.** Única excepción: `dev/catalogo.tsx` con `mocks/catalog.ts`.
+- Avisos sin leer: `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`); llamar a `actualizarNoLeidas()` después de leer o crear notificaciones.
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
 - Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.

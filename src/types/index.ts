@@ -342,3 +342,45 @@ export type ReporteHistorial = {
   // Ya no cuenta como activo
   vencido: boolean;
 };
+
+// Paradero favorito con la unidad que llega primero, según reportes (F3_01)
+export type ParaderoFavorito = {
+  paradero: Paradero;
+  // null si ninguna línea del paradero tiene reportes de ubicación vigentes
+  proxima: ProximaUnidad | null;
+  // Líneas que pasan por el paradero
+  lineas: number;
+  // Alerta que sube en el paradero; null si no hay
+  alerta: AlertaDiaria | null;
+};
+
+// Ruta guardada (F3_01): una alerta diaria o una línea favorita sin alerta
+export type RutaGuardada =
+  | { tipo: "alerta"; alerta: AlertaDiaria; linea: Linea; paradero: Paradero; destino: Destino }
+  | { tipo: "linea"; linea: Linea };
+
+export type Favoritos = {
+  lugares: LugarGuardado[];
+  paraderos: ParaderoFavorito[];
+  rutas: RutaGuardada[];
+};
+
+export type TipoNotificacion = "llegada" | "desvio" | "transito" | "seguridad" | "logro";
+
+// Aviso del centro de notificaciones (F3_04)
+export type Notificacion = {
+  id: string;
+  tipo: TipoNotificacion;
+  titulo: string;
+  detalle: string;
+  // Fecha ISO
+  fecha: string;
+  leida: boolean;
+  lineaId?: string;
+  paraderoId?: string;
+  alertaId?: string;
+};
+
+// Viaje que arma una alerta diaria: línea, paradero de subida, destino y el
+// sentido en que la línea llega al destino (aviso de llegada, F3_04)
+export type ViajeAlerta = OpcionRutaAlerta & { sentido: Sentido };

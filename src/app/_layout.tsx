@@ -11,6 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
 import { PantallaCarga, ToastProvider } from "@/components";
+import { NotificacionesProvider } from "@/context/NotificacionesContext";
 import { PreferenciasProvider, usePreferencias } from "@/context/PreferenciasContext";
 import { ViajeProvider } from "@/context/ViajeContext";
 
@@ -20,9 +21,11 @@ export default function RootLayout() {
   return (
     <PreferenciasProvider>
       <ViajeProvider>
-        <ToastProvider>
-          <RootNavigator />
-        </ToastProvider>
+        <NotificacionesProvider>
+          <ToastProvider>
+            <RootNavigator />
+          </ToastProvider>
+        </NotificacionesProvider>
       </ViajeProvider>
     </PreferenciasProvider>
   );

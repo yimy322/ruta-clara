@@ -2,13 +2,15 @@ import { BellPlus, CircleAlert, CircleUser, House, Star, type LucideIcon } from 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { borderWidths, colors, opacity, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
 
 export type BottomNavTab = "inicio" | "favoritos" | "reportar" | "alertas" | "perfil";
 
 type BottomNavProps = {
   active: BottomNavTab;
   onSelect: (tab: BottomNavTab) => void;
+  // Avisos pendientes por tab: con más de 0 se dibuja un punto rojo sobre el ícono
+  badge?: Partial<Record<BottomNavTab, number>>;
 };
 
 const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
@@ -21,7 +23,7 @@ const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
 
 // Navegación inferior de 5 ítems. Es solo visual: (tabs)/_layout.tsx la
 // conecta a las Tabs de Expo Router. Respeta el borde seguro inferior.
-export function BottomNav({ active, onSelect }: BottomNavProps) {
+export function BottomNav({ active, onSelect, badge }: BottomNavProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -31,16 +33,20 @@ export function BottomNav({ active, onSelect }: BottomNavProps) {
     >
       {TABS.map(({ key, label, Icon }) => {
         const selected = key === active;
+        const pendientes = badge?.[key] ?? 0;
         return (
           <Pressable
             key={key}
             onPress={() => onSelect(key)}
             accessibilityRole="tab"
-            accessibilityLabel={label}
+            accessibilityLabel={pendientes > 0 ? `${label}, ${pendientes} sin leer` : label}
             accessibilityState={{ selected }}
             style={({ pressed }) => [styles.tab, selected && styles.tabActive, pressed && styles.pressed]}
           >
-            <Icon color={colors.ink} size={sizes.navIcon} />
+            <View>
+              <Icon color={colors.ink} size={sizes.navIcon} />
+              {pendientes > 0 && <View style={styles.badge} />}
+            </View>
             <Text
               style={selected ? [typography.captionStrong, styles.labelActive] : [typography.tab, styles.label]}
               numberOfLines={1}
@@ -78,6 +84,17 @@ const styles = StyleSheet.create({
   },
   labelActive: {
     color: colors.ink,
+  },
+  badge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: sizes.badgeDot,
+    height: sizes.badgeDot,
+    borderRadius: radii.pill,
+    borderWidth: borderWidths.thin,
+    borderColor: colors.surface,
+    backgroundColor: colors.red,
   },
   pressed: {
     opacity: opacity.pressed,

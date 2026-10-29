@@ -1,16 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-  Bell,
-  Briefcase,
-  GraduationCap,
-  House,
-  LocateFixed,
-  Menu,
-  Plus,
-  Search,
-  TriangleAlert,
-  type LucideIcon,
-} from "lucide-react-native";
+import { Bell, LocateFixed, Menu, Plus, Search, TriangleAlert } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,12 +17,7 @@ import { usePermisoUbicacion } from "@/hooks/usePermisoUbicacion";
 import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, LugarGuardado, Paradero, UnidadEnVivo } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
-
-const ICONO_LUGAR: Record<LugarGuardado["nombre"], LucideIcon> = {
-  Casa: House,
-  Trabajo: Briefcase,
-  U: GraduationCap,
-};
+import { ICONO_LUGAR } from "@/utils/icons";
 
 // F1_04 · Inicio — Principal
 export default function Inicio() {

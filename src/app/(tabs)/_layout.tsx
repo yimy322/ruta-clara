@@ -2,6 +2,7 @@ import { Tabs, useRouter } from "expo-router";
 import type { BottomTabBarProps } from "expo-router/tabs";
 
 import { BottomNav, type BottomNavTab } from "@/components";
+import { useNotificaciones } from "@/context/NotificacionesContext";
 
 // Nombre de ruta (archivo en /(tabs)) ↔ clave del componente BottomNav.
 const ROUTE_TO_TAB: Record<string, BottomNavTab> = {
@@ -15,6 +16,7 @@ const ROUTE_TO_TAB: Record<string, BottomNavTab> = {
 // Adapta el tabBar de Expo Router a BottomNav. Emite tabPress igual que la
 // barra por defecto, para que los listeners puedan hacer preventDefault.
 function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
+  const { noLeidas } = useNotificaciones();
   const activeRoute = state.routes[state.index];
 
   const handleSelect = (tab: BottomNavTab) => {
@@ -28,7 +30,13 @@ function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     }
   };
 
-  return <BottomNav active={ROUTE_TO_TAB[activeRoute.name] ?? "inicio"} onSelect={handleSelect} />;
+  return (
+    <BottomNav
+      active={ROUTE_TO_TAB[activeRoute.name] ?? "inicio"}
+      onSelect={handleSelect}
+      badge={{ alertas: noLeidas }}
+    />
+  );
 }
 
 export default function TabsLayout() {

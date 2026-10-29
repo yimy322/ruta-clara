@@ -124,6 +124,9 @@ export const sizes = {
   avatar: 64,
   // Alerta diaria (F3_03)
   dayCircle: 38,
+  // Notificaciones (F3_04)
+  notifIcon: 32,
+  unreadDot: 8,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

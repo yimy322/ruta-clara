@@ -4,10 +4,11 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BarraProgreso, Button, Chip, IconButton, ListItem, TarjetaEstadistica, Tile } from "@/components";
+import { BarraProgreso, Button, Chip, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
 import { RANGOS } from "@/config/gamificacion";
+import { useNotificaciones } from "@/context/NotificacionesContext";
 import { usePreferencias } from "@/context/PreferenciasContext";
-import { getHistorialReportes, getInsignias, getUsuario } from "@/data/repositorio";
+import { getHistorialReportes, getInsignias, getUsuario, simularAvisoAlerta } from "@/data/repositorio";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Insignia, ReporteHistorial, Usuario } from "@/types";
 import { formatearDia, formatearPuntos, tituloHistorial } from "@/utils/formato";
@@ -31,6 +32,8 @@ export default function Perfil() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { reiniciarOnboarding } = usePreferencias();
+  const { actualizarNoLeidas } = useNotificaciones();
+  const { mostrar } = useToast();
   const [datos, setDatos] = useState<Datos>();
 
   // Al volver a la tab, por si ganó puntos reportando
@@ -47,6 +50,19 @@ export default function Perfil() {
       };
     }, []),
   );
+
+  // Desarrollo: crea el aviso de llegada de la primera alerta activa
+  const simularAviso = async () => {
+    try {
+      await simularAvisoAlerta();
+    } catch {
+      Alert.alert("Sin alertas", "Primero crea una alerta desde un paradero");
+      return;
+    }
+    await actualizarNoLeidas();
+    mostrar("Nuevo aviso en Alertas");
+    router.navigate("/alertas");
+  };
 
   const verInsignia = (insignia: Insignia) =>
     Alert.alert(insignia.nombre, insignia.obtenida ? `Lograda: ${insignia.requisito}` : insignia.requisito);
@@ -122,6 +138,7 @@ export default function Perfil() {
               <Text style={[typography.overline, styles.muted]}>Desarrollo</Text>
               <Button label="Ver catálogo" variant="tertiary" onPress={() => router.push("/dev/catalogo")} />
               <Button label="Ver datos" variant="tertiary" onPress={() => router.push("/dev/datos")} />
+              <Button label="Simular aviso de alerta" variant="tertiary" onPress={simularAviso} />
               {/* Vuelve al primer uso: Stack.Protected redirige a /onboarding */}
               <Button label="Reiniciar onboarding" variant="tertiary" onPress={reiniciarOnboarding} />
             </View>

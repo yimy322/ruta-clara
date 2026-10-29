@@ -9,6 +9,7 @@ import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
 import { insignias } from "@/mocks/insignias";
 import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
+import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
 import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
 import { ubicacionUsuario, usuario } from "@/mocks/usuario";
@@ -20,24 +21,29 @@ import type {
   Coordenada,
   DatosAlerta,
   Destino,
+  Favoritos,
   Insignia,
   Linea,
   LineaSugerida,
   LugarGuardado,
+  Notificacion,
   OpcionRuta,
   OpcionRutaAlerta,
   Paradero,
+  ParaderoFavorito,
   ParaderoTramo,
   ProximaUnidad,
   Reporte,
   ReporteHistorial,
   ResultadoReporte,
   ResumenParadero,
+  RutaGuardada,
   Sentido,
   UnidadEnCamino,
   UnidadEnVivo,
   Usuario,
   Via,
+  ViajeAlerta,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
@@ -351,6 +357,12 @@ function proximaUnidad(linea: Linea, paradero: Paradero): ProximaUnidad {
   };
 }
 
+// Unidades de cada línea del paradero, de la que llega primero a la última
+const proximasDelParadero = (paradero: Paradero) =>
+  lineasDelParadero(paradero.id)
+    .map((linea) => proximaUnidad(linea, paradero))
+    .sort((a, b) => a.minutos - b.minutos);
+
 // Detalle de paradero (F3_02): último reporte de paradero, reportes de
 // seguridad y unidades que llegan, de las últimas VENTANA_PARADERO_H horas.
 // null si el paradero no existe.
@@ -372,9 +384,7 @@ export async function getResumenParadero(paraderoId: string): Promise<ResumenPar
     paradero,
     estado: ultimo ? { ocupacion: ultimo.ocupacion, espera: ultimo.espera, creadoEn: ultimo.creadoEn } : null,
     seguridad: recientes.filter((r) => r.paraderoId === paraderoId),
-    proximas: lineasDelParadero(paraderoId)
-      .map((linea) => proximaUnidad(linea, paradero))
-      .sort((a, b) => a.minutos - b.minutos),
+    proximas: proximasDelParadero(paradero),
   };
 }
 
@@ -597,16 +607,27 @@ export async function eliminarAlerta(id: string): Promise<void> {
   }
 }
 
-// En algún sentido de la línea, el paradero del recorrido más cercano al
-// destino viene después del de subida (la misma bajada que elige getTramoViaje)
-function llegaAlDestino(linea: Linea, subidaId: string, destino: Destino) {
-  return [linea.recorridoIda, linea.recorridoVuelta].some((ids) => {
+// Sentido de la línea en que el paradero del recorrido más cercano al destino
+// viene después del de subida (la misma bajada que elige getTramoViaje); null
+// si en ninguno llega
+function sentidoHacia(linea: Linea, subidaId: string, destino: Destino): Sentido | null {
+  const sentidos: [Sentido, string[]][] = [
+    ["ida", linea.recorridoIda],
+    ["vuelta", linea.recorridoVuelta],
+  ];
+  for (const [sentido, ids] of sentidos) {
     const recorrido = ids.flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
     const bajada = masCercano(destino.lat, destino.lng, recorrido);
     const subida = ids.indexOf(subidaId);
-    return bajada !== null && subida !== -1 && ids.indexOf(bajada.id) > subida;
-  });
+    if (bajada !== null && subida !== -1 && ids.indexOf(bajada.id) > subida) {
+      return sentido;
+    }
+  }
+  return null;
 }
+
+const llegaAlDestino = (linea: Linea, subidaId: string, destino: Destino) =>
+  sentidoHacia(linea, subidaId, destino) !== null;
 
 // Rutas para una alerta diaria (F3_03). Cada línea + paradero de subida se
 // combina con los destinos que la línea sirve en la búsqueda (rutasPorDestino)
@@ -650,4 +671,99 @@ export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<Opcion
     }
   }
   return opciones;
+}
+
+// Favoritos (F3_01) en una sola llamada. Paraderos en el orden en que se
+// marcaron; rutas: primero las alertas y luego las líneas favoritas sin alerta.
+export async function getFavoritos(): Promise<Favoritos> {
+  await esperar();
+
+  const favoritos: ParaderoFavorito[] = [...paraderosMarcados].flatMap((id) => {
+    const paradero = paraderos.find((p) => p.id === id);
+    if (!paradero) {
+      return [];
+    }
+    return {
+      paradero,
+      proxima: proximasDelParadero(paradero).find((unidad) => unidad.fuente !== "sin_datos") ?? null,
+      lineas: lineasDelParadero(id).length,
+      alerta: alertas.find((alerta) => alerta.paraderoId === id) ?? null,
+    };
+  });
+
+  const rutas: RutaGuardada[] = alertas.flatMap((alerta) => {
+    const linea = lineas.find((l) => l.id === alerta.lineaId);
+    const paradero = paraderos.find((p) => p.id === alerta.paraderoId);
+    const destino = destinos.find((d) => d.id === alerta.destinoId);
+    return linea && paradero && destino ? { tipo: "alerta" as const, alerta, linea, paradero, destino } : [];
+  });
+  for (const linea of lineas) {
+    if (favoritas.has(linea.id) && !alertas.some((alerta) => alerta.lineaId === linea.id)) {
+      rutas.push({ tipo: "linea", linea });
+    }
+  }
+
+  return { lugares: lugaresGuardados, paraderos: favoritos, rutas };
+}
+
+// Línea, paradero, destino y sentido de la alerta, para iniciar la espera
+// desde un aviso de llegada (F3_04); null si la alerta ya no existe.
+export async function getViajeDeAlerta(alertaId: string): Promise<ViajeAlerta | null> {
+  await esperar();
+  const alerta = alertas.find((a) => a.id === alertaId);
+  const linea = lineas.find((l) => l.id === alerta?.lineaId);
+  const paradero = paraderos.find((p) => p.id === alerta?.paraderoId);
+  const destino = destinos.find((d) => d.id === alerta?.destinoId);
+  if (!linea || !paradero || !destino) {
+    return null;
+  }
+  return { linea, paradero, destino, sentido: sentidoHacia(linea, paradero.id, destino) ?? "ida" };
+}
+
+// Notificaciones en memoria: duran mientras la app está abierta.
+// Fase 5: se guardan por usuario en Supabase y llegan por Realtime / push.
+const notificaciones: Notificacion[] = notificacionesIniciales.map((n) => ({ ...n }));
+
+// De la más reciente a la más antigua
+export async function getNotificaciones(): Promise<Notificacion[]> {
+  await esperar();
+  return [...notificaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+
+export async function marcarNotificacionLeida(id: string): Promise<void> {
+  await esperar();
+  const notificacion = notificaciones.find((n) => n.id === id);
+  if (notificacion) {
+    notificacion.leida = true;
+  }
+}
+
+export async function contarNoLeidas(): Promise<number> {
+  await esperar();
+  return notificaciones.filter((n) => !n.leida).length;
+}
+
+// Desarrollo: simula el aviso que dispara la primera alerta activa cuando su
+// unidad está a `minutosAntes` del paradero. Falla si no hay alertas activas.
+export async function simularAvisoAlerta(): Promise<Notificacion> {
+  await esperar();
+  const alerta = alertas.find((a) => a.activa);
+  const linea = lineas.find((l) => l.id === alerta?.lineaId);
+  const paradero = paraderos.find((p) => p.id === alerta?.paraderoId);
+  if (!alerta || !linea || !paradero) {
+    throw new Error("No hay alertas activas");
+  }
+  const notificacion: Notificacion = {
+    id: `n${Date.now()}`,
+    tipo: "llegada",
+    titulo: `¡Tu combi habitual está a ${alerta.minutosAntes} min del paradero!`,
+    detalle: `${linea.nombre} · ${paradero.nombre}`,
+    fecha: new Date().toISOString(),
+    leida: false,
+    lineaId: linea.id,
+    paraderoId: paradero.id,
+    alertaId: alerta.id,
+  };
+  notificaciones.push(notificacion);
+  return notificacion;
 }

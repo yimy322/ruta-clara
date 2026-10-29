@@ -9,6 +9,7 @@ export { Chip, type ChipState } from "./Chip";
 export { GraficoAfluencia } from "./GraficoAfluencia";
 export { Header } from "./Header";
 export { IconButton } from "./IconButton";
+export { ItemNotificacion } from "./ItemNotificacion";
 export { ListItem } from "./ListItem";
 export { Mapa } from "./Mapa";
 export { OpcionGrande } from "./OpcionGrande";

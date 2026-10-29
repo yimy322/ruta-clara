@@ -1,6 +1,9 @@
 // Formato de textos de la interfaz.
 import type {
   CausaTransito,
+  Destino,
+  Linea,
+  Paradero,
   ProximaUnidad,
   LineaSugerida,
   NivelCongestion,
@@ -279,3 +282,10 @@ export function partirCoincidencia(texto: string, consulta: string): [string, st
   const fin = origen[pos + buscada.length - 1] + 1;
   return [letras.slice(0, inicio).join(""), letras.slice(inicio, fin).join(""), letras.slice(fin).join("")];
 }
+
+// "Paradero Puente Nuevo" → "Puente Nuevo"
+const sinPrefijoParadero = (nombre: string) => nombre.replace(/^Paradero\s+/i, "");
+
+// "La 50 · Puente Nuevo → Jockey Plaza" (rutas guardadas, F3_01)
+export const textoRutaAlerta = (linea: Linea, paradero: Paradero, destino: Destino) =>
+  `${linea.nombre} · ${sinPrefijoParadero(paradero.nombre)} → ${destino.nombre}`;
