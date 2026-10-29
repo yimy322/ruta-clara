@@ -1,6 +1,7 @@
 // Formato de textos de la interfaz.
 import type {
   CausaTransito,
+  ProximaUnidad,
   LineaSugerida,
   NivelCongestion,
   NivelTrafico,
@@ -18,9 +19,11 @@ import type {
 // 2.5 → "S/ 2.50"
 export const formatearPasaje = (monto: number) => `S/ ${monto.toFixed(2)}`;
 
+// Minutos enteros transcurridos desde la fecha ISO
+export const minutosDesde = (fechaISO: string) => Math.floor((Date.now() - new Date(fechaISO).getTime()) / 60_000);
+
 // Fecha ISO → "ahora", "hace 4 min", "hace 2 h"
-export const haceCuanto = (fechaISO: string) =>
-  haceMinutos(Math.floor((Date.now() - new Date(fechaISO).getTime()) / 60_000));
+export const haceCuanto = (fechaISO: string) => haceMinutos(minutosDesde(fechaISO));
 
 // 4 → "hace 4 min"; 0 → "ahora"; 120 → "hace 2 h"
 export function haceMinutos(minutos: number) {
@@ -44,12 +47,41 @@ export function haceSegundos(segundos: number) {
   return haceMinutos(Math.floor(segundos / 60));
 }
 
+// (7, 0) → "7:00 AM"; (18, 5) → "6:05 PM"
+export function formatoHora(hora: number, minuto: number) {
+  return `${hora % 12 || 12}:${String(minuto).padStart(2, "0")} ${hora < 12 ? "AM" : "PM"}`;
+}
+
 // Fecha ISO → "7:52 AM"
 export function formatearHora(fechaISO: string) {
   const fecha = new Date(fechaISO);
-  const horas = fecha.getHours();
-  const minutos = String(fecha.getMinutes()).padStart(2, "0");
-  return `${horas % 12 || 12}:${minutos} ${horas < 12 ? "AM" : "PM"}`;
+  return formatoHora(fecha.getHours(), fecha.getMinutes());
+}
+
+// Días como en Date.getDay() (0 = domingo), en el orden de la semana: lunes primero
+const SEMANA = [1, 2, 3, 4, 5, 6, 0];
+const LABORABLES = [1, 2, 3, 4, 5];
+const FIN_DE_SEMANA = [6, 0];
+// "Mi" distingue el miércoles del martes
+const INICIAL_DIA = ["D", "L", "M", "Mi", "J", "V", "S"];
+
+// [1, 2, 3, 4, 5] → "L–V"; los 7 → "Todos los días"; [6, 0] → "Fin de semana";
+// [5, 1, 3] → "L, Mi, V"
+export function formatoDias(dias: number[]) {
+  const elegidos = new Set(dias);
+  const son = (grupo: number[]) => elegidos.size === grupo.length && grupo.every((dia) => elegidos.has(dia));
+  if (son(SEMANA)) {
+    return "Todos los días";
+  }
+  if (son(LABORABLES)) {
+    return "L–V";
+  }
+  if (son(FIN_DE_SEMANA)) {
+    return "Fin de semana";
+  }
+  return SEMANA.filter((dia) => elegidos.has(dia))
+    .map((dia) => INICIAL_DIA[dia])
+    .join(", ");
 }
 
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
@@ -128,6 +160,24 @@ const ESPERA: Record<TiempoEspera, string> = {
 };
 
 export const etiquetaEspera = (espera: TiempoEspera) => ESPERA[espera];
+
+// Desde el menor valor del rango reportado (F3_02)
+const ESPERA_PARADERO: Record<TiempoEspera, string> = {
+  "5_10": "Espera ~5 min",
+  "15_20": "Espera ~15 min",
+  mas_30: "Espera +30 min",
+};
+
+export const textoEsperaParadero = (espera: TiempoEspera) => ESPERA_PARADERO[espera];
+
+// "Lleno · en vivo", "Sopa · reportado hace 9 min", "Sin datos recientes" (F3_02)
+export function textoProximaUnidad({ fuente, ocupacion, reportadoEn }: ProximaUnidad) {
+  if (fuente === "sin_datos" || !reportadoEn) {
+    return "Sin datos recientes";
+  }
+  const detalle = fuente === "en_vivo" ? "en vivo" : `reportado ${haceCuanto(reportadoEn)}`;
+  return ocupacion ? `${etiquetaOcupacion(ocupacion)} · ${detalle}` : detalle[0].toUpperCase() + detalle.slice(1);
+}
 
 const CONGESTION: Record<NivelCongestion, string> = {
   fluido: "Fluido",

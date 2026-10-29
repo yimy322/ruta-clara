@@ -17,10 +17,10 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { BannerUbicacion, Button, CardParadero, Chip, IconButton, Mapa, type DatosCardParadero } from "@/components";
 import {
+  getActividadParadero,
   getLugaresGuardados,
   getParaderoCercano,
   getParaderosCercanos,
-  getResumenParadero,
   getUbicacionUsuario,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
@@ -75,9 +75,9 @@ export default function Inicio() {
         }
         return;
       }
-      const resumen = await getResumenParadero(paradero.id);
+      const actividad = await getActividadParadero(paradero.id);
       if (activo) {
-        setCercano({ paradero, resumen, distanciaM: distanciaMetros(lat, lng, paradero.lat, paradero.lng) });
+        setCercano({ paradero, actividad, distanciaM: distanciaMetros(lat, lng, paradero.lat, paradero.lng) });
       }
     })();
 
@@ -98,7 +98,8 @@ export default function Inicio() {
         margen={{ top: altoArriba, bottom: altoAbajo }}
       />
 
-      <SafeAreaView style={styles.capa} edges={["left", "right"]}>
+      {/* box-none: el área vacía de la capa deja pasar los toques al mapa (Fase 6) */}
+      <SafeAreaView style={styles.capa} edges={["left", "right"]} pointerEvents="box-none">
         <View style={{ paddingTop: insets.top + spacing.sm }} onLayout={alto(setAltoArriba)}>
           <View style={styles.header}>
             <IconButton
@@ -176,9 +177,7 @@ export default function Inicio() {
           {cercano !== null && (
             <CardParadero
               datos={cercano ?? null}
-              onPress={() => {
-                // TODO F3_02: detalle del paradero
-              }}
+              onPress={(id) => router.push({ pathname: "/paradero/[id]", params: { id } })}
             />
           )}
         </View>

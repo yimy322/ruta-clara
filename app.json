@@ -49,7 +49,8 @@
           "photosPermission": "RutaClara usa tus fotos para adjuntarlas a tus reportes.",
           "cameraPermission": "RutaClara usa la cámara para que tomes una foto de lo que reportas."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

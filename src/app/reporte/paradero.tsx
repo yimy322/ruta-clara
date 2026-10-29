@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from "expo-router";
 import { Smile, Users, UsersRound, type LucideIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -5,7 +6,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, Chip, Header, ListItem, Mapa, OpcionGrande, Tile } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
-import { getLineasPorParadero, getParaderoCercano, getParaderosCercanos, getUbicacionUsuario } from "@/data/repositorio";
+import {
+  getLineasPorParadero,
+  getParadero,
+  getParaderoCercano,
+  getParaderosCercanos,
+  getUbicacionUsuario,
+} from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, Linea, Ocupacion, Paradero, TiempoEspera } from "@/types";
@@ -24,8 +31,10 @@ const ESTADOS: { valor: Ocupacion; label: string; icono: LucideIcon }[] = [
 
 type Lista = "paraderos" | "lineas";
 
-// F2_05 · Espera en paradero
+// F2_05 · Espera en paradero. Desde el detalle de paradero (F3_02) se abre
+// directo en este paso con `paraderoId`; si no, se detecta el más cercano.
 export default function ReporteParadero() {
+  const { paraderoId: paraderoInicial } = useLocalSearchParams<{ paraderoId?: string }>();
   const { borrador, actualizar } = useReporte();
   const { enviar, enviando } = useEnviarReporte();
 
@@ -40,7 +49,7 @@ export default function ReporteParadero() {
     (async () => {
       const coordenada = await getUbicacionUsuario();
       const [detectado, cercanos] = await Promise.all([
-        getParaderoCercano(coordenada.lat, coordenada.lng),
+        paraderoInicial ? getParadero(paraderoInicial) : getParaderoCercano(coordenada.lat, coordenada.lng),
         getParaderosCercanos(coordenada.lat, coordenada.lng),
       ]);
       if (!activo) {
@@ -54,7 +63,7 @@ export default function ReporteParadero() {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [paraderoInicial]);
 
   // Si no eligió otro, el detectado
   const paraderoId = borrador.paraderoId ?? cercano?.id;
@@ -179,7 +188,8 @@ export default function ReporteParadero() {
       <View style={styles.abajo}>
         <Button
           label={enviando ? "Enviando…" : "Enviar al toque"}
-          onPress={() => enviar({ ...borrador, paraderoId })}
+          // El tipo se fija aquí: al entrar desde F3_02 no se pasa por el panel F2_01
+          onPress={() => enviar({ ...borrador, tipo: "paradero", paraderoId })}
           disabled={!borrador.espera || !paraderoId || enviando}
           fullWidth
         />

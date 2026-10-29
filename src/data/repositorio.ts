@@ -1,10 +1,11 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
+import { UMBRAL_EN_VIVO_MIN, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
-import { lineasFavoritas } from "@/mocks/favoritos";
+import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
 import { insignias } from "@/mocks/insignias";
 import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
@@ -13,16 +14,21 @@ import { reportes } from "@/mocks/reportes";
 import { ubicacionUsuario, usuario } from "@/mocks/usuario";
 import { vias } from "@/mocks/vias";
 import type {
+  ActividadParadero,
+  AlertaDiaria,
   BorradorReporte,
   Coordenada,
+  DatosAlerta,
   Destino,
   Insignia,
   Linea,
   LineaSugerida,
   LugarGuardado,
   OpcionRuta,
+  OpcionRutaAlerta,
   Paradero,
   ParaderoTramo,
+  ProximaUnidad,
   Reporte,
   ReporteHistorial,
   ResultadoReporte,
@@ -35,8 +41,6 @@ import type {
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
-// Un reporte deja de contar como activo después de este tiempo
-const VIGENCIA_REPORTE_MIN = 30;
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
 const RADIO_LUGAR_M = 5000;
@@ -123,12 +127,39 @@ export async function getParaderoCercano(lat: number, lng: number): Promise<Para
   return paraderoMasCercano(lat, lng);
 }
 
+const lineasDelParadero = (paraderoId: string) =>
+  lineas.filter((linea) => linea.recorridoIda.includes(paraderoId) || linea.recorridoVuelta.includes(paraderoId));
+
 // Líneas que pasan por el paradero en cualquiera de los dos sentidos
 export async function getLineasPorParadero(paraderoId: string): Promise<Linea[]> {
   await esperar();
-  return lineas.filter(
-    (linea) => linea.recorridoIda.includes(paraderoId) || linea.recorridoVuelta.includes(paraderoId),
-  );
+  return lineasDelParadero(paraderoId);
+}
+
+// Favoritos en memoria, igual que las líneas favoritas.
+// Fase 5: se guardan por usuario en Supabase.
+const paraderosMarcados = new Set(paraderosFavoritos);
+
+// En el orden en que se marcaron
+export async function getParaderosFavoritos(): Promise<Paradero[]> {
+  await esperar();
+  return [...paraderosMarcados].flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
+}
+
+export async function esParaderoFavorito(paraderoId: string): Promise<boolean> {
+  await esperar();
+  return paraderosMarcados.has(paraderoId);
+}
+
+// Marca o desmarca el paradero y devuelve el estado nuevo (true = favorito).
+export async function alternarParaderoFavorito(paraderoId: string): Promise<boolean> {
+  await esperar();
+  if (paraderosMarcados.has(paraderoId)) {
+    paraderosMarcados.delete(paraderoId);
+    return false;
+  }
+  paraderosMarcados.add(paraderoId);
+  return true;
 }
 
 // Fase 6: geocodificación inversa de la ubicación real.
@@ -258,7 +289,7 @@ export async function getUnidadesEnVivo(lat: number, lng: number): Promise<Unida
 }
 
 // Cada confirmación cuenta como un reporte más del mismo hecho.
-export async function getResumenParadero(paraderoId: string): Promise<ResumenParadero> {
+export async function getActividadParadero(paraderoId: string): Promise<ActividadParadero> {
   await esperar();
   const vigentes = reportes
     .filter((reporte) => reporte.paraderoId === paraderoId && minutosDesde(reporte.creadoEn) <= VIGENCIA_REPORTE_MIN)
@@ -270,6 +301,15 @@ export async function getResumenParadero(paraderoId: string): Promise<ResumenPar
   };
 }
 
+// Último reporte de ubicación vigente de la línea
+const ultimaUbicacion = (lineaId: string): Reporte | undefined =>
+  reportes
+    .filter((r) => r.tipo === "ubicacion" && r.lineaId === lineaId && minutosDesde(r.creadoEn) <= VIGENCIA_REPORTE_MIN)
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))[0];
+
+// Minutos en llegar al paradero en línea recta a velocidad media; al menos 1
+const etaHasta = (metros: number) => Math.max(Math.round(minutosEnRecorrer(metros)), 1);
+
 // Unidad de la línea más próxima al paradero, según su último reporte de
 // ubicación vigente; null si no hay. La ETA sale de la distancia en línea
 // recta a velocidad media.
@@ -277,9 +317,7 @@ export async function getUnidadEnCamino(lineaId: string, paraderoId: string): Pr
   await esperar();
   const linea = lineas.find((l) => l.id === lineaId);
   const paradero = paraderos.find((p) => p.id === paraderoId);
-  const reporte = reportes
-    .filter((r) => r.tipo === "ubicacion" && r.lineaId === lineaId && minutosDesde(r.creadoEn) <= VIGENCIA_REPORTE_MIN)
-    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))[0];
+  const reporte = ultimaUbicacion(lineaId);
   if (!linea || !paradero || !reporte) {
     return null;
   }
@@ -289,11 +327,54 @@ export async function getUnidadEnCamino(lineaId: string, paraderoId: string): Pr
     lat: reporte.lat,
     lng: reporte.lng,
     distanciaM,
-    etaMin: Math.max(Math.round(minutosEnRecorrer(distanciaM)), 1),
+    etaMin: etaHasta(distanciaM),
     ocupacion: reporte.ocupacion,
     velocidad: reporte.velocidad,
     pasajeros: reporte.confirmaciones,
     actualizadoEn: reporte.creadoEn,
+  };
+}
+
+// Unidad de la línea que llega al paradero. Sin reporte de ubicación vigente,
+// la espera estimada es la frecuencia de la línea (peor caso).
+function proximaUnidad(linea: Linea, paradero: Paradero): ProximaUnidad {
+  const reporte = ultimaUbicacion(linea.id);
+  if (!reporte) {
+    return { linea, minutos: linea.frecuenciaMin, fuente: "sin_datos" };
+  }
+  return {
+    linea,
+    minutos: etaHasta(distanciaMetros(reporte.lat, reporte.lng, paradero.lat, paradero.lng)),
+    fuente: minutosDesde(reporte.creadoEn) < UMBRAL_EN_VIVO_MIN ? "en_vivo" : "reporte",
+    ocupacion: reporte.ocupacion,
+    reportadoEn: reporte.creadoEn,
+  };
+}
+
+// Detalle de paradero (F3_02): último reporte de paradero, reportes de
+// seguridad y unidades que llegan, de las últimas VENTANA_PARADERO_H horas.
+// null si el paradero no existe.
+export async function getResumenParadero(paraderoId: string): Promise<ResumenParadero | null> {
+  const [, recientes] = await Promise.all([esperar(), getReportesSeguridad(VENTANA_PARADERO_H)]);
+  const paradero = paraderos.find((p) => p.id === paraderoId);
+  if (!paradero) {
+    return null;
+  }
+
+  const ultimo = reportes
+    .filter(
+      (r) =>
+        r.tipo === "paradero" && r.paraderoId === paraderoId && minutosDesde(r.creadoEn) <= VENTANA_PARADERO_H * 60,
+    )
+    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))[0];
+
+  return {
+    paradero,
+    estado: ultimo ? { ocupacion: ultimo.ocupacion, espera: ultimo.espera, creadoEn: ultimo.creadoEn } : null,
+    seguridad: recientes.filter((r) => r.paraderoId === paraderoId),
+    proximas: lineasDelParadero(paraderoId)
+      .map((linea) => proximaUnidad(linea, paradero))
+      .sort((a, b) => a.minutos - b.minutos),
   };
 }
 
@@ -473,4 +554,100 @@ export async function getHistorialReportes(): Promise<ReporteHistorial[]> {
 export async function getInsignias(): Promise<Insignia[]> {
   await esperar();
   return insignias;
+}
+
+// Alertas en memoria: duran mientras la app está abierta y empiezan vacías.
+// Fase 5: se guardan por usuario en Supabase y las dispara el servidor.
+const alertas: AlertaDiaria[] = [];
+
+export async function getAlertas(): Promise<AlertaDiaria[]> {
+  await esperar();
+  return [...alertas];
+}
+
+export async function getAlerta(id: string): Promise<AlertaDiaria | null> {
+  await esperar();
+  return alertas.find((alerta) => alerta.id === id) ?? null;
+}
+
+// Alerta que sube en el paradero; null si no hay
+export async function getAlertaDeParadero(paraderoId: string): Promise<AlertaDiaria | null> {
+  await esperar();
+  return alertas.find((alerta) => alerta.paraderoId === paraderoId) ?? null;
+}
+
+// Crea la alerta si no trae id; si no, la reemplaza.
+export async function guardarAlerta(datos: DatosAlerta): Promise<AlertaDiaria> {
+  await esperar();
+  const alerta: AlertaDiaria = { ...datos, id: datos.id ?? `a${Date.now()}` };
+  const i = alertas.findIndex((a) => a.id === alerta.id);
+  if (i === -1) {
+    alertas.push(alerta);
+  } else {
+    alertas[i] = alerta;
+  }
+  return alerta;
+}
+
+export async function eliminarAlerta(id: string): Promise<void> {
+  await esperar();
+  const i = alertas.findIndex((alerta) => alerta.id === id);
+  if (i !== -1) {
+    alertas.splice(i, 1);
+  }
+}
+
+// En algún sentido de la línea, el paradero del recorrido más cercano al
+// destino viene después del de subida (la misma bajada que elige getTramoViaje)
+function llegaAlDestino(linea: Linea, subidaId: string, destino: Destino) {
+  return [linea.recorridoIda, linea.recorridoVuelta].some((ids) => {
+    const recorrido = ids.flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
+    const bajada = masCercano(destino.lat, destino.lng, recorrido);
+    const subida = ids.indexOf(subidaId);
+    return bajada !== null && subida !== -1 && ids.indexOf(bajada.id) > subida;
+  });
+}
+
+// Rutas para una alerta diaria (F3_03). Cada línea + paradero de subida se
+// combina con los destinos que la línea sirve en la búsqueda (rutasPorDestino)
+// y a los que llega desde ese paradero. Paraderos de subida: con paraderoId,
+// solo ese; si no, los favoritos (con todas sus líneas) y, para las líneas
+// favoritas, el paradero de su recorrido más cercano al usuario.
+export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<OpcionRutaAlerta[]> {
+  await esperar();
+  const subidas: { linea: Linea; paradero: Paradero }[] = [];
+
+  const idsSubida = paraderoId ? [paraderoId] : [...paraderosMarcados];
+  for (const id of idsSubida) {
+    const paradero = paraderos.find((p) => p.id === id);
+    if (paradero) {
+      subidas.push(...lineasDelParadero(id).map((linea) => ({ linea, paradero })));
+    }
+  }
+
+  if (!paraderoId) {
+    for (const linea of lineas.filter((l) => favoritas.has(l.id))) {
+      const recorrido = linea.recorridoIda.flatMap((id) => paraderos.find((p) => p.id === id) ?? []);
+      const paradero = masCercano(ubicacionUsuario.lat, ubicacionUsuario.lng, recorrido);
+      if (paradero) {
+        subidas.push({ linea, paradero });
+      }
+    }
+  }
+
+  const opciones: OpcionRutaAlerta[] = [];
+  for (const { linea, paradero } of subidas) {
+    const servidos = destinos.filter((destino) =>
+      rutasPorDestino[destino.id]?.some((ruta) => ruta.lineaId === linea.id),
+    );
+    for (const destino of servidos) {
+      const repetida = opciones.some(
+        (o) => o.linea.id === linea.id && o.paradero.id === paradero.id && o.destino.id === destino.id,
+      );
+      if (!repetida && llegaAlDestino(linea, paradero.id, destino)) {
+        opciones.push({ linea, paradero, destino });
+      }
+    }
+  }
+  return opciones;
 }

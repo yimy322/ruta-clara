@@ -8,6 +8,9 @@ type IconButtonProps = {
   icon: ReactNode;
   onPress: () => void;
   active?: boolean;
+  // Fondo amarillo: algo que el usuario marcó, como un favorito (F1_07, F3_02).
+  // No confundir con Live, que es el amarillo de las unidades en vivo
+  tono?: "destacado";
   accessibilityLabel: string;
 };
 
@@ -17,7 +20,8 @@ const hitSlop = { top: slop, bottom: slop, left: slop, right: slop };
 
 // Botón de icono 36 pt. Pensado para íconos de lucide-react-native: si el
 // ícono no define color ni tamaño, se le asignan según el estado.
-export function IconButton({ icon, onPress, active = false, accessibilityLabel }: IconButtonProps) {
+export function IconButton({ icon, onPress, active = false, tono, accessibilityLabel }: IconButtonProps) {
+  const destacado = tono === "destacado";
   const color = active ? colors.surface : colors.ink;
 
   const content = withIconDefaults(icon, { color, size: sizes.iconGlyph });
@@ -28,8 +32,13 @@ export function IconButton({ icon, onPress, active = false, accessibilityLabel }
       hitSlop={hitSlop}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ selected: active }}
-      style={({ pressed }) => [styles.base, active && styles.active, pressed && styles.pressed]}
+      accessibilityState={{ selected: active || destacado }}
+      style={({ pressed }) => [
+        styles.base,
+        active && styles.active,
+        destacado && styles.destacado,
+        pressed && styles.pressed,
+      ]}
     >
       {content}
     </Pressable>
@@ -49,6 +58,9 @@ const styles = StyleSheet.create({
   },
   active: {
     backgroundColor: colors.ink,
+  },
+  destacado: {
+    backgroundColor: colors.yellow,
   },
   pressed: {
     opacity: opacity.pressed,

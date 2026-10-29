@@ -163,8 +163,8 @@ export default function DetalleRuta() {
         subtitle={`${etiquetaTipo(linea.tipo)} · ${linea.empresa}`}
         right={
           <IconButton
-            icon={<Star />}
-            active={favorita}
+            icon={<Star fill={favorita ? colors.ink : "none"} />}
+            tono={favorita ? "destacado" : undefined}
             onPress={alternar}
             accessibilityLabel={favorita ? "Quitar de Favoritos" : "Guardar en Favoritos"}
           />

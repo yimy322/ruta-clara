@@ -122,6 +122,8 @@ export const sizes = {
   radioDot: 10, // supuesto: Figma lo dibuja como imagen
   // Perfil (F2_09)
   avatar: 64,
+  // Alerta diaria (F3_03)
+  dayCircle: 38,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

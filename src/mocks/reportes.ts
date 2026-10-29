@@ -22,6 +22,7 @@ export const reportes: Reporte[] = [
     lat: -12.0436,
     lng: -76.9988,
     ocupacion: "lleno", // supuesto: F1_04 muestra "Lleno" en la card
+    espera: "15_20", // supuesto: F3_02 muestra "Espera ~15 min"
     nota: "Mucha gente esperando",
     creadoEn: haceMin(4),
     confirmaciones: 3,
@@ -35,7 +36,8 @@ export const reportes: Reporte[] = [
     lng: -77.0066,
     ocupacion: "lleno",
     velocidad: "lento",
-    creadoEn: haceMin(5),
+    // supuesto: menos de UMBRAL_EN_VIVO_MIN para que La 50 salga "en vivo" en F3_02
+    creadoEn: haceMin(3),
     confirmaciones: 3,
   },
   {
@@ -91,7 +93,7 @@ export const reportes: Reporte[] = [
     ocupacion: "lleno", // supuesto
     // supuesto: Figma dice "Hoy 7:16" a las 7:20; queda un minuto antes que r2
     // para que la unidad en vivo de La 50 siga siendo la de F1_08
-    creadoEn: haceMin(6),
+    creadoEn: haceMin(4),
     confirmaciones: 6,
   },
   {

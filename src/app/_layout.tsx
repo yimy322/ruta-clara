@@ -68,10 +68,12 @@ function RootNavigator() {
           <Stack.Screen name="buscar" />
           <Stack.Screen name="rutas" />
           <Stack.Screen name="ruta/[id]" />
+          <Stack.Screen name="paradero/[id]" />
           <Stack.Screen name="viaje/espera" />
           <Stack.Screen name="viaje/a-bordo" />
           <Stack.Screen name="viaje/fin" options={{ presentation: "fullScreenModal" }} />
           <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
+          <Stack.Screen name="alerta" options={{ presentation: "modal" }} />
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="dev/catalogo" />
           <Stack.Screen name="dev/datos" />

@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
-import type { Paradero, ResumenParadero } from "@/types";
+import type { ActividadParadero, Paradero } from "@/types";
 import { etiquetaOcupacion, formatearDistancia, haceCuanto } from "@/utils/formato";
 
 import { Chip } from "./Chip";
@@ -9,17 +9,17 @@ import { Chip } from "./Chip";
 export type DatosCardParadero = {
   paradero: Paradero;
   distanciaM: number;
-  resumen: ResumenParadero;
+  actividad: ActividadParadero;
 };
 
 type CardParaderoProps = {
   // null mientras se cargan los datos
   datos: DatosCardParadero | null;
-  onPress: () => void;
+  onPress: (paraderoId: string) => void;
 };
 
 // "3 reportes activos · hace 4 min"
-function textoReportes({ reportesActivos, ultimoReporte }: ResumenParadero) {
+function textoReportes({ reportesActivos, ultimoReporte }: ActividadParadero) {
   if (reportesActivos === 0) {
     return "Sin reportes activos";
   }
@@ -38,12 +38,13 @@ export function CardParadero({ datos, onPress }: CardParaderoProps) {
     );
   }
 
-  const { paradero, distanciaM, resumen } = datos;
+  const { paradero, distanciaM, actividad } = datos;
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => onPress(paradero.id)}
       accessibilityRole="button"
+      accessibilityLabel={`Ver paradero ${paradero.nombre.replace(/^Paradero /, "")}`}
       style={({ pressed }) => [styles.base, pressed && styles.pressed]}
     >
       <View style={styles.texto}>
@@ -54,10 +55,10 @@ export function CardParadero({ datos, onPress }: CardParaderoProps) {
           {paradero.nombre}
         </Text>
         <Text style={[typography.caption, styles.muted]} numberOfLines={1}>
-          {textoReportes(resumen)}
+          {textoReportes(actividad)}
         </Text>
       </View>
-      {resumen.ocupacion && <Chip label={etiquetaOcupacion(resumen.ocupacion)} state="live" />}
+      {actividad.ocupacion && <Chip label={etiquetaOcupacion(actividad.ocupacion)} state="live" />}
     </Pressable>
   );
 }

@@ -131,12 +131,79 @@ export type UnidadEnVivo = {
   lng: number;
 };
 
-// Estado de un paradero según sus reportes vigentes (card de F1_04)
-export type ResumenParadero = {
+// Actividad de un paradero según sus reportes vigentes (card de F1_04)
+export type ActividadParadero = {
   reportesActivos: number;
   // Fecha ISO del reporte más reciente; null si no hay reportes vigentes
   ultimoReporte: string | null;
   ocupacion?: Ocupacion;
+};
+
+// De dónde sale la ETA de una unidad: reporte de ubicación reciente, reporte
+// más antiguo o, sin reportes vigentes, la frecuencia de la línea
+export type FuenteUnidad = "en_vivo" | "reporte" | "sin_datos";
+
+// Unidad que llega al paradero (F3_02)
+export type ProximaUnidad = {
+  linea: Linea;
+  // Estimados si la fuente es sin_datos
+  minutos: number;
+  fuente: FuenteUnidad;
+  ocupacion?: Ocupacion;
+  // Fecha ISO del reporte de ubicación; falta si la fuente es sin_datos
+  reportadoEn?: string;
+};
+
+// Último reporte de paradero (F2_05)
+export type EstadoParadero = {
+  ocupacion?: Ocupacion;
+  espera?: TiempoEspera;
+  // Fecha ISO
+  creadoEn: string;
+};
+
+// Detalle de paradero (F3_02)
+export type ResumenParadero = {
+  paradero: Paradero;
+  // null si no hay reportes de paradero recientes
+  estado: EstadoParadero | null;
+  // Reportes de seguridad recientes del paradero, del más reciente al más antiguo
+  seguridad: Reporte[];
+  // De la que llega primero a la última
+  proximas: ProximaUnidad[];
+};
+
+export type MinutosAntes = 3 | 5 | 10;
+
+// Alerta diaria de un viaje habitual (F3_03)
+export type AlertaDiaria = {
+  id: string;
+  lineaId: string;
+  // Paradero de subida
+  paraderoId: string;
+  destinoId: string;
+  // Hora de salida, 0–23 y 0–59
+  hora: number;
+  minuto: number;
+  // Días de la semana como en Date.getDay(): 0 = domingo … 6 = sábado
+  dias: number[];
+  // Avisar cuando la unidad esté a estos minutos del paradero
+  minutosAntes: MinutosAntes;
+  // Avisar también de tránsito y desvíos en la ruta
+  transito: boolean;
+  // Avisar también de reportes de seguridad en el paradero
+  seguridad: boolean;
+  activa: boolean;
+};
+
+// Sin id, guardarAlerta crea una alerta nueva
+export type DatosAlerta = Omit<AlertaDiaria, "id"> & { id?: string };
+
+// Ruta para elegir en una alerta: línea, paradero de subida y destino (F3_03)
+export type OpcionRutaAlerta = {
+  linea: Linea;
+  paradero: Paradero;
+  destino: Destino;
 };
 
 export type Sentido = "ida" | "vuelta";
