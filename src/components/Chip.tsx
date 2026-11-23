@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, minTouch, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, minTouch, opacity, radii, sizes, typography } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type ChipState = "default" | "selected" | "live" | "alert";
@@ -9,6 +9,7 @@ export type ChipState = "default" | "selected" | "live" | "alert";
 type ChipProps = {
   label: string;
   state?: ChipState;
+  // Ícono opcional de lucide-react-native (16 pt)
   icon?: ReactNode;
   onPress?: () => void;
 };
@@ -17,7 +18,8 @@ type ChipProps = {
 const verticalSlop = (minTouch - sizes.chipHeight) / 2;
 const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 
-// Chip 32 pt. Live = unidad en vivo (amarillo), Alert = seguridad (rojo).
+// Chip píldora de 32 pt (Figma 69:459). Live = unidad en vivo (amarillo),
+// Alert = seguridad (rojo).
 export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
   const content = (
     <>
@@ -38,11 +40,7 @@ export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
       hitSlop={hitSlop}
       accessibilityRole="button"
       accessibilityState={{ selected: state === "selected" }}
-      style={({ pressed }) => [
-        styles.base,
-        containerStyles[state],
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.base, containerStyles[state], pressed && styles.pressed]}
     >
       {content}
     </Pressable>
@@ -52,11 +50,11 @@ export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
 const styles = StyleSheet.create({
   base: {
     height: sizes.chipHeight,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: sizes.chipPaddingX,
     borderRadius: radii.pill,
     borderWidth: borderWidths.thin,
     flexDirection: "row",
-    gap: spacing.xs,
+    gap: sizes.chipGap,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-start",
@@ -66,24 +64,24 @@ const styles = StyleSheet.create({
   },
 });
 
-// Selected no tiene borde en Figma; se usa el mismo color del fondo para
-// que el chip no cambie de tamaño al seleccionarlo.
+// Solo Default lleva borde en Figma; en los demás el borde es transparente
+// para que el chip no cambie de tamaño al seleccionarlo.
 const containerStyles = StyleSheet.create({
   default: {
     backgroundColor: colors.surface,
-    borderColor: colors.ink,
+    borderColor: colors.line,
   },
   selected: {
     backgroundColor: colors.ink,
-    borderColor: colors.ink,
+    borderColor: "transparent",
   },
   live: {
     backgroundColor: colors.yellow,
-    borderColor: colors.ink,
+    borderColor: "transparent",
   },
   alert: {
     backgroundColor: colors.redSoft,
-    borderColor: colors.red,
+    borderColor: "transparent",
   },
 });
 
@@ -91,5 +89,5 @@ const labelStyles = StyleSheet.create({
   default: { color: colors.ink },
   selected: { color: colors.surface },
   live: { color: colors.ink },
-  alert: { color: colors.red },
+  alert: { color: colors.redStrong },
 });

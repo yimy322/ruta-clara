@@ -114,7 +114,8 @@ const styles = StyleSheet.create({
   muted: {
     color: colors.inkMuted,
   },
+  // Rojo sobre redSoft: redStrong (contraste AA)
   red: {
-    color: colors.red,
+    color: colors.redStrong,
   },
 });

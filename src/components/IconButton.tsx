@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
-import { borderWidths, colors, minTouch, opacity, radii, sizes } from "@/theme";
+import { colors, opacity, radii, shadows, sizes } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 type IconButtonProps = {
@@ -14,22 +14,16 @@ type IconButtonProps = {
   accessibilityLabel: string;
 };
 
-// Extiende el área táctil del botón (36 pt) hasta 44 pt
-const slop = (minTouch - sizes.iconButton) / 2;
-const hitSlop = { top: slop, bottom: slop, left: slop, right: slop };
-
-// Botón de icono 36 pt. Pensado para íconos de lucide-react-native: si el
-// ícono no define color ni tamaño, se le asignan según el estado.
+// Botón de ícono circular de 44 pt (Figma 73:1005) con sombra de tarjeta.
+// Pensado para íconos de lucide-react-native: si el ícono no define color ni
+// tamaño, se le asignan según el estado.
 export function IconButton({ icon, onPress, active = false, tono, accessibilityLabel }: IconButtonProps) {
   const destacado = tono === "destacado";
   const color = active ? colors.surface : colors.ink;
 
-  const content = withIconDefaults(icon, { color, size: sizes.iconGlyph });
-
   return (
     <Pressable
       onPress={onPress}
-      hitSlop={hitSlop}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: active || destacado }}
@@ -40,7 +34,7 @@ export function IconButton({ icon, onPress, active = false, tono, accessibilityL
         pressed && styles.pressed,
       ]}
     >
-      {content}
+      {withIconDefaults(icon, { color, size: sizes.iconGlyph })}
     </Pressable>
   );
 }
@@ -49,12 +43,11 @@ const styles = StyleSheet.create({
   base: {
     width: sizes.iconButton,
     height: sizes.iconButton,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.pill,
     backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
+    ...shadows.card,
   },
   active: {
     backgroundColor: colors.ink,

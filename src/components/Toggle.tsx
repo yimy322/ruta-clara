@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { borderWidths, colors, minTouch, opacity, radii, sizes } from "@/theme";
+import { colors, minTouch, opacity, radii, shadows, sizes } from "@/theme";
 
 type ToggleProps = {
   value: boolean;
@@ -12,8 +12,8 @@ type ToggleProps = {
 const verticalSlop = (minTouch - sizes.toggleHeight) / 2;
 const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 
-// Interruptor on/off. On: pista negra con perilla blanca a la derecha.
-// Off: pista blanca con borde y perilla negra a la izquierda.
+// Interruptor on/off (Figma 69:469). On: pista ink con perilla blanca a la
+// derecha. Off: pista controlOff (3,3:1) con perilla blanca a la izquierda.
 export function Toggle({ value, onValueChange, accessibilityLabel }: ToggleProps) {
   return (
     <Pressable
@@ -22,13 +22,9 @@ export function Toggle({ value, onValueChange, accessibilityLabel }: ToggleProps
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value }}
-      style={({ pressed }) => [
-        styles.track,
-        value ? styles.trackOn : styles.trackOff,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.track, value ? styles.trackOn : styles.trackOff, pressed && styles.pressed]}
     >
-      <View style={[styles.knob, value ? styles.knobOn : styles.knobOff]} />
+      <View style={styles.knob} />
     </Pressable>
   );
 }
@@ -38,30 +34,23 @@ const styles = StyleSheet.create({
     width: sizes.toggleWidth,
     height: sizes.toggleHeight,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
     justifyContent: "center",
-    paddingHorizontal: sizes.toggleInset - borderWidths.regular,
+    paddingHorizontal: sizes.toggleInset,
   },
   trackOn: {
     backgroundColor: colors.ink,
-    borderColor: colors.ink,
     alignItems: "flex-end",
   },
   trackOff: {
-    backgroundColor: colors.surface,
-    borderColor: colors.ink,
+    backgroundColor: colors.controlOff,
     alignItems: "flex-start",
   },
   knob: {
     width: sizes.toggleKnob,
     height: sizes.toggleKnob,
     borderRadius: radii.pill,
-  },
-  knobOn: {
     backgroundColor: colors.surface,
-  },
-  knobOff: {
-    backgroundColor: colors.ink,
+    ...shadows.card,
   },
   pressed: {
     opacity: opacity.pressed,

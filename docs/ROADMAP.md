@@ -43,8 +43,8 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.2B | Seguridad (F2_07) + Perfil (F2_09) | ✅ |
 | 4.3A | Detalle de paradero (F3_02) + Configurar alerta (F3_03) | ✅ |
 | 4.3B | Favoritos (F3_01) + Centro de notificaciones (F3_04) | ✅ |
-| **4.5A** | **Tokens y componentes de alta fidelidad** | 📝 **siguiente** |
-| 4.4 | Ajustes, Mapa de seguridad, Menú lateral (F3_05–F3_07) + TODO | 📝 |
+| 4.5A | Tokens y componentes de alta fidelidad | ✅ (22/11) |
+| **4.4** | **Ajustes, Mapa de seguridad, Menú lateral (F3_05–F3_07) + TODO** | 📝 **siguiente** |
 | 4.5B | Pantallas del Flujo 1 en alta fidelidad | 📝 |
 | 4.5C | Pantallas de los Flujos 2 y 3 en alta fidelidad | 📝 |
 | 4.7 | Estados E1–E10 en la app | 📝 |
@@ -110,10 +110,10 @@ El Proyecto Final evalúa un **MVP funcional, usable e innovador**, no solo la a
 - 4.3A: `/paradero/[id]` (F3_02) y `/alerta` (F3_03, modal, `@react-native-community/datetimepicker`); paraderos favoritos y alertas en memoria.
 - 4.3B: Favoritos (F3_01) y Centro de notificaciones (F3_04) con badge «sin leer» en el BottomNav y botón de desarrollo «Simular aviso de alerta».
 
-### 4.5A · Tokens y componentes de alta fidelidad — 📝 siguiente
+### 4.5A · Tokens y componentes de alta fidelidad — ✅
 Actualizar `src/theme` y `src/components` a los estilos y componentes de la página de alta fidelidad. Sin tocar la lógica.
 
-### 4.4 · Ajustes, Mapa de seguridad, Menú lateral — 📝
+### 4.4 · Ajustes, Mapa de seguridad, Menú lateral — 📝 siguiente
 F3_05, F3_06, F3_07 y conectar los TODO (menú ☰, chip Seguridad, `/ajustes` provisional). Incluye la confirmación de «Cerrar sesión» (mejora pendiente del AP2).
 
 ### 4.5B / 4.5C · Pantallas en alta fidelidad — 📝

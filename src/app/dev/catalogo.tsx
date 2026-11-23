@@ -1,4 +1,17 @@
-import { Bell, Bus, MapPin, Search, Share2, ShieldAlert, Star, TrafficCone, Users } from "lucide-react-native";
+import {
+  Bell,
+  Bus,
+  House,
+  MapPin,
+  Radio,
+  Search,
+  Share2,
+  ShieldAlert,
+  Star,
+  TrafficCone,
+  TriangleAlert,
+  Users,
+} from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,11 +30,13 @@ import {
   type BottomNavTab,
 } from "@/components";
 import { catalogHeader, catalogRoutes } from "@/mocks/catalog";
-import { colors, radii, spacing, typography } from "@/theme";
+import { colors, radii, shadows, sizes, spacing, typography, type ShadowToken } from "@/theme";
 
 // Pantalla de desarrollo: catálogo de componentes base con todas sus variantes,
 // como la sección "Componentes" de Figma. Se abre desde "Ver catálogo" en Inicio.
 const noop = () => {};
+
+const SOMBRAS: ShadowToken[] = ["card", "float", "sheet", "pin", "primary", "danger", "focusRing"];
 
 export default function Catalogo() {
   const [alertsOn, setAlertsOn] = useState(true);
@@ -35,21 +50,31 @@ export default function Catalogo() {
       <Header title="Catálogo de componentes" />
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <Section title="Button">
-          <Variant label="Primary">
+          <Variant label="Primary · Default / Disabled">
             <Button label="Buscar ruta" onPress={noop} fullWidth />
+            <Button label="Buscar ruta" onPress={noop} fullWidth disabled />
           </Variant>
-          <Variant label="Secondary">
+          <Variant label="Secondary · Default / Disabled">
             <Button label="Ver en el mapa" variant="secondary" onPress={noop} fullWidth />
+            <Button label="Ver en el mapa" variant="secondary" onPress={noop} fullWidth disabled />
           </Variant>
-          <Variant label="Tertiary">
-            <Button label="Omitir" variant="tertiary" onPress={noop} />
+          <Variant label="Tertiary · Default / Disabled">
+            <View style={styles.row}>
+              <Button label="Omitir" variant="tertiary" onPress={noop} />
+              <Button label="Omitir" variant="tertiary" onPress={noop} disabled />
+            </View>
           </Variant>
-          <Variant label="Danger">
+          <Variant label="Danger · Default / Disabled">
             <Button label="Reportar peligro" variant="danger" onPress={noop} fullWidth />
+            <Button label="Reportar peligro" variant="danger" onPress={noop} fullWidth disabled />
           </Variant>
-          <Variant label="Disabled">
-            <Button label="Enviar reporte" onPress={noop} fullWidth disabled />
+          <Variant label="Con ícono · Pill">
+            <Button label="Reportar" variant="danger" icon={<TriangleAlert />} onPress={noop} pill />
           </Variant>
+          <Text style={styles.caption}>
+            Pressed: mantén presionado cualquier botón. Focus: anillo azul al navegar con teclado o Control por
+            botón.
+          </Text>
         </Section>
 
         <Section title="Chip">
@@ -59,16 +84,23 @@ export default function Catalogo() {
             <Chip label="En vivo · 4 min" state="live" />
             <Chip label="Seguridad / Peligro" state="alert" />
           </View>
-          <Text style={styles.caption}>Default (presionable) · Selected · Live · Alert</Text>
+          <View style={styles.row}>
+            <Chip label="Casa" icon={<House />} onPress={noop} />
+            <Chip label="Todas" icon={<Bell />} state="selected" onPress={noop} />
+            <Chip label="En vivo" icon={<Radio />} state="live" />
+            <Chip label="Seguridad" icon={<TriangleAlert />} state="alert" onPress={noop} />
+          </View>
+          <Text style={styles.caption}>Default · Selected · Live · Alert (sin y con ícono)</Text>
         </Section>
 
         <Section title="Icon Button">
           <View style={styles.row}>
             <IconButton icon={<Search />} onPress={noop} accessibilityLabel="Buscar" />
             <IconButton icon={<Star />} onPress={noop} accessibilityLabel="Favorito" active />
+            <IconButton icon={<Star />} onPress={noop} accessibilityLabel="Quitar de favoritos" tono="destacado" />
             <IconButton icon={<Share2 />} onPress={noop} accessibilityLabel="Compartir viaje" />
           </View>
-          <Text style={styles.caption}>Default · Active</Text>
+          <Text style={styles.caption}>Default · Active · Destacado · Default</Text>
         </Section>
 
         <Section title="Toggle">
@@ -148,7 +180,16 @@ export default function Catalogo() {
 
         <Section title="Bottom Nav">
           <View style={styles.card}>
-            <BottomNav active={tab} onSelect={setTab} />
+            <BottomNav active={tab} onSelect={setTab} badge={{ alertas: 2 }} />
+          </View>
+        </Section>
+        <Section title="Sombras">
+          <View style={styles.row}>
+            {SOMBRAS.map((sombra) => (
+              <View key={sombra} style={[styles.sombra, shadows[sombra]]}>
+                <Text style={styles.caption}>{sombra}</Text>
+              </View>
+            ))}
           </View>
         </Section>
       </ScrollView>
@@ -198,8 +239,16 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radii.lg,
+    borderRadius: radii.control,
     overflow: "hidden",
+  },
+  sombra: {
+    width: sizes.tileWidth,
+    height: sizes.buttonHeightLarge,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
   },
   caption: {
     ...typography.caption,

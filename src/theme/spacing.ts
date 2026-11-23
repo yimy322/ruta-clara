@@ -17,6 +17,10 @@ export const radii = {
   lg: 14,
   xl: 20,
   xxl: 24,
+  // Alta fidelidad: botones, tiles y tarjetas
+  control: 16,
+  // Alta fidelidad: insignias (List Item)
+  badge: 12,
   // Ilustraciones del onboarding (F1_02–F1_03)
   art: 16,
   pill: 999,
@@ -40,8 +44,8 @@ export const sizes = {
   buttonHeight: 52,
   buttonPaddingX: 20,
   chipHeight: 32,
-  iconButton: 36,
-  iconGlyph: 18,
+  iconButton: 44,
+  iconGlyph: 20,
   toggleWidth: 44,
   toggleHeight: 26,
   toggleKnob: 20,
@@ -49,10 +53,19 @@ export const sizes = {
   tileWidth: 104,
   tilePaddingY: 14,
   tileIcon: 36,
-  badge: 36,
+  // Ícono del Tile: círculo de 40 con glifo de 22
+  tileIconCircle: 40,
+  tileGlyph: 22,
+  badge: 40,
   navHeight: 64,
   navIcon: 22,
-  chipIcon: 14,
+  // Píldora amarilla de la pestaña activa
+  navPill: 52,
+  navPillHeight: 30,
+  navPaddingBottom: 10,
+  chipIcon: 16,
+  chipPaddingX: 14,
+  chipGap: 6,
   searchHeight: 44,
   // Campos origen/destino (F1_05)
   fieldHeight: 40,

@@ -19,7 +19,7 @@ type ItemNotificacionProps = {
 // líneas, detalle y punto rojo si no está leído. Un aviso de llegada sin leer
 // va con fondo amarillo suave.
 export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }: ItemNotificacionProps) {
-  const colorIcono = tono === "seguridad" ? colors.red : colors.ink;
+  const colorIcono = tono === "seguridad" ? colors.redStrong : colors.ink;
 
   return (
     <Pressable

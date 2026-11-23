@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type TileState = "default" | "selected" | "danger";
 
 type TileProps = {
   label: string;
+  // Ícono de lucide-react-native; va en un círculo de 40 pt
   icon?: ReactNode;
   state?: TileState;
   onPress: () => void;
@@ -17,10 +18,10 @@ type TileProps = {
   atenuado?: boolean;
 };
 
-// Tile de selección con icono (104 pt de ancho). Selected = estado activo
-// (amarillo), Danger = seguridad/urgencia (rojo).
+// Tile de selección con ícono (Figma 69:474), 104 pt de ancho. Tarjeta con
+// sombra; Selected = amarillo con borde ink, Danger = seguridad (rojo suave).
 export function Tile({ label, icon, state = "default", onPress, fill = false, atenuado = false }: TileProps) {
-  const color = state === "danger" ? colors.red : colors.ink;
+  const color = state === "danger" ? colors.redStrong : colors.ink;
 
   return (
     <Pressable
@@ -36,7 +37,11 @@ export function Tile({ label, icon, state = "default", onPress, fill = false, at
         pressed && styles.pressed,
       ]}
     >
-      {icon != null && withIconDefaults(icon, { color, size: sizes.tileIcon })}
+      {icon != null && (
+        <View style={[styles.icon, state !== "default" && styles.iconOnColor]}>
+          {withIconDefaults(icon, { color, size: sizes.tileGlyph })}
+        </View>
+      )}
       <Text style={[typography.caption, styles.label, { color }]} numberOfLines={2}>
         {label}
       </Text>
@@ -50,7 +55,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: sizes.tilePaddingY,
     gap: spacing.sm,
-    borderRadius: radii.lg,
+    borderRadius: radii.control,
+    // Borde transparente en Default para que el tile no cambie de tamaño
     borderWidth: borderWidths.regular,
     alignItems: "center",
   },
@@ -58,6 +64,17 @@ const styles = StyleSheet.create({
     flex: 1,
     width: undefined,
     paddingHorizontal: spacing.xxs,
+  },
+  icon: {
+    width: sizes.tileIconCircle,
+    height: sizes.tileIconCircle,
+    borderRadius: radii.pill,
+    backgroundColor: colors.canvas,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconOnColor: {
+    backgroundColor: colors.surface,
   },
   label: {
     textAlign: "center",
@@ -73,14 +90,16 @@ const styles = StyleSheet.create({
 const containerStyles = StyleSheet.create({
   default: {
     backgroundColor: colors.surface,
-    borderColor: colors.ink,
+    borderColor: "transparent",
+    ...shadows.card,
   },
   selected: {
     backgroundColor: colors.yellow,
     borderColor: colors.ink,
+    ...shadows.card,
   },
   danger: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.redSoft,
     borderColor: colors.red,
   },
 });

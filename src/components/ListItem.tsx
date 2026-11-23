@@ -15,8 +15,8 @@ type ListItemProps = {
   destacado?: boolean;
 };
 
-// Fila de lista: badge (número de ruta o ícono), título, subtítulo y texto
-// final. Si recibe onPress se vuelve presionable.
+// Fila de lista (Figma 73:1007): insignia de 40 pt (número de ruta o ícono),
+// título, subtítulo y texto final. Si recibe onPress se vuelve presionable.
 export function ListItem({ title, subtitle, badge, trailing, onPress, destacado = false }: ListItemProps) {
   const content = (
     <>
@@ -83,9 +83,8 @@ const styles = StyleSheet.create({
   badge: {
     width: sizes.badge,
     height: sizes.badge,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.badge,
+    backgroundColor: colors.canvas,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",

@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
@@ -19,8 +19,9 @@ type ButtonProps = {
   large?: boolean;
 };
 
-// Botón 52 pt. Primary = acción principal, Secondary = alternativa,
-// Tertiary = enlace, Danger = seguridad/urgencia.
+// Botón 52 pt (Figma 69:450). Primary = acción principal, Secondary =
+// alternativa, Tertiary = enlace, Danger = seguridad/urgencia.
+// Estados: pressed, disabled y focus (anillo azul con teclado o lector).
 export function Button({
   label,
   onPress,
@@ -31,27 +32,42 @@ export function Button({
   pill = false,
   large = false,
 }: ButtonProps) {
+  const [focused, setFocused] = useState(false);
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       style={({ pressed }) => [
         styles.base,
         containerStyles[variant],
+        !disabled && shadowStyles[variant],
         fullWidth && styles.fullWidth,
         pill && styles.pill,
         large && styles.large,
-        pressed && styles.pressed,
-        disabled && styles.disabled,
+        pressed && !disabled && pressedStyles[variant],
+        disabled && disabledStyles[variant],
+        focused && !disabled && shadows.focusRing,
       ]}
     >
-      {icon != null &&
-        withIconDefaults(icon, { color: labelStyles[variant].color, size: sizes.iconGlyph })}
-      <Text style={[typography.button, labelStyles[variant]]} numberOfLines={1}>
-        {label}
-      </Text>
+      {({ pressed }) => {
+        const color = disabled ? colors.inkMuted : labelStyles[variant].color;
+        return (
+          <>
+            {icon != null && withIconDefaults(icon, { color, size: sizes.iconGlyph })}
+            <Text
+              style={[typography.button, { color }, pressed && variant === "tertiary" && styles.tertiaryPressed]}
+              numberOfLines={1}
+            >
+              {label}
+            </Text>
+          </>
+        );
+      }}
     </Pressable>
   );
 }
@@ -60,7 +76,7 @@ const styles = StyleSheet.create({
   base: {
     height: sizes.buttonHeight,
     paddingHorizontal: sizes.buttonPaddingX,
-    borderRadius: radii.lg,
+    borderRadius: radii.control,
     flexDirection: "row",
     gap: spacing.sm,
     alignItems: "center",
@@ -76,11 +92,9 @@ const styles = StyleSheet.create({
   large: {
     height: sizes.buttonHeightLarge,
   },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  disabled: {
-    opacity: opacity.disabled,
+  // Figma no dibuja Tertiary presionado // supuesto: texto atenuado
+  tertiaryPressed: {
+    color: colors.inkMuted,
   },
 });
 
@@ -99,6 +113,30 @@ const containerStyles = StyleSheet.create({
   danger: {
     backgroundColor: colors.red,
   },
+});
+
+// Sombra de color solo en Primary y Danger habilitados
+const shadowStyles = {
+  primary: shadows.primary,
+  secondary: undefined,
+  tertiary: undefined,
+  danger: shadows.danger,
+} as const;
+
+const pressedStyles = StyleSheet.create({
+  primary: { backgroundColor: colors.inkPressed },
+  secondary: { backgroundColor: colors.canvas },
+  tertiary: {},
+  // Figma deja Danger igual al presionar // supuesto: rojo intenso como respuesta
+  danger: { backgroundColor: colors.redStrong },
+});
+
+// Deshabilitado: fondo line y texto inkMuted (no opacidad), como en Figma
+const disabledStyles = StyleSheet.create({
+  primary: { backgroundColor: colors.line },
+  secondary: { borderColor: colors.line },
+  tertiary: {},
+  danger: { backgroundColor: colors.line },
 });
 
 const labelStyles = StyleSheet.create({
