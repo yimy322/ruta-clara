@@ -11,11 +11,18 @@ Los pasajeros reportan en tiempo real dónde vienen las unidades, la espera en p
 
 ## Diseño
 - Figma: https://www.figma.com/design/scCnOTBkUv6axMpU4GiLwc/RutaClara
-- Son wireframes de baja-media fidelidad: respetar estructura, jerarquía y navegación; los estilos se ajustarán después.
-- Estilos de Figma: RC/Color/* y RC/Type/* → replicarlos como tokens en /src/theme.
-- Componentes base en Figma: Status Bar, Button, Chip, Icon Button, Toggle, Tile, List Item, Header, Bottom Nav.
+- Referencia visual: página "RutaClara · Alta fidelidad" (node 69:441).
+  La página "RutaClara · Prototipo" son los wireframes del AP2: no usarla para estilos.
+- Estilos de alta fidelidad: RC-HF/Color/*, RC-HF/Type/*, RC-HF/Shadow/* → tokens en /src/theme.
+  RC-HF-Dark/* (oscuro) y RC-HF-HC/* (alto contraste) para el tema dinámico.
+- Componentes maestros en la sección 69:442; íconos = lucide-react-native (mismos nombres).
+- Node-ids de pantallas, estados y componentes: docs/RUTACLARA_CONTEXT.md §7.
 - Grid 8 pt, márgenes 16, áreas táctiles mínimas de 44 pt.
 - Rojo = seguridad/urgencia · Amarillo = unidad en vivo · Azul = ubicación del usuario.
+
+## Documentación del proyecto
+Antes de cada paso, leer docs/ROADMAP.md y docs/RUTACLARA_CONTEXT.md.
+Los prompts pendientes están en docs/PROMPTS_PENDIENTES.md.
 
 ## Pantallas (ID de Figma → flujo)
 - F1_01–F1_10: búsqueda de rutas y viaje en vivo
@@ -44,7 +51,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F3_02 · Detalle de paradero | paradero/[id].tsx | /paradero/puente-nuevo | Stack (desde la card de Inicio). Recarga al recibir foco |
 | F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
-| F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (provisional, desde ⚙ en Mi perfil) |
+| F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (provisional, desde ⚙ en Mi perfil y en Alertas) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
 | F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
 | F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/la-50 | Stack |
@@ -73,6 +80,10 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 ## Reglas de trabajo
 - Textos de la interfaz en español peruano, tal como aparecen en Figma.
 - Componentes funcionales con hooks; un componente por archivo en /src/components.
-- No instalar librerías nuevas sin preguntar antes. Aprobado como herramienta de desarrollo: ESLint (eslint + eslint-config-expo, config en eslint.config.js).
-- Trabajar una pantalla o componente a la vez y explicar brevemente qué cambió.
-- Usar datos de prueba en /src/mocks hasta que se conecte Supabase.
+- No instalar librerías nuevas sin preguntar antes; instalar siempre con `npx expo install`. Aprobado como herramienta de desarrollo: ESLint (eslint + eslint-config-expo, config en eslint.config.js).
+- Fuente Inter por familia según el peso (`Inter_600SemiBold`…); no usar `fontWeight`.
+- Leer el frame de alta fidelidad con el MCP de Figma antes de escribir código de una pantalla o componente.
+- Mostrar el plan antes de ejecutar; trabajar una pantalla o componente a la vez y explicar brevemente qué cambió.
+- Validar con `npx tsc --noEmit` y `npx expo lint` (y `npx expo-doctor` si cambian las dependencias); commit tras cada paso verificado.
+- Usar datos de prueba de /src/mocks (a través de `@/data/repositorio`) hasta que se conecte Supabase. Para imitar números de Figma se ajustan los escenarios de prueba, nunca la lógica.
+- Alerta urgente de seguridad: en pruebas nunca tocar «Llamar» (105 es la central real de la PNP); usar «Ahora no».

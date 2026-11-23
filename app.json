@@ -50,7 +50,10 @@
           "cameraPermission": "RutaClara usa la cámara para que tomes una foto de lo que reportas."
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

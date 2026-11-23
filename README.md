@@ -105,8 +105,8 @@ Los wireframes y el prototipo navegable (26 pantallas en 3 flujos) están en Fig
 
 - [x] Fase 1: entorno, proyecto Expo y conexión con Figma
 - [x] Fase 2: tokens de diseño y componentes base
-- [ ] Fase 3: Flujo 1 (búsqueda y viaje en vivo)
-- [ ] Fase 4: Flujos 2 y 3 (reportes, favoritos y alertas)
+- [x] Fase 3: Flujo 1 (búsqueda y viaje en vivo)
+- [ ] Fase 4: Flujos 2 y 3 (reportes, favoritos y alertas) — en curso: faltan Ajustes, Mapa de seguridad, Menú lateral y el paso a alta fidelidad
 - [ ] Fase 5: backend con Supabase
 - [ ] Fase 6: mapa real, ubicación y notificaciones
 
