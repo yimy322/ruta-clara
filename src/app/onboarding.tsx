@@ -17,7 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, Paginador } from "@/components";
 import { usePreferencias } from "@/context/PreferenciasContext";
-import { borderWidths, colors, minTouch, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, minTouch, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 
 const ilustracionRutas = require("../../assets/images/onboarding-1.png");
 const ilustracionReportes = require("../../assets/images/onboarding-2.png");
@@ -206,10 +206,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
     padding: sizes.cardPadding,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   prePermisoIcono: {
     width: sizes.prePermisoIcon,
@@ -217,8 +216,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    backgroundColor: colors.canvas,
   },
   prePermisoTexto: {
     ...typography.caption,

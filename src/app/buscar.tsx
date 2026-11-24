@@ -4,8 +4,8 @@ import {
   Briefcase,
   GraduationCap,
   House,
-  MapPin,
-  RotateCcw,
+  History,
+  LocateFixed,
   type LucideIcon,
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Chip, IconButton, ListItem } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { buscarDestinos, getDestinosComunes, getDestinosRecientes, getLugaresGuardados } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Destino, LugarGuardado } from "@/types";
 import { partirCoincidencia } from "@/utils/formato";
 
@@ -113,7 +113,7 @@ export default function Buscar() {
     return resultado.destinos.map((destino, i) => (
       <ListItem
         key={destino.id}
-        badge={<MapPin />}
+        badge={<LocateFixed />}
         title={tituloResaltado(destino.nombre, resultado.consulta)}
         subtitle={destino.distrito}
         destacado={i === 0}
@@ -176,7 +176,7 @@ export default function Buscar() {
             {recientes.map((destino) => (
               <ListItem
                 key={destino.id}
-                badge={<RotateCcw />}
+                badge={<History />}
                 title={destino.nombre}
                 subtitle={destino.distrito}
                 onPress={() => irARutas(destino.nombre)}
@@ -224,8 +224,11 @@ const styles = StyleSheet.create({
   campoOrigen: {
     borderColor: colors.line,
   },
+  // Campo activo: tarjeta con sombra, sin borde
   campoDestino: {
-    borderColor: colors.ink,
+    borderColor: "transparent",
+    borderRadius: radii.control,
+    ...shadows.card,
   },
   punto: {
     width: sizes.fieldDot,

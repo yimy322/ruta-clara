@@ -149,6 +149,7 @@ src/
 - `getReportesSeguridad(horas)`, `getHistorialReportes()`.
 - **4.3A:** `getParaderosFavoritos`, `esParaderoFavorito`, `alternarParaderoFavorito`, `getResumenParadero(id)`, `getActividadParadero` (renombrado del antiguo `getResumenParadero`), `getAlertas`, `getAlerta`, `getAlertaDeParadero`, `guardarAlerta`, `eliminarAlerta`, `getOpcionesRutaAlerta`.
 - **4.3B:** `getFavoritos`, `getNotificaciones`, `marcarNotificacionLeida`, `contarNoLeidas`, `simularAvisoAlerta`.
+- **4.5B:** `Mapa` con decoración (manzanas, parque, avenida) y props opcionales `marcadorParadero="P"` y `estiloUnidad="burbuja"` (solo Inicio); `CardParadero` recibe `proximas` de `getResumenParadero`; `ListItem enTarjeta`.
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.
 

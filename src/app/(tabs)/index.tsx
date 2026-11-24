@@ -19,11 +19,12 @@ import {
   getLugaresGuardados,
   getParaderoCercano,
   getParaderosCercanos,
+  getResumenParadero,
   getUbicacionUsuario,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
 import { usePermisoUbicacion } from "@/hooks/usePermisoUbicacion";
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, LugarGuardado, Paradero, UnidadEnVivo } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 import { ICONO_LUGAR } from "@/utils/icons";
@@ -69,9 +70,17 @@ export default function Inicio() {
         }
         return;
       }
-      const actividad = await getActividadParadero(paradero.id);
+      const [actividad, resumen] = await Promise.all([
+        getActividadParadero(paradero.id),
+        getResumenParadero(paradero.id),
+      ]);
       if (activo) {
-        setCercano({ paradero, actividad, distanciaM: distanciaMetros(lat, lng, paradero.lat, paradero.lng) });
+        setCercano({
+          paradero,
+          actividad,
+          proximas: resumen?.proximas ?? [],
+          distanciaM: distanciaMetros(lat, lng, paradero.lat, paradero.lng),
+        });
       }
     })();
 
@@ -89,6 +98,8 @@ export default function Inicio() {
         usuario={usuario}
         paraderos={paraderos}
         unidades={unidades}
+        marcadorParadero="P"
+        estiloUnidad="burbuja"
         margen={{ top: altoArriba, bottom: altoAbajo }}
       />
 
@@ -198,12 +209,11 @@ const styles = StyleSheet.create({
     height: sizes.searchHeight,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
+    gap: sizes.legendPadding,
     paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   punto: {
     position: "absolute",

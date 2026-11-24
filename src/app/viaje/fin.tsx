@@ -4,10 +4,10 @@ import { useCallback, useState } from "react";
 import { Alert, BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, Chip, IconButton, Tile } from "@/components";
+import { Button, Chip, IconButton, TarjetaEstadistica, Tile } from "@/components";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
 import { crearReporte } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { colors, radii, sizes, spacing, typography } from "@/theme";
 import { formatearEta, formatearHora, formatearPasaje } from "@/utils/formato";
 
 const VALORACIONES: { valor: number; label: string; icono: LucideIcon }[] = [
@@ -113,18 +113,9 @@ export default function FinViaje() {
         </Text>
 
         <View style={styles.stats}>
-          <View style={styles.stat}>
-            <Text style={[typography.h2, styles.ink]}>{formatearEta(minutos)}</Text>
-            <Text style={[typography.caption, styles.muted]}>tiempo total</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={[typography.h2, styles.ink]}>{paraderos}</Text>
-            <Text style={[typography.caption, styles.muted]}>paraderos</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={[typography.h2, styles.ink]}>{formatearPasaje(viaje.linea.pasaje)}</Text>
-            <Text style={[typography.caption, styles.muted]}>pasaje</Text>
-          </View>
+          <TarjetaEstadistica valor={formatearEta(minutos)} label="tiempo total" />
+          <TarjetaEstadistica valor={String(paraderos)} label="paraderos" />
+          <TarjetaEstadistica valor={formatearPasaje(viaje.linea.pasaje)} label="pasaje" />
         </View>
 
         <View style={styles.pregunta}>
@@ -192,8 +183,6 @@ const styles = StyleSheet.create({
     width: sizes.successIcon,
     height: sizes.successIcon,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
     backgroundColor: colors.yellow,
     alignItems: "center",
     justifyContent: "center",
@@ -202,15 +191,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "stretch",
     gap: spacing.sm,
-  },
-  stat: {
-    flex: 1,
-    alignItems: "center",
-    gap: spacing.xxs,
-    padding: sizes.statPadding,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
   },
   pregunta: {
     alignSelf: "stretch",

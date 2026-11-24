@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, minTouch, opacity, sizes, typography } from "@/theme";
+import { colors, minTouch, opacity, radii, shadows, sizes, typography } from "@/theme";
 
 type Opcion<T extends string> = {
   valor: T;
@@ -18,11 +18,11 @@ const verticalSlop = (minTouch - sizes.segmentedHeight) / 2;
 const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 
 // Control segmentado de ancho completo (p. ej. Ida / Vuelta en F1_07).
-// La opción elegida va en ink.
+// Tarjeta con sombra; la opción elegida va en ink.
 export function Segmented<T extends string>({ opciones, valor, onChange }: SegmentedProps<T>) {
   return (
     <View style={styles.base} accessibilityRole="tablist">
-      {opciones.map((opcion) => {
+      {opciones.map((opcion, i) => {
         const elegida = opcion.valor === valor;
         return (
           <Pressable
@@ -31,7 +31,13 @@ export function Segmented<T extends string>({ opciones, valor, onChange }: Segme
             hitSlop={hitSlop}
             accessibilityRole="tab"
             accessibilityState={{ selected: elegida }}
-            style={({ pressed }) => [styles.opcion, elegida && styles.elegida, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.opcion,
+              i === 0 && styles.primera,
+              i === opciones.length - 1 && styles.ultima,
+              elegida && styles.elegida,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={[typography.bodyStrong, elegida ? styles.labelElegida : styles.label]} numberOfLines={1}>
               {opcion.label}
@@ -46,10 +52,18 @@ export function Segmented<T extends string>({ opciones, valor, onChange }: Segme
 const styles = StyleSheet.create({
   base: {
     flexDirection: "row",
-    borderRadius: sizes.segmentedRadius,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    overflow: "hidden",
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
+    ...shadows.card,
+  },
+  // El recorte va en cada extremo: overflow hidden en la tarjeta cortaría la sombra
+  primera: {
+    borderTopLeftRadius: radii.control,
+    borderBottomLeftRadius: radii.control,
+  },
+  ultima: {
+    borderTopRightRadius: radii.control,
+    borderBottomRightRadius: radii.control,
   },
   opcion: {
     flex: 1,

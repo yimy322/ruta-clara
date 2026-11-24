@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from "expo-router";
-import { ArrowLeft, CircleDot, Play } from "lucide-react-native";
+import { ArrowLeft, MapPin, Radio } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,7 +8,7 @@ import { Button, Chip, IconButton, Mapa, useToast } from "@/components";
 import { INTERVALO_ETA_MS } from "@/config/simulacion";
 import { useViaje } from "@/context/ViajeContext";
 import { getReportesCercanos, getUnidadEnCamino } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Reporte, UnidadEnCamino } from "@/types";
 import {
   etiquetaOcupacion,
@@ -130,7 +130,7 @@ export default function Espera() {
                   linea: unidad.linea,
                   ...posicion,
                   etiqueta: `${unidad.linea.nombre} · ${formatearDistancia(unidad.distanciaM * fraccion)}`,
-                  icono: <Play />,
+                  icono: <Radio />,
                 },
               ]
             : []
@@ -155,7 +155,7 @@ export default function Espera() {
           <View style={styles.zona}>
             <Chip
               label={`${reportes.length} ${reportes.length === 1 ? "reporte" : "reportes"} en tu zona`}
-              icon={<CircleDot />}
+              icon={<MapPin />}
             />
           </View>
         </View>
@@ -237,11 +237,10 @@ const styles = StyleSheet.create({
   paradero: {
     flex: 1,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    paddingVertical: sizes.stepPillPaddingY,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   zona: {
     flexDirection: "row",
@@ -282,9 +281,9 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: spacing.md,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
+    ...shadows.card,
   },
   acciones: {
     flexDirection: "row",

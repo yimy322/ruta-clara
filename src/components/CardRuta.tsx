@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { NivelTrafico, OpcionRuta } from "@/types";
 import {
   etiquetaOcupacion,
@@ -15,7 +15,7 @@ import { Chip, type ChipState } from "./Chip";
 
 type CardRutaProps = {
   opcion: OpcionRuta;
-  // Borde grueso: la opción recomendada
+  // Borde yellowDeep: la opción recomendada
   recomendada?: boolean;
   onPress: () => void;
 };
@@ -59,13 +59,15 @@ const styles = StyleSheet.create({
   base: {
     gap: spacing.sm,
     padding: sizes.cardPadding,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
+    // Borde transparente para que la recomendada no cambie de tamaño
+    borderWidth: borderWidths.medium,
+    borderColor: "transparent",
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   recomendada: {
-    borderWidth: borderWidths.thick,
+    borderColor: colors.yellowDeep,
   },
   cabecera: {
     flexDirection: "row",

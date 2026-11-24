@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { colors, radii, sizes, spacing, typography } from "@/theme";
 
 type TarjetaEstadisticaProps = {
   valor: string;
@@ -29,9 +29,7 @@ const styles = StyleSheet.create({
     gap: spacing.xxs,
     padding: sizes.statPadding,
     borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.canvas,
   },
   ink: {
     color: colors.ink,

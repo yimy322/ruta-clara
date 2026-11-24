@@ -1,8 +1,9 @@
+import { Bus } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, Linea, NivelZona, Paradero } from "@/types";
 
 import { Chip } from "./Chip";
@@ -42,6 +43,11 @@ type MapaProps = {
   etiquetaUsuario?: string;
   // Une cada unidad con el usuario con una línea punteada (unidad en camino, F1_08)
   seguimiento?: boolean;
+  // "P": paradero como cuadro negro con una P (Inicio, F1_04). Por defecto, punto
+  marcadorParadero?: "punto" | "P";
+  // "burbuja": unidad en vivo como píldora amarilla con ícono de bus (F1_04).
+  // Por defecto, Chip Live
+  estiloUnidad?: "chip" | "burbuja";
   // Manchas de calor de seguridad, debajo de los demás puntos (F3_06)
   zonas?: ZonaMapa[];
   // Espacio tapado por controles flotantes: los puntos se acomodan fuera de él
@@ -56,9 +62,30 @@ const BORDE_Y = spacing.xxl;
 // Lado mínimo de la caja en grados (~550 m), para que un solo punto no llene el mapa
 const SPAN_MINIMO = 0.005;
 
-// Calles decorativas, en fracción del ancho/alto (posiciones del wireframe F1_04)
+// Calles decorativas, en fracción del ancho/alto (posiciones de F1_04)
 const CALLES_HORIZONTALES = [0.3, 0.64];
 const CALLES_VERTICALES = [0.33, 0.72];
+
+// Manzanas y parque decorativos (alta fidelidad, F1_04), en fracción del
+// ancho/alto del frame de 360 × 740: [left, top, width, height]
+const MANZANAS: [number, number, number, number][] = [
+  [0.39, 0.054, 0.278, 0.216],
+  [0.044, 0.338, 0.256, 0.149],
+  [0.778, 0.338, 0.178, 0.176],
+  [0.044, 0.676, 0.256, 0.203],
+];
+const PARQUE: [number, number, number, number] = [0.394, 0.405, 0.294, 0.162];
+// Avenida diagonal: centro en fracción y giro (F1_04)
+const AVENIDA = { top: 0.65, angulo: "-22deg" } as const;
+// Bajo este alto el mapa es una miniatura: sin avenida, para no tapar el recorrido
+const ALTO_MINIMO_AVENIDA = 300;
+
+const fraccion = ([left, top, width, height]: [number, number, number, number]): ViewStyle => ({
+  left: `${left * 100}%`,
+  top: `${top * 100}%`,
+  width: `${width * 100}%`,
+  height: `${height * 100}%`,
+});
 
 // Mapa PROVISIONAL que imita los wireframes: fondo plano, calles fijas y los
 // puntos ubicados con una proyección simple que encuadra todo lo recibido.
@@ -71,6 +98,8 @@ export function Mapa({
   etiqueta,
   etiquetaUsuario,
   seguimiento = false,
+  marcadorParadero = "punto",
+  estiloUnidad = "chip",
   zonas = [],
   margen,
   estilo,
@@ -87,6 +116,11 @@ export function Mapa({
 
   return (
     <View style={[styles.base, estilo]} onLayout={handleLayout} accessibilityLabel="Mapa">
+      {MANZANAS.map((m) => (
+        <View key={`m${m.join()}`} style={[styles.manzana, fraccion(m)]} />
+      ))}
+      <View style={[styles.parque, fraccion(PARQUE)]} />
+      {tamano.alto >= ALTO_MINIMO_AVENIDA && <View style={styles.avenida} />}
       {CALLES_HORIZONTALES.map((y) => (
         <View key={`h${y}`} style={[styles.calle, styles.calleHorizontal, { top: `${y * 100}%` }]} />
       ))}
@@ -137,10 +171,14 @@ export function Mapa({
         paraderos.map((paradero) => (
           <View
             key={paradero.id}
-            style={[styles.marcador, styles.paradero, proyectar(paradero)]}
+            style={[styles.marcador, marcadorParadero === "P" ? styles.paraderoP : styles.paradero, proyectar(paradero)]}
             accessibilityLabel={paradero.nombre}
           >
-            <View style={styles.paraderoCentro} />
+            {marcadorParadero === "P" ? (
+              <Text style={[typography.captionStrong, styles.paraderoLetra]}>P</Text>
+            ) : (
+              <View style={styles.paraderoCentro} />
+            )}
           </View>
         ))}
 
@@ -161,7 +199,19 @@ export function Mapa({
       {proyectar &&
         unidades.map((unidad) => (
           <View key={unidad.linea.id} style={[styles.marcador, styles.unidad, proyectar(unidad)]}>
-            <Chip label={unidad.etiqueta ?? unidad.linea.nombre} icon={unidad.icono} state="live" />
+            {estiloUnidad === "burbuja" ? (
+              <View style={styles.burbuja} accessibilityLabel={`Unidad en vivo: ${unidad.etiqueta ?? unidad.linea.nombre}`}>
+                <View style={styles.burbujaIcono}>
+                  {/* supuesto: Figma no deja ver el color del ícono; amarillo sobre el círculo negro */}
+                  <Bus color={colors.yellow} size={sizes.mapBusGlyph} />
+                </View>
+                <Text style={[typography.captionStrong, styles.ink]} numberOfLines={1}>
+                  {unidad.etiqueta ?? unidad.linea.nombre}
+                </Text>
+              </View>
+            ) : (
+              <Chip label={unidad.etiqueta ?? unidad.linea.nombre} icon={unidad.icono} state="live" />
+            )}
           </View>
         ))}
 
@@ -253,6 +303,26 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: colors.surface,
   },
+  manzana: {
+    position: "absolute",
+    borderRadius: radii.md,
+    backgroundColor: colors.block,
+  },
+  parque: {
+    position: "absolute",
+    borderRadius: radii.control,
+    backgroundColor: colors.park,
+  },
+  // Más ancha que el mapa para que el giro no deje puntas visibles
+  avenida: {
+    position: "absolute",
+    left: "-25%",
+    right: "-25%",
+    top: `${AVENIDA.top * 100}%`,
+    height: sizes.mapAvenue,
+    backgroundColor: colors.avenue,
+    transform: [{ rotate: AVENIDA.angulo }],
+  },
   calleHorizontal: {
     left: 0,
     right: 0,
@@ -277,6 +347,40 @@ const styles = StyleSheet.create({
     borderColor: colors.ink,
     alignItems: "center",
     justifyContent: "center",
+  },
+  paraderoP: {
+    width: sizes.mapStopP,
+    height: sizes.mapStopP,
+    borderRadius: radii.md,
+    backgroundColor: colors.ink,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.pin,
+  },
+  paraderoLetra: {
+    color: colors.surface,
+  },
+  burbuja: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: sizes.chipGap,
+    paddingLeft: sizes.mapBusPadding,
+    paddingRight: spacing.md,
+    paddingVertical: sizes.mapBusPadding,
+    borderRadius: radii.pill,
+    backgroundColor: colors.yellow,
+    ...shadows.pin,
+  },
+  burbujaIcono: {
+    width: sizes.mapBusCircle,
+    height: sizes.mapBusCircle,
+    borderRadius: radii.pill,
+    backgroundColor: colors.ink,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ink: {
+    color: colors.ink,
   },
   paraderoCentro: {
     width: sizes.mapStop / 2,

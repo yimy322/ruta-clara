@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CircleDot, Star } from "lucide-react-native";
+import { MapPin, Star } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -191,13 +191,14 @@ export default function DetalleRuta() {
         <GraficoAfluencia valores={linea.afluencia} />
 
         <Text style={[typography.overline, styles.muted]}>Paraderos cercanos</Text>
-        <View style={styles.lista}>
+        <View>
           {cercanos.slice(0, PARADEROS_VISIBLES).map(({ paradero, distanciaM }) => (
             <ListItem
               key={paradero.id}
-              badge={<CircleDot />}
+              badge={<MapPin />}
               title={paradero.nombre}
               trailing={formatearDistancia(distanciaM)}
+              enTarjeta
             />
           ))}
         </View>
@@ -232,9 +233,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   // ListItem trae su propio margen lateral de 16
-  lista: {
-    marginHorizontal: -spacing.lg,
-  },
   pie: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,

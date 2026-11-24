@@ -13,11 +13,22 @@ type ListItemProps = {
   onPress?: () => void;
   // Fondo amarillo suave: la opción sugerida
   destacado?: boolean;
+  // Sin margen lateral, para listas dentro de un contenido que ya tiene
+  // márgenes (F1_07)
+  enTarjeta?: boolean;
 };
 
 // Fila de lista (Figma 73:1007): insignia de 40 pt (número de ruta o ícono),
 // título, subtítulo y texto final. Si recibe onPress se vuelve presionable.
-export function ListItem({ title, subtitle, badge, trailing, onPress, destacado = false }: ListItemProps) {
+export function ListItem({
+  title,
+  subtitle,
+  badge,
+  trailing,
+  onPress,
+  destacado = false,
+  enTarjeta = false,
+}: ListItemProps) {
   const content = (
     <>
       {badge != null && (
@@ -52,14 +63,19 @@ export function ListItem({ title, subtitle, badge, trailing, onPress, destacado 
   );
 
   if (!onPress) {
-    return <View style={[styles.base, destacado && styles.destacado]}>{content}</View>;
+    return <View style={[styles.base, enTarjeta && styles.enTarjeta, destacado && styles.destacado]}>{content}</View>;
   }
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.base, destacado && styles.destacado, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.base,
+        enTarjeta && styles.enTarjeta,
+        destacado && styles.destacado,
+        pressed && styles.pressed,
+      ]}
     >
       {content}
     </Pressable>
@@ -79,6 +95,10 @@ const styles = StyleSheet.create({
   },
   destacado: {
     backgroundColor: colors.yellowSoft,
+  },
+  enTarjeta: {
+    paddingHorizontal: 0,
+    paddingVertical: spacing.sm,
   },
   badge: {
     width: sizes.badge,

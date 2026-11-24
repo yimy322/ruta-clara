@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, Vibration, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, Header, Toggle, useToast } from "@/components";
+import { BarraProgreso, Button, Header, Toggle, useToast } from "@/components";
 import { INTERVALO_PARADERO_MS } from "@/config/simulacion";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
 import { getTramoViaje } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { ParaderoTramo } from "@/types";
 import { formatearEta } from "@/utils/formato";
 
@@ -120,9 +120,7 @@ export default function ABordo() {
       ) : (
         <ScrollView contentContainerStyle={styles.contenido}>
           <View style={styles.progreso}>
-            <View style={styles.barra}>
-              <View style={[styles.relleno, { width: `${((posicion + 1) / tramo.length) * 100}%` }]} />
-            </View>
+            <BarraProgreso progreso={(posicion + 1) / tramo.length} />
             <Text style={[typography.caption, styles.muted]}>
               {posicion + 1} de {tramo.length} paraderos
             </Text>
@@ -192,11 +190,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   enVivo: {
-    width: sizes.iconButton,
-    height: sizes.iconButton,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    width: sizes.indicadorViaje,
+    height: sizes.indicadorViaje,
+    borderRadius: radii.badge,
     backgroundColor: colors.yellow,
     alignItems: "center",
     justifyContent: "center",
@@ -212,17 +208,6 @@ const styles = StyleSheet.create({
   },
   progreso: {
     gap: spacing.xs,
-  },
-  barra: {
-    height: sizes.progressHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.line,
-    overflow: "hidden",
-  },
-  relleno: {
-    height: "100%",
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
   },
   fila: {
     flexDirection: "row",
@@ -254,9 +239,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
     padding: sizes.cardPadding,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
+    ...shadows.card,
   },
   cardTexto: {
     flex: 1,

@@ -76,12 +76,17 @@ export const sizes = {
   badgeDot: 10,
   // Mapa provisional (F1_04)
   mapStop: 20,
+  // Alta fidelidad: paradero «P», burbuja de unidad en vivo y avenida
+  mapStopP: 28,
+  mapBusCircle: 24,
+  mapBusGlyph: 14,
+  mapBusPadding: 5,
+  mapAvenue: 18,
   mapUser: 16,
   mapUserHalo: 36,
   mapRoad: 10,
   // Detalle de ruta (F1_07)
   segmentedHeight: 40,
-  segmentedRadius: 12,
   routeMap: 140,
   mapRoute: 3,
   mapLabelPaddingX: 6,
@@ -134,6 +139,8 @@ export const sizes = {
   radio: 24,
   radioDot: 10, // supuesto: Figma lo dibuja como imagen
   // Perfil (F2_09)
+  // Indicador «a bordo» del header de F1_09
+  indicadorViaje: 36,
   avatar: 64,
   // Alerta diaria (F3_03)
   dayCircle: 38,
