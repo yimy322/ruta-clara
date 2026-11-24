@@ -211,6 +211,19 @@ const SEGURIDAD: Record<TipoSeguridad, string> = {
 
 export const etiquetaSeguridad = (seguridad: TipoSeguridad) => SEGURIDAD[seguridad];
 
+// Dentro de una frase: «5 reportes de robo» (F3_06)
+const SEGURIDAD_EN_FRASE: Record<TipoSeguridad, string> = {
+  paradero_peligroso: "paradero peligroso",
+  robo: "robo",
+  acoso: "acoso",
+  conductor_imprudente: "conductor imprudente",
+};
+
+export const seguridadEnFrase = (seguridad: TipoSeguridad) => SEGURIDAD_EN_FRASE[seguridad];
+
+// «1 reporte» / «5 reportes»
+export const cantidadReportes = (n: number) => `${n} ${n === 1 ? "reporte" : "reportes"}`;
+
 const TIPO_REPORTE: Record<TipoReporte, string> = {
   ubicacion: "Ubicación",
   paradero: "Paradero",

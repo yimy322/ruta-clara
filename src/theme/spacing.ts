@@ -140,10 +140,26 @@ export const sizes = {
   // Notificaciones (F3_04)
   notifIcon: 32,
   unreadDot: 8,
+  // Ajustes y menú lateral (F3_05, F3_07)
+  avatarSmall: 44,
+  avatarMedium: 56,
+  settingsIcon: 22,
+  // Alto mínimo de una fila de Ajustes (área táctil 44 pt)
+  minTouchRow: 44,
+  chevron: 18,
+  drawerWidth: 288,
+  menuRowHeight: 65,
+  // Mapa de seguridad (F3_06): manchas de calor y leyenda
+  zonaAlta: 144,
+  zonaMedia: 92,
+  legendDot: 8,
+  legendPadding: 10,
 } as const;
 
 // Feedback al presionar y estado deshabilitado
 export const opacity = {
   pressed: 0.7,
   disabled: 0.4,
+  // Centro de una mancha de calor del mapa de seguridad (F3_06) // supuesto
+  zonaCentro: 0.55,
 } as const;

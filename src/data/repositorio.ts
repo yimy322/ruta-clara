@@ -1,7 +1,7 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
-import { UMBRAL_EN_VIVO_MIN, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
+import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
 import { destinos } from "@/mocks/destinos";
@@ -39,11 +39,13 @@ import type {
   ResumenParadero,
   RutaGuardada,
   Sentido,
+  TipoSeguridad,
   UnidadEnCamino,
   UnidadEnVivo,
   Usuario,
   Via,
   ViajeAlerta,
+  ZonaSeguridad,
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
@@ -545,6 +547,42 @@ export async function getReportesSeguridad(horas: number): Promise<Reporte[]> {
     .filter((reporte) => reporte.tipo === "seguridad" && minutosDesde(reporte.creadoEn) <= horas * 60)
     .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
     .map((reporte) => (reporte.anonimo ? { ...reporte, usuarioId: undefined } : reporte));
+}
+
+// Reportes de seguridad de las últimas `horas` agrupados por paradero, de la
+// zona con más reportes a la de menos (F3_06). `tipo` filtra por lo que pasó.
+export async function getZonasSeguridad(horas: number, tipo?: TipoSeguridad): Promise<ZonaSeguridad[]> {
+  const recientes = (await getReportesSeguridad(horas)).filter((r) => !tipo || r.seguridad === tipo);
+
+  const porParadero = new Map<string, Reporte[]>();
+  for (const reporte of recientes) {
+    if (reporte.paraderoId) {
+      porParadero.set(reporte.paraderoId, [...(porParadero.get(reporte.paraderoId) ?? []), reporte]);
+    }
+  }
+
+  const zonas: ZonaSeguridad[] = [];
+  for (const [paraderoId, delParadero] of porParadero) {
+    const paradero = paraderos.find((p) => p.id === paraderoId);
+    if (!paradero) continue;
+
+    const conteo = new Map<TipoSeguridad, number>();
+    for (const r of delParadero) {
+      if (r.seguridad) conteo.set(r.seguridad, (conteo.get(r.seguridad) ?? 0) + 1);
+    }
+    const tipoFrecuente = [...conteo.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "paradero_peligroso";
+
+    zonas.push({
+      paradero,
+      nivel: delParadero.length >= UMBRAL_ZONA_ALTA ? "alto" : "medio",
+      cantidad: delParadero.length,
+      tipoFrecuente,
+      // getReportesSeguridad ya los ordena del más reciente al más antiguo
+      ultimo: delParadero[0].creadoEn,
+    });
+  }
+
+  return zonas.sort((a, b) => b.cantidad - a.cantidad);
 }
 
 // Reportes del usuario, del más reciente al más antiguo (F2_09).

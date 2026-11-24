@@ -78,6 +78,7 @@ function RootNavigator() {
           <Stack.Screen name="reporte" options={{ presentation: "modal" }} />
           <Stack.Screen name="alerta" options={{ presentation: "modal" }} />
           <Stack.Screen name="ajustes" />
+          <Stack.Screen name="seguridad" />
           <Stack.Screen name="dev/catalogo" />
           <Stack.Screen name="dev/datos" />
         </Stack.Protected>

@@ -16,8 +16,8 @@ Actualizado: **22 de noviembre de 2026**. Prompts para Claude Code **que todaví
 |---|---|---|
 | 0 | Arranque: verificar el estado del proyecto | ✅ ejecutado el 22/11 |
 | 1 | 4.5A · Tokens y componentes de alta fidelidad | ✅ ejecutado el 22/11 |
-| 2 | 4.4 · Ajustes, Mapa de seguridad, Menú lateral | 📝 siguiente |
-| 3 | 4.5B · Pantallas del Flujo 1 en alta fidelidad | 📝 |
+| 2 | 4.4 · Ajustes, Mapa de seguridad, Menú lateral | ✅ ejecutado el 24/11 |
+| 3 | 4.5B · Pantallas del Flujo 1 en alta fidelidad | 📝 siguiente |
 | 4 | 4.5C · Pantallas de los Flujos 2 y 3 en alta fidelidad | 📝 |
 | 5 | 4.7 · Estados E1–E10 | 📝 |
 | 6 | 4.6 + 4.8 · Tema dinámico y módulo de accesibilidad | 📝 |

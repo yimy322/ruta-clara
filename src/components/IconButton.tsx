@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
-import { colors, opacity, radii, shadows, sizes } from "@/theme";
+import { borderWidths, colors, opacity, radii, shadows, sizes } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 type IconButtonProps = {
@@ -10,7 +10,8 @@ type IconButtonProps = {
   active?: boolean;
   // Fondo amarillo: algo que el usuario marcó, como un favorito (F1_07, F3_02).
   // No confundir con Live, que es el amarillo de las unidades en vivo
-  tono?: "destacado";
+  // "seguridad": borde rojo, como el acceso al mapa de seguridad (F3_07)
+  tono?: "destacado" | "seguridad";
   accessibilityLabel: string;
 };
 
@@ -31,6 +32,7 @@ export function IconButton({ icon, onPress, active = false, tono, accessibilityL
         styles.base,
         active && styles.active,
         destacado && styles.destacado,
+        tono === "seguridad" && styles.seguridad,
         pressed && styles.pressed,
       ]}
     >
@@ -54,6 +56,10 @@ const styles = StyleSheet.create({
   },
   destacado: {
     backgroundColor: colors.yellow,
+  },
+  seguridad: {
+    borderWidth: borderWidths.regular,
+    borderColor: colors.red,
   },
   pressed: {
     opacity: opacity.pressed,

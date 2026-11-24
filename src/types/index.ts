@@ -1,4 +1,5 @@
 // Tipos del dominio. Se comparten entre mocks, repositorio y pantallas.
+import type { ImageSourcePropType } from "react-native";
 
 export type TipoUnidad = "combi" | "custer" | "micro";
 
@@ -256,6 +257,24 @@ export type Usuario = {
   reportesMes: number;
   // 0–100: reportes del mes que otros pasajeros confirmaron
   porcentajeConfirmados: number;
+  // Ya enmascarado para mostrar (F3_05)
+  telefono: string;
+  // Foto de perfil. Fase 5: URL en Supabase Storage
+  avatar?: ImageSourcePropType;
+};
+
+// Nivel de una zona del mapa de seguridad (F3_06)
+export type NivelZona = "alto" | "medio";
+
+// Reportes de seguridad recientes agrupados por paradero (F3_06)
+export type ZonaSeguridad = {
+  paradero: Paradero;
+  nivel: NivelZona;
+  cantidad: number;
+  // Tipo más reportado en el paradero
+  tipoFrecuente: TipoSeguridad;
+  // Fecha ISO del reporte más reciente
+  ultimo: string;
 };
 
 export type Rango = {

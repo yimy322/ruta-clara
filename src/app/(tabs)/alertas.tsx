@@ -140,11 +140,13 @@ export default function Alertas() {
           }
           break;
         case "transito":
-        // TODO F3_06: la alerta de seguridad abrirá el mapa de seguridad (paso 4.4)
-        case "seguridad":
           if (notificacion.paraderoId) {
             router.push({ pathname: "/paradero/[id]", params: { id: notificacion.paraderoId } });
           }
+          break;
+        case "seguridad":
+          // El mapa de seguridad muestra en la hoja el paradero del aviso
+          router.push({ pathname: "/seguridad", params: { paraderoId: notificacion.paraderoId } });
           break;
         case "logro":
           router.navigate("/perfil");
@@ -164,7 +166,6 @@ export default function Alertas() {
         <Text style={[typography.h1, styles.ink]} accessibilityRole="header">
           Alertas
         </Text>
-        {/* TODO F3_05: ajustes */}
         <IconButton icon={<Settings />} accessibilityLabel="Ajustes" onPress={() => router.push("/ajustes")} />
       </View>
 

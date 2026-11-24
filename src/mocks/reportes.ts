@@ -107,4 +107,41 @@ export const reportes: Reporte[] = [
     creadoEn: ayerALas(18, 40),
     confirmaciones: 1, // supuesto
   },
+  // Mapa de seguridad (F3_06). Todos supuesto: Figma muestra Plaza Norte como
+  // zona roja con "5 reportes de robo · último hace 40 min" y otra zona media.
+  ...[40, 55, 70, 85, 100].map(
+    (min, i): Reporte => ({
+      id: `rs${i + 1}`,
+      tipo: "seguridad",
+      paraderoId: "plaza-norte",
+      seguridad: "robo",
+      anonimo: true,
+      lat: -12.0063,
+      lng: -77.059,
+      creadoEn: haceMin(min),
+      confirmaciones: 2,
+    }),
+  ),
+  {
+    id: "rs6",
+    tipo: "seguridad",
+    paraderoId: "los-angeles",
+    seguridad: "acoso", // supuesto
+    anonimo: true,
+    lat: -12.0612,
+    lng: -76.9642,
+    creadoEn: haceMin(35),
+    confirmaciones: 1,
+  },
+  {
+    id: "rs7",
+    tipo: "seguridad",
+    paraderoId: "los-angeles",
+    seguridad: "paradero_peligroso", // supuesto
+    anonimo: true,
+    lat: -12.0612,
+    lng: -76.9642,
+    creadoEn: haceMin(80),
+    confirmaciones: 1,
+  },
 ];

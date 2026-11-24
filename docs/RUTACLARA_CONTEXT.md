@@ -119,15 +119,17 @@ src/
 │   ├── alerta.tsx       # F3_03 (modal; params paraderoId | id)
 │   ├── viaje/           # espera, a-bordo, fin
 │   ├── reporte/         # _layout (Stack + ReporteProvider): index, linea, estado, ubicacion, paradero, transito, seguridad, gracias
-│   ├── ajustes.tsx      # provisional (se reemplaza en 4.4)
+│   ├── ajustes.tsx      # F3_05 (interruptores en PreferenciasContext.ajustes)
+│   ├── seguridad.tsx    # F3_06 (param opcional paraderoId)
 │   ├── onboarding.tsx, buscar.tsx, rutas.tsx
 │   └── dev/             # catalogo, datos (solo __DEV__)
-├── components/          # Base: Button, Chip, IconButton (tono="destacado"), Toggle, Tile, ListItem, Header, BottomNav (badge), Mapa, Segmented, Toast (+ ToastProvider)
+├── components/          # Base: Button, Chip, IconButton (tono="destacado" | "seguridad"), Toggle, Tile, ListItem, Header, BottomNav (badge), Mapa, Segmented, Toast (+ ToastProvider)
 │                        # Pantallas: BannerUbicacion, BarraProgreso, BotonMantener, CardParadero, CardRuta, GraficoAfluencia,
 │                        # ItemNotificacion, OpcionGrande, OpcionRadio, Paginador, PantallaCarga, PinUnidad, PlaceholderScreen,
-│                        # TarjetaDato, TarjetaEstadistica · index.ts (barril)
+│                        # TarjetaDato, TarjetaEstadistica · F3: Avatar, FilaAjuste, MenuLateral (F3_07, Modal sobre Inicio)
+│                        # index.ts (barril)
 ├── context/             # ViajeContext, ReporteContext, NotificacionesContext, PreferenciasContext
-├── hooks/               # usePermisoUbicacion, useEnviarReporte
+├── hooks/               # usePermisoUbicacion, useEnviarReporte, useCerrarSesion
 ├── data/                # repositorio.ts (única puerta a los datos), preferencias.ts
 ├── config/              # gamificacion.ts, reportes.ts, simulacion.ts
 ├── mocks/  theme/ (colors, spacing, typography)  types/  utils/
@@ -147,6 +149,7 @@ src/
 - `getReportesSeguridad(horas)`, `getHistorialReportes()`.
 - **4.3A:** `getParaderosFavoritos`, `esParaderoFavorito`, `alternarParaderoFavorito`, `getResumenParadero(id)`, `getActividadParadero` (renombrado del antiguo `getResumenParadero`), `getAlertas`, `getAlerta`, `getAlertaDeParadero`, `guardarAlerta`, `eliminarAlerta`, `getOpcionesRutaAlerta`.
 - **4.3B:** `getFavoritos`, `getNotificaciones`, `marcarNotificacionLeida`, `contarNoLeidas`, `simularAvisoAlerta`.
+- **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.
 
 **Contexts:** `ViajeContext` (linea, paraderoEspera, destino, sentido, estado, avisarParaBajar, finEn…), `ReporteContext` (tipo, lineaId, enUnidad, ocupacion, velocidad, posicion, compartirEnVivo…), `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`), `PreferenciasContext` (`onboardingVisto`…), y `ToastProvider` (en `components/Toast.tsx`).
@@ -282,12 +285,13 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | F2_01–F2_08 | `/reporte/*` | Modal con stack propio |
 | F3_02 | `/paradero/[id]` | Stack ✅ |
 | F3_03 | `/alerta` | Modal ✅ |
-| F3_05 | `/ajustes` | Provisional → real en 4.4 |
-| F3_06, F3_07 | por definir en 4.4 | — |
+| F3_05 | `/ajustes` | Stack ✅ |
+| F3_06 | `/seguridad` | Stack ✅ |
+| F3_07 | `MenuLateral` (componente, ☰ de Inicio) | Modal ✅ |
 | A1/A2 | `/accesibilidad` (propuesta) | 4.8 |
 | D1–D5 | `/cuenta`, `/cuenta/eliminar/*` (propuesta) | 4.9 |
 
-**TODO pendientes en el código (verificado el 22/11/2026):** menú ☰ de Inicio → F3_07; chip Seguridad → F3_06; reemplazar `/ajustes` (⚙ de Perfil y Alertas ya navegan a la provisional); notificación de seguridad → F3_06; desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
+**TODO pendientes en el código (verificado el 24/11/2026):** Accesibilidad desde Ajustes (4.8); Mi cuenta desde la fila de perfil (4.9); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
 
 ---
 
@@ -330,7 +334,8 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | Fase 6 | Proveedor de mapa (restricción de Expo Go) |
 | Prueba con usuario | Hacerla con la app real (guion en D9) |
 | README | Actualizar la sección «Avance» (SDK 58 ya está en `main` y subido: commit `353ee42`) |
-| Informe AP3 | 2 comentarios abiertos (AP1 y confirmación de «Cerrar sesión») |
+| Informe AP3 | 2 comentarios abiertos (AP1 y confirmación de «Cerrar sesión»; esta última ya está implementada en F3_07) |
+| Soporte | Reemplazar el número de WhatsApp de ejemplo en `src/config/soporte.ts` |
 
 ## 13. Procedimientos conocidos
 - **Actualizar el SDK:** rama `actualizar-sdk-XX` → `npx expo install expo@^XX.0.0 --fix` → si hay `ERESOLVE`, `rm -rf node_modules package-lock.json && npm install && npx expo install --fix` → `npx expo-doctor` 20/20 → revisar changelog → probar → merge y push.

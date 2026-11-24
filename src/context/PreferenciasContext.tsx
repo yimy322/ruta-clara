@@ -1,6 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { getOnboardingVisto, reiniciarPreferencias, setOnboardingVisto } from "@/data/preferencias";
+import {
+  AJUSTES_POR_DEFECTO,
+  getAjustes,
+  getOnboardingVisto,
+  reiniciarPreferencias,
+  setAjustes,
+  setOnboardingVisto,
+  type Ajustes,
+} from "@/data/preferencias";
 
 // Duración mínima de la pantalla de carga, para que no parpadee
 const CARGA_MINIMA_MS = 1500;
@@ -10,6 +18,9 @@ type PreferenciasContextValue = {
   onboardingVisto: boolean | null;
   completarOnboarding: () => Promise<void>;
   reiniciarOnboarding: () => Promise<void>;
+  // Ajustes de F3_05 y F3_06; se guardan en el dispositivo al cambiarlos
+  ajustes: Ajustes;
+  cambiarAjuste: (clave: keyof Ajustes, valor: boolean) => void;
 };
 
 const PreferenciasContext = createContext<PreferenciasContextValue | null>(null);
@@ -17,14 +28,17 @@ const PreferenciasContext = createContext<PreferenciasContextValue | null>(null)
 const esperar = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Preferencias locales compartidas por el layout raíz (rutas protegidas),
-// el onboarding y Perfil.
+// el onboarding, Perfil, Ajustes y el mapa de seguridad.
 export function PreferenciasProvider({ children }: { children: ReactNode }) {
   const [onboardingVisto, setVisto] = useState<boolean | null>(null);
+  const [ajustes, setEstadoAjustes] = useState<Ajustes>(AJUSTES_POR_DEFECTO);
 
   useEffect(() => {
     let activo = true;
-    Promise.all([getOnboardingVisto(), esperar(CARGA_MINIMA_MS)]).then(([visto]) => {
-      if (activo) setVisto(visto);
+    Promise.all([getOnboardingVisto(), getAjustes(), esperar(CARGA_MINIMA_MS)]).then(([visto, guardados]) => {
+      if (!activo) return;
+      setEstadoAjustes(guardados);
+      setVisto(visto);
     });
     return () => {
       activo = false;
@@ -38,12 +52,23 @@ export function PreferenciasProvider({ children }: { children: ReactNode }) {
 
   const reiniciarOnboarding = useCallback(async () => {
     await reiniciarPreferencias();
+    setEstadoAjustes(AJUSTES_POR_DEFECTO);
     setVisto(false);
   }, []);
 
+  // Se actualiza en pantalla al instante; si no se puede guardar, el cambio
+  // dura hasta cerrar la app
+  const cambiarAjuste = useCallback((clave: keyof Ajustes, valor: boolean) => {
+    setEstadoAjustes((anteriores) => {
+      const nuevos = { ...anteriores, [clave]: valor };
+      setAjustes(nuevos).catch(() => {});
+      return nuevos;
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ onboardingVisto, completarOnboarding, reiniciarOnboarding }),
-    [onboardingVisto, completarOnboarding, reiniciarOnboarding],
+    () => ({ onboardingVisto, completarOnboarding, reiniciarOnboarding, ajustes, cambiarAjuste }),
+    [onboardingVisto, completarOnboarding, reiniciarOnboarding, ajustes, cambiarAjuste],
   );
 
   return <PreferenciasContext.Provider value={value}>{children}</PreferenciasContext.Provider>;

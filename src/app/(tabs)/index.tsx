@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BannerUbicacion, Button, CardParadero, Chip, IconButton, Mapa, type DatosCardParadero } from "@/components";
+import {
+  BannerUbicacion,
+  Button,
+  CardParadero,
+  Chip,
+  IconButton,
+  Mapa,
+  MenuLateral,
+  type DatosCardParadero,
+} from "@/components";
 import {
   getActividadParadero,
   getLugaresGuardados,
@@ -31,6 +40,7 @@ export default function Inicio() {
   const [lugares, setLugares] = useState<LugarGuardado[]>([]);
   // undefined = cargando; null = no hay paradero cercano
   const [cercano, setCercano] = useState<DatosCardParadero | null>();
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   // Alto de los controles flotantes, para que el mapa no ponga puntos debajo
   const [altoArriba, setAltoArriba] = useState(0);
@@ -89,9 +99,7 @@ export default function Inicio() {
             <IconButton
               icon={<Menu />}
               accessibilityLabel="Menú"
-              onPress={() => {
-                // TODO F3_07: menú lateral
-              }}
+              onPress={() => setMenuAbierto(true)}
             />
             <Pressable
               onPress={() => router.push("/buscar")}
@@ -134,9 +142,7 @@ export default function Inicio() {
               label="Seguridad"
               state="alert"
               icon={<TriangleAlert />}
-              onPress={() => {
-                // TODO F3_06: alertas de seguridad
-              }}
+              onPress={() => router.push("/seguridad")}
             />
           </ScrollView>
         </View>
@@ -166,6 +172,8 @@ export default function Inicio() {
           )}
         </View>
       </SafeAreaView>
+
+      <MenuLateral visible={menuAbierto} onCerrar={() => setMenuAbierto(false)} />
     </View>
   );
 }

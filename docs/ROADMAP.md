@@ -14,7 +14,7 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 hasta el **paso 4.3B**. Falta 4.4 (Ajustes, Mapa de seguridad, Menú lateral) y todo el **paso visual a alta fidelidad**.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Falta pasar las pantallas existentes a alta fidelidad (**4.5B / 4.5C**).
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -44,8 +44,8 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.3A | Detalle de paradero (F3_02) + Configurar alerta (F3_03) | ✅ |
 | 4.3B | Favoritos (F3_01) + Centro de notificaciones (F3_04) | ✅ |
 | 4.5A | Tokens y componentes de alta fidelidad | ✅ (22/11) |
-| **4.4** | **Ajustes, Mapa de seguridad, Menú lateral (F3_05–F3_07) + TODO** | 📝 **siguiente** |
-| 4.5B | Pantallas del Flujo 1 en alta fidelidad | 📝 |
+| 4.4 | Ajustes, Mapa de seguridad, Menú lateral (F3_05–F3_07) + TODO | ✅ (24/11) |
+| **4.5B** | **Pantallas del Flujo 1 en alta fidelidad** | 📝 **siguiente** |
 | 4.5C | Pantallas de los Flujos 2 y 3 en alta fidelidad | 📝 |
 | 4.7 | Estados E1–E10 en la app | 📝 |
 | 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | 📝 |
@@ -113,10 +113,10 @@ El Proyecto Final evalúa un **MVP funcional, usable e innovador**, no solo la a
 ### 4.5A · Tokens y componentes de alta fidelidad — ✅
 Actualizar `src/theme` y `src/components` a los estilos y componentes de la página de alta fidelidad. Sin tocar la lógica.
 
-### 4.4 · Ajustes, Mapa de seguridad, Menú lateral — 📝 siguiente
+### 4.4 · Ajustes, Mapa de seguridad, Menú lateral — ✅
 F3_05, F3_06, F3_07 y conectar los TODO (menú ☰, chip Seguridad, `/ajustes` provisional). Incluye la confirmación de «Cerrar sesión» (mejora pendiente del AP2).
 
-### 4.5B / 4.5C · Pantallas en alta fidelidad — 📝
+### 4.5B / 4.5C · Pantallas en alta fidelidad — 📝 4.5B siguiente
 Pantalla por pantalla contra los frames de alta fidelidad. Incluye la tarjeta de Inicio con próximas unidades, marcadores «P», burbujas de unidades y el esqueleto de carga entre Búsqueda y Resultados.
 
 ### 4.7 · Estados — 📝

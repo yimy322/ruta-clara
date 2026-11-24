@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react";
+import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
-import type { Coordenada, Linea, Paradero } from "@/types";
+import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import type { Coordenada, Linea, NivelZona, Paradero } from "@/types";
 
 import { Chip } from "./Chip";
 
@@ -13,6 +14,20 @@ type UnidadMapa = {
   // Texto del chip; por defecto el nombre de la línea
   etiqueta?: string;
   icono?: ReactNode;
+};
+
+// Mancha de calor del mapa de seguridad (F3_06)
+type ZonaMapa = {
+  id: string;
+  lat: number;
+  lng: number;
+  nivel: NivelZona;
+};
+
+// Diámetro y color de cada nivel (manchas de F3_06)
+const ZONA: Record<NivelZona, { diametro: number; color: string; texto: string }> = {
+  alto: { diametro: sizes.zonaAlta, color: colors.red, texto: "Zona de riesgo alto" },
+  medio: { diametro: sizes.zonaMedia, color: colors.amber, texto: "Zona de riesgo medio" },
 };
 
 type MapaProps = {
@@ -27,6 +42,8 @@ type MapaProps = {
   etiquetaUsuario?: string;
   // Une cada unidad con el usuario con una línea punteada (unidad en camino, F1_08)
   seguimiento?: boolean;
+  // Manchas de calor de seguridad, debajo de los demás puntos (F3_06)
+  zonas?: ZonaMapa[];
   // Espacio tapado por controles flotantes: los puntos se acomodan fuera de él
   margen?: Insets;
   estilo?: StyleProp<ViewStyle>;
@@ -54,6 +71,7 @@ export function Mapa({
   etiqueta,
   etiquetaUsuario,
   seguimiento = false,
+  zonas = [],
   margen,
   estilo,
 }: MapaProps) {
@@ -64,7 +82,7 @@ export function Mapa({
     setTamano({ ancho: width, alto: height });
   };
 
-  const puntos: Coordenada[] = [...(usuario ? [usuario] : []), ...paraderos, ...unidades];
+  const puntos: Coordenada[] = [...(usuario ? [usuario] : []), ...paraderos, ...unidades, ...zonas];
   const proyectar = crearProyeccion(puntos, usuario, tamano.ancho, tamano.alto, margen);
 
   return (
@@ -75,6 +93,30 @@ export function Mapa({
       {CALLES_VERTICALES.map((x) => (
         <View key={`v${x}`} style={[styles.calle, styles.calleVertical, { left: `${x * 100}%` }]} />
       ))}
+
+      {proyectar &&
+        zonas.map((zona) => {
+          const { diametro, color, texto } = ZONA[zona.nivel];
+          const radio = diametro / 2;
+          return (
+            <View
+              key={`z${zona.id}`}
+              style={[styles.marcador, { width: diametro, height: diametro }, proyectar(zona)]}
+              accessibilityLabel={texto}
+              pointerEvents="none"
+            >
+              <Svg width={diametro} height={diametro}>
+                <Defs>
+                  <RadialGradient id={`g${zona.id}`} cx="50%" cy="50%" r="50%">
+                    <Stop offset="0" stopColor={color} stopOpacity={opacity.zonaCentro} />
+                    <Stop offset="1" stopColor={color} stopOpacity={0} />
+                  </RadialGradient>
+                </Defs>
+                <Circle cx={radio} cy={radio} r={radio} fill={`url(#g${zona.id})`} />
+              </Svg>
+            </View>
+          );
+        })}
 
       {proyectar &&
         recorrido &&

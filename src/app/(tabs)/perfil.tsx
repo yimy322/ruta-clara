@@ -73,7 +73,6 @@ export default function Perfil() {
         <Text style={[typography.h1, styles.ink]} accessibilityRole="header">
           Mi perfil
         </Text>
-        {/* TODO F3_05: ajustes */}
         <IconButton icon={<Settings />} accessibilityLabel="Ajustes" onPress={() => router.push("/ajustes")} />
       </View>
 

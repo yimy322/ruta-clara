@@ -15,3 +15,10 @@ export const UMBRAL_OCUPACION_LIVE_MIN = 15;
 
 // Ventana del estado y de la seguridad en el detalle de paradero ("Seguro 2 h", F3_02)
 export const VENTANA_PARADERO_H = 2;
+
+// Mapa de seguridad (F3_06): ventanas de tiempo que alterna el chip «2 h ▾»
+export const VENTANAS_SEGURIDAD_H = [2, 6, 24] as const;
+
+// Reportes de seguridad en un paradero, dentro de la ventana, para que su
+// zona sea alta; con menos (y al menos uno) es media
+export const UMBRAL_ZONA_ALTA = 3;

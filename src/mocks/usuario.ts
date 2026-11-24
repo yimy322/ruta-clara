@@ -11,4 +11,6 @@ export const usuario: Usuario = {
   puntos: 1240,
   reportesMes: 47,
   porcentajeConfirmados: 92,
+  telefono: "+51 987 •••• 21", // supuesto: el número de F3_05
+  avatar: require("../../assets/images/avatar-rosa.png"), // ilustración de Figma (F3_05, F3_07)
 };

@@ -51,7 +51,9 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F3_02 · Detalle de paradero | paradero/[id].tsx | /paradero/puente-nuevo | Stack (desde la card de Inicio). Recarga al recibir foco |
 | F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
-| F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (provisional, desde ⚙ en Mi perfil y en Alertas) |
+| F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (desde ⚙ en Mi perfil y en Alertas, y desde el menú lateral). Los interruptores van en `ajustes` de `usePreferencias()` |
+| F3_06 · Mapa de seguridad | seguridad.tsx | /seguridad | Stack (chip Seguridad de Inicio, menú lateral, aviso de seguridad). Param opcional `paraderoId` |
+| F3_07 · Menú lateral | components/MenuLateral.tsx | — | No es ruta: Modal sobre Inicio (☰) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
 | F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
 | F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/la-50 | Stack |
@@ -62,6 +64,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
 Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext). Toda ruta nueva debe declararse dentro del grupo protegido.
+Cerrar sesión: `useCerrarSesion()` (/src/hooks) pide confirmación y vuelve al onboarding.
 Cerrar el modal de reporte desde cualquier paso: `cerrar()` de `useReporte()` (`router.dismissAll()` solo vuelve al primer paso del stack anidado).
 Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).
