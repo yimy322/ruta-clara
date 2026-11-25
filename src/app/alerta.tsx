@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, Chip, Header, IconButton, ListItem, Toggle, useToast } from "@/components";
 import { eliminarAlerta, getAlerta, getOpcionesRutaAlerta, guardarAlerta } from "@/data/repositorio";
-import { borderWidths, colors, minTouch, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { colors, minTouch, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { AlertaDiaria, MinutosAntes, OpcionRutaAlerta } from "@/types";
 import { formatoDias, formatoHora } from "@/utils/formato";
 
@@ -350,7 +350,7 @@ export default function Alerta() {
             <Text style={[typography.body, styles.ink, styles.selectorTexto]}>
               {opcion ? (
                 <>
-                  <Text style={typography.bodyStrong}>{opcion.linea.nombre}</Text>
+                  <Text style={typography.bodyBold}>{opcion.linea.nombre}</Text>
                   {` · ${opcion.paradero.nombre} → ${opcion.destino.nombre}`}
                 </>
               ) : (
@@ -437,10 +437,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: sizes.cardPadding,
     paddingVertical: spacing.sm,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   horaFila: {
     flexDirection: "row",
@@ -455,9 +454,7 @@ const styles = StyleSheet.create({
     width: sizes.dayCircle,
     height: sizes.dayCircle,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.canvas,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -469,19 +466,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
     padding: spacing.md,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   selectorTexto: {
     flex: 1,
   },
   lista: {
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
     overflow: "hidden",
+    ...shadows.card,
   },
   chips: {
     flexDirection: "row",

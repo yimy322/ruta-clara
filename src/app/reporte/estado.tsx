@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Armchair, Gauge, Hourglass, TrafficCone, Users, UsersRound, type LucideIcon } from "lucide-react-native";
+import { Armchair, Frown, Gauge, TrafficCone, Users, Zap, type LucideIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,17 +18,16 @@ const EN_UNIDAD: { valor: EnUnidad; label: string }[] = [
   { valor: "paradero", label: "En el paradero" },
 ];
 
-// Íconos provisionales: en Figma son círculos
 const OCUPACIONES: Opcion<Ocupacion>[] = [
   { valor: "sentados", label: "Vacío / Sentados", icono: Armchair },
   { valor: "lleno", label: "Lleno", icono: Users },
-  { valor: "sopa", label: "Sopa · apretadísimo", icono: UsersRound },
+  { valor: "sopa", label: "Sopa · apretadísimo", icono: Frown },
 ];
 
 const VELOCIDADES: Opcion<Velocidad>[] = [
   { valor: "normal", label: "Normal", icono: Gauge },
   { valor: "lento", label: "Lento / Tránsito", icono: TrafficCone },
-  { valor: "chanteando", label: "Chanteando · para mucho", icono: Hourglass },
+  { valor: "chanteando", label: "Chanteando · para mucho", icono: Zap },
 ];
 
 // F2_03 · Estado del carro (paso 2 de 3)
@@ -76,7 +75,7 @@ export default function EstadoUnidad() {
 
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
-      <Header eyebrow={linea ? `Paso 2 de 3 · ${linea.codigo}` : "Paso 2 de 3"} title="¿Cómo está la unidad?" />
+      <Header eyebrow={linea ? `Paso 2 de 3 · ${linea.nombre}` : "Paso 2 de 3"} title="¿Cómo está la unidad?" />
 
       <ScrollView contentContainerStyle={styles.contenido}>
         <BarraProgreso progreso={2 / 3} />

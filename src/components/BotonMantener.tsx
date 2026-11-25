@@ -1,8 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
-import { Animated, Pressable, StyleSheet, Text, type AccessibilityActionEvent } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View, type AccessibilityActionEvent } from "react-native";
 
-import { colors, radii, sizes, typography } from "@/theme";
+import { colors, radii, shadows, sizes, typography } from "@/theme";
 
 type BotonMantenerProps = {
   label: string;
@@ -69,21 +69,29 @@ export function BotonMantener({
       accessibilityHint={accessibilityHint}
       accessibilityActions={[{ name: "activate", label: accessibilityLabel ?? label }]}
       onAccessibilityAction={onAccessibilityAction}
-      style={styles.base}
+      // La sombra va afuera: el botón recorta el relleno con overflow hidden
+      style={styles.sombra}
     >
-      <Animated.View style={[styles.relleno, { width: ancho }]} />
-      <Text style={[typography.button, styles.label]} numberOfLines={1}>
-        {label}
-      </Text>
+      <View style={styles.base}>
+        <Animated.View style={[styles.relleno, { width: ancho }]} />
+        <Text style={[typography.button, styles.label]} numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  sombra: {
+    alignSelf: "stretch",
+    borderRadius: radii.control,
+    ...shadows.danger,
+  },
   base: {
     height: sizes.buttonHeight,
     paddingHorizontal: sizes.buttonPaddingX,
-    borderRadius: radii.lg,
+    borderRadius: radii.control,
     backgroundColor: colors.red,
     alignItems: "center",
     justifyContent: "center",

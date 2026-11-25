@@ -18,8 +18,8 @@ Actualizado: **22 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 1 | 4.5A · Tokens y componentes de alta fidelidad | ✅ ejecutado el 22/11 |
 | 2 | 4.4 · Ajustes, Mapa de seguridad, Menú lateral | ✅ ejecutado el 24/11 |
 | 3 | 4.5B · Pantallas del Flujo 1 en alta fidelidad | ✅ ejecutado el 25/11 |
-| 4 | 4.5C · Pantallas de los Flujos 2 y 3 en alta fidelidad | 📝 siguiente |
-| 5 | 4.7 · Estados E1–E10 | 📝 |
+| 4 | 4.5C · Pantallas de los Flujos 2 y 3 en alta fidelidad | ✅ ejecutado el 25/11 |
+| 5 | 4.7 · Estados E1–E10 | 📝 siguiente |
 | 6 | 4.6 + 4.8 · Tema dinámico y módulo de accesibilidad | 📝 |
 | 7 | 4.9 · Cuenta y eliminación de cuenta | 📝 |
 | 8 | Revisión de SDK 58 (si no se hizo) | ❓ |

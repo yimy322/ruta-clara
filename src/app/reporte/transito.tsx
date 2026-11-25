@@ -250,16 +250,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: sizes.congestionPaddingX,
     paddingVertical: sizes.congestionPaddingY,
     borderRadius: sizes.optionRadius,
+    // Borde transparente para que el elegido no cambie de tamaño
     borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
+    borderColor: "transparent",
+    backgroundColor: colors.canvas,
   },
   nivelElegido: {
-    borderWidth: borderWidths.medium,
+    borderRadius: radii.control,
+    borderColor: colors.ink,
     backgroundColor: colors.yellow,
   },
   nivelTrancadera: {
-    borderWidth: borderWidths.medium,
+    borderRadius: radii.control,
     borderColor: colors.red,
     backgroundColor: colors.redSoft,
   },
@@ -321,7 +323,8 @@ const styles = StyleSheet.create({
   muted: {
     color: colors.inkMuted,
   },
+  // Rojo sobre redSoft: redStrong (contraste AA)
   red: {
-    color: colors.red,
+    color: colors.redStrong,
   },
 });

@@ -26,6 +26,8 @@ export const typography = {
   title: style(fonts.semiBold, 15),
   body: style(fonts.regular, 14),
   bodyStrong: style(fonts.semiBold, 14),
+  // Nombre de la línea en el selector de ruta (F3_03)
+  bodyBold: style(fonts.bold, 14),
   caption: style(fonts.regular, 12),
   captionStrong: style(fonts.semiBold, 12),
   overline: {

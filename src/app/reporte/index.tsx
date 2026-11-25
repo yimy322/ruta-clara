@@ -1,5 +1,5 @@
 import { useRouter, type Href } from "expo-router";
-import { MapPin, ShieldAlert, Split, TrafficCone, Users, X } from "lucide-react-native";
+import { Bus, ShieldAlert, Split, TrafficCone, Users, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -48,6 +48,8 @@ export default function PanelReporte() {
   return (
     <View style={styles.screen}>
       <Mapa estilo={StyleSheet.absoluteFill} usuario={ubicacion} />
+      {/* Velo sobre el mapa: el panel es lo importante (RC-HF/Color/Scrim) */}
+      <View style={[StyleSheet.absoluteFill, styles.velo]} pointerEvents="none" />
 
       <SafeAreaView style={styles.capa} edges={["left", "right"]}>
         <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
@@ -68,7 +70,7 @@ export default function PanelReporte() {
           <View style={styles.fila}>
             <Tile
               label="Ubicación de combi"
-              icon={<MapPin />}
+              icon={<Bus />}
               state="selected"
               fill
               onPress={() => empezar({ tipo: "ubicacion", modo: "ubicacion" }, "/reporte/linea")}
@@ -112,6 +114,9 @@ export default function PanelReporte() {
 }
 
 const styles = StyleSheet.create({
+  velo: {
+    backgroundColor: colors.scrim,
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.map,

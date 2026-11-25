@@ -9,7 +9,7 @@ import { CALLE_USUARIO, PRECISION_GPS_M } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { getLinea, getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Linea, Paradero } from "@/types";
 import { etiquetaOcupacion, etiquetaVelocidad } from "@/utils/formato";
 
@@ -68,7 +68,7 @@ export default function ConfirmarUbicacion() {
       </SafeAreaView>
 
       <View style={styles.centro} pointerEvents="none">
-        {linea && <PinUnidad etiqueta={linea.codigo} />}
+        {linea && <PinUnidad etiqueta={linea.nombre} pista="arrastra el mapa para ajustar" />}
       </View>
 
       <SafeAreaView edges={["left", "right"]}>
@@ -85,7 +85,7 @@ export default function ConfirmarUbicacion() {
           </View>
 
           <View style={styles.chips}>
-            {linea && <Chip label={linea.codigo} />}
+            {linea && <Chip label={linea.nombre} />}
             {borrador.ocupacion && <Chip label={etiquetaOcupacion(borrador.ocupacion)} />}
             {borrador.velocidad && <Chip label={etiquetaVelocidad(borrador.velocidad)} />}
             <Chip label="Editar" onPress={() => router.back()} />
@@ -133,10 +133,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.md,
     paddingVertical: sizes.stepPillPaddingY,
-    borderRadius: sizes.stepPillRadius,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   centro: {
     flex: 1,

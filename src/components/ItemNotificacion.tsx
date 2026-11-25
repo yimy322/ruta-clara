@@ -33,7 +33,7 @@ export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }
       ]}
     >
       <View style={[styles.icono, tono && iconoStyles[tono]]}>
-        {withIconDefaults(icon, { color: colorIcono, size: sizes.chipIcon })}
+        {withIconDefaults(icon, { color: colorIcono, size: sizes.notifGlyph })}
       </View>
       <View style={styles.texto}>
         <Text style={[typography.bodyStrong, styles.ink]} numberOfLines={2}>
@@ -65,10 +65,8 @@ const styles = StyleSheet.create({
   icono: {
     width: sizes.notifIcon,
     height: sizes.notifIcon,
-    borderRadius: radii.sm,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
+    borderRadius: radii.badge,
+    backgroundColor: colors.canvas,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -97,8 +95,11 @@ const iconoStyles = StyleSheet.create({
   llegada: {
     backgroundColor: colors.yellow,
   },
+  // Círculo con borde rojo: la seguridad se distingue también por la forma
   seguridad: {
-    backgroundColor: colors.redSoft,
+    borderRadius: radii.control,
+    borderWidth: borderWidths.regular,
     borderColor: colors.red,
+    backgroundColor: colors.redSoft,
   },
 });

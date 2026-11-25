@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { Smile, Users, UsersRound, type LucideIcon } from "lucide-react-native";
+import { Frown, Smile, Users, type LucideIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,19 +14,18 @@ import {
   getUbicacionUsuario,
 } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, Linea, Ocupacion, Paradero, TiempoEspera } from "@/types";
 import { etiquetaEspera, formatearDistancia } from "@/utils/formato";
 import { distanciaMetros } from "@/utils/geo";
 
 const ESPERAS: TiempoEspera[] = ["5_10", "15_20", "mas_30"];
 
-// El estado del paradero se guarda como ocupación. Íconos provisionales: en
-// Figma son círculos
+// El estado del paradero se guarda como ocupación
 const ESTADOS: { valor: Ocupacion; label: string; icono: LucideIcon }[] = [
   { valor: "sentados", label: "Tranquilo", icono: Smile },
   { valor: "lleno", label: "Lleno", icono: Users },
-  { valor: "sopa", label: "Desbordado", icono: UsersRound },
+  { valor: "sopa", label: "Desbordado", icono: Frown },
 ];
 
 type Lista = "paraderos" | "lineas";
@@ -129,6 +128,7 @@ export default function ReporteParadero() {
         <Mapa
           estilo={styles.mapa}
           paraderos={paradero ? [paradero] : []}
+          marcadorParadero="P"
           etiqueta="Mini-mapa del paradero detectado"
         />
 
@@ -209,10 +209,10 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   lista: {
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
     overflow: "hidden",
+    ...shadows.card,
   },
   mapa: {
     height: sizes.paraderoMap,

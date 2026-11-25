@@ -16,6 +16,8 @@ type ListItemProps = {
   // Sin margen lateral, para listas dentro de un contenido que ya tiene
   // márgenes (F1_07)
   enTarjeta?: boolean;
+  // Con enTarjeta: padding vertical de 12 en vez de 8 (F3_02)
+  amplio?: boolean;
 };
 
 // Fila de lista (Figma 73:1007): insignia de 40 pt (número de ruta o ícono),
@@ -28,6 +30,7 @@ export function ListItem({
   onPress,
   destacado = false,
   enTarjeta = false,
+  amplio = false,
 }: ListItemProps) {
   const content = (
     <>
@@ -63,7 +66,7 @@ export function ListItem({
   );
 
   if (!onPress) {
-    return <View style={[styles.base, enTarjeta && styles.enTarjeta, destacado && styles.destacado]}>{content}</View>;
+    return <View style={[styles.base, enTarjeta && styles.enTarjeta, enTarjeta && amplio && styles.amplio, destacado && styles.destacado]}>{content}</View>;
   }
 
   return (
@@ -73,6 +76,7 @@ export function ListItem({
       style={({ pressed }) => [
         styles.base,
         enTarjeta && styles.enTarjeta,
+        enTarjeta && amplio && styles.amplio,
         destacado && styles.destacado,
         pressed && styles.pressed,
       ]}
@@ -99,6 +103,9 @@ const styles = StyleSheet.create({
   enTarjeta: {
     paddingHorizontal: 0,
     paddingVertical: spacing.sm,
+  },
+  amplio: {
+    paddingVertical: spacing.md,
   },
   badge: {
     width: sizes.badge,

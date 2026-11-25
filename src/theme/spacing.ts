@@ -146,6 +146,7 @@ export const sizes = {
   dayCircle: 38,
   // Notificaciones (F3_04)
   notifIcon: 32,
+  notifGlyph: 18,
   unreadDot: 8,
   // Ajustes y menú lateral (F3_05, F3_07)
   avatarSmall: 44,

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { borderWidths, colors, opacity, sizes, spacing, typography } from "@/theme";
+import { colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 
 type OpcionGrandeProps = {
   label: string;
@@ -30,10 +30,9 @@ const styles = StyleSheet.create({
     height: sizes.optionHeight,
     justifyContent: "center",
     paddingHorizontal: spacing.lg,
-    borderRadius: sizes.optionRadius,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   selected: {
     backgroundColor: colors.ink,

@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BarraProgreso, Button } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import { formatearPuntos } from "@/utils/formato";
 import { calcularRango } from "@/utils/gamificacion";
 
@@ -161,8 +161,6 @@ const styles = StyleSheet.create({
     width: sizes.successIconLarge,
     height: sizes.successIconLarge,
     borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
     backgroundColor: colors.yellow,
     alignItems: "center",
     justifyContent: "center",
@@ -171,10 +169,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     gap: spacing.sm,
     padding: sizes.cardPadding,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   cardFila: {
     flexDirection: "row",

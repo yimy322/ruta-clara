@@ -311,9 +311,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
+  // Una sola fila, como en Figma (los 4 chips entran en 360 pt)
   filtros: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xs,

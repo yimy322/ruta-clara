@@ -1,20 +1,19 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { Eye, Lock, Settings, ShieldCheck, Sunrise, User, type LucideIcon } from "lucide-react-native";
+import { Eye, Lock, Settings, ShieldCheck, Star, Sunrise, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BarraProgreso, Button, Chip, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
+import { Avatar, BarraProgreso, Button, Chip, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
 import { RANGOS } from "@/config/gamificacion";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getHistorialReportes, getInsignias, getUsuario, simularAvisoAlerta } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { colors, sizes, spacing, typography } from "@/theme";
 import type { Insignia, ReporteHistorial, Usuario } from "@/types";
 import { formatearDia, formatearPuntos, tituloHistorial } from "@/utils/formato";
 import { calcularRango, progresoEscala } from "@/utils/gamificacion";
 
-// Íconos provisionales: en Figma son círculos
 const ICONOS: Record<string, LucideIcon> = {
   madrugador: Sunrise,
   "ojo-de-halcon": Eye,
@@ -120,13 +119,14 @@ export default function Perfil() {
           {datos.historial.length === 0 ? (
             <Text style={[typography.body, styles.muted]}>Aún no tienes reportes</Text>
           ) : (
-            <View style={styles.historial}>
+            <View>
               {datos.historial.map((item) => (
                 <ListItem
                   key={item.reporte.id}
                   title={tituloHistorial(item)}
                   subtitle={`${formatearDia(item.reporte.creadoEn)} · +${item.puntos} pts`}
                   trailing={item.vencido ? "Vencido" : `✓ ${item.reporte.confirmaciones} confirman`}
+                  enTarjeta
                 />
               ))}
             </View>
@@ -154,15 +154,12 @@ function Encabezado({ usuario }: { usuario: Usuario }) {
 
   return (
     <View style={styles.encabezado}>
-      {/* Placeholder: todavía no hay foto de perfil */}
-      <View style={styles.avatar}>
-        <User color={colors.inkMuted} size={sizes.tileIcon} />
-      </View>
+      <Avatar fuente={usuario.avatar} tamano={sizes.avatar} />
       <View style={styles.nombre}>
         <Text style={[typography.h2, styles.ink]} numberOfLines={1}>
           {usuario.nombre}
         </Text>
-        <Chip label={`★ ${actual.nombre}`} state="live" />
+        <Chip label={actual.nombre} icon={<Star fill={colors.ink} />} state="live" />
       </View>
     </View>
   );
@@ -194,16 +191,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.lg,
   },
-  avatar: {
-    width: sizes.avatar,
-    height: sizes.avatar,
-    borderRadius: radii.pill,
-    borderWidth: borderWidths.thin,
-    borderStyle: "dashed",
-    borderColor: colors.line,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   nombre: {
     flex: 1,
     gap: spacing.sm,
@@ -219,10 +206,6 @@ const styles = StyleSheet.create({
   fila: {
     flexDirection: "row",
     gap: spacing.sm,
-  },
-  // ListItem trae su propio padding horizontal; aquí va al ras del contenido
-  historial: {
-    marginHorizontal: -spacing.lg,
   },
   dev: {
     marginTop: spacing.xl,

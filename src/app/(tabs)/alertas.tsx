@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { Play, Redo, Settings, Star, TriangleAlert, Waves, type LucideIcon } from "lucide-react-native";
+import { Bus, Settings, Split, Star, TrafficCone, TriangleAlert, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,9 +28,9 @@ const FILTROS: { valor: Filtro; label: string; tipos: TipoNotificacion[]; vacio:
 ];
 
 const ICONO: Record<TipoNotificacion, LucideIcon> = {
-  llegada: Play,
-  desvio: Redo,
-  transito: Waves,
+  llegada: Bus,
+  desvio: Split,
+  transito: TrafficCone,
   seguridad: TriangleAlert,
   logro: Star,
 };
@@ -169,7 +169,13 @@ export default function Alertas() {
         <IconButton icon={<Settings />} accessibilityLabel="Ajustes" onPress={() => router.push("/ajustes")} />
       </View>
 
-      <View style={styles.filtros}>
+      {/* Una sola fila con scroll horizontal, como en Figma */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filtrosScroll}
+        contentContainerStyle={styles.filtros}
+      >
         {FILTROS.map(({ valor, label }) => (
           <Chip
             key={valor}
@@ -178,7 +184,7 @@ export default function Alertas() {
             onPress={() => setFiltro(valor)}
           />
         ))}
-      </View>
+      </ScrollView>
 
       {estado.tipo === "cargando" && (
         <View style={styles.estado}>
@@ -214,7 +220,7 @@ export default function Alertas() {
                 return (
                   <ItemNotificacion
                     key={notificacion.id}
-                    icon={<Icono />}
+                    icon={notificacion.tipo === "logro" ? <Icono fill={colors.ink} /> : <Icono />}
                     titulo={notificacion.titulo}
                     detalle={`${notificacion.detalle} · ${cuando}`}
                     leida={notificacion.leida}
@@ -245,9 +251,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
+  filtrosScroll: {
+    flexGrow: 0,
+  },
   filtros: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xs,

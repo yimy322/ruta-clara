@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { AlarmClock, Star, TriangleAlert } from "lucide-react-native";
+import { Star, TriangleAlert } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -150,7 +150,7 @@ export default function DetalleParadero() {
         }
       />
       <ScrollView contentContainerStyle={styles.contenido}>
-        <Mapa paraderos={[paradero]} etiqueta="Ubicación del paradero" estilo={styles.mapa} />
+        <Mapa paraderos={[paradero]} marcadorParadero="P" etiqueta="Ubicación del paradero" estilo={styles.mapa} />
 
         <View style={styles.chips}>
           <ChipOcupacion estado={resumen.estado} />
@@ -170,13 +170,15 @@ export default function DetalleParadero() {
         {proximas.length === 0 ? (
           <Text style={[typography.body, styles.muted]}>Ninguna línea registrada pasa por este paradero.</Text>
         ) : (
-          <View style={styles.lista}>
+          <View>
             {proximas.map((unidad) => (
               <ListItem
                 key={unidad.linea.id}
                 badge={unidad.linea.codigo}
                 title={unidad.linea.nombre}
                 subtitle={textoProximaUnidad(unidad)}
+                enTarjeta
+                amplio
                 trailing={
                   unidad.fuente === "sin_datos" ? (
                     <Text style={[typography.bodyStrong, styles.muted]}>~{unidad.minutos}</Text>
@@ -194,7 +196,6 @@ export default function DetalleParadero() {
       <View style={styles.pie}>
         <Button
           label={alerta ? "Editar alerta del paradero" : "Suscribirme a alertas del paradero"}
-          icon={<AlarmClock />}
           onPress={abrirAlerta}
           fullWidth
         />
@@ -230,10 +231,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: spacing.sm,
-  },
-  // ListItem trae su propio margen lateral de 16
-  lista: {
-    marginHorizontal: -spacing.lg,
   },
   pie: {
     gap: spacing.md,

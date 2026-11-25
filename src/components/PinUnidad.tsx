@@ -1,13 +1,15 @@
-import { Play } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import { Radio } from "lucide-react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, radii, sizes } from "@/theme";
+import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 
 import { Chip } from "./Chip";
 
 type PinUnidadProps = {
   // Código de la línea, p. ej. "La 50"
   etiqueta: string;
+  // Texto de ayuda bajo el halo, p. ej. "arrastra el mapa para ajustar"
+  pista?: string;
 };
 
 // Cuánto entra el palito en el halo (Figma F2_04)
@@ -15,12 +17,17 @@ const SOLAPE = 10;
 
 // Pin de la unidad que se reporta (F2_04): chip en vivo, palito y halo de
 // precisión GPS. La punta del palito marca la posición.
-export function PinUnidad({ etiqueta }: PinUnidadProps) {
+export function PinUnidad({ etiqueta, pista }: PinUnidadProps) {
   return (
     <View style={styles.base} accessibilityLabel={`Unidad ${etiqueta}`}>
-      <Chip label={etiqueta} icon={<Play />} state="live" />
+      <Chip label={etiqueta} icon={<Radio />} state="live" />
       <View style={styles.palito} />
       <View style={styles.halo} />
+      {pista != null && (
+        <View style={styles.pista}>
+          <Text style={[typography.caption, styles.pistaTexto]}>{pista}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -44,5 +51,17 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.blue,
     backgroundColor: colors.blueHalo,
+  },
+  pista: {
+    marginTop: spacing.xs,
+    paddingHorizontal: sizes.mapLabelPaddingX,
+    paddingVertical: sizes.mapLabelPaddingY,
+    borderRadius: radii.xs,
+    borderWidth: borderWidths.thin,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+  },
+  pistaTexto: {
+    color: colors.inkMuted,
   },
 });

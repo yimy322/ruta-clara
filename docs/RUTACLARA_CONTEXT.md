@@ -150,6 +150,7 @@ src/
 - **4.3A:** `getParaderosFavoritos`, `esParaderoFavorito`, `alternarParaderoFavorito`, `getResumenParadero(id)`, `getActividadParadero` (renombrado del antiguo `getResumenParadero`), `getAlertas`, `getAlerta`, `getAlertaDeParadero`, `guardarAlerta`, `eliminarAlerta`, `getOpcionesRutaAlerta`.
 - **4.3B:** `getFavoritos`, `getNotificaciones`, `marcarNotificacionLeida`, `contarNoLeidas`, `simularAvisoAlerta`.
 - **4.5B:** `Mapa` con decoración (manzanas, parque, avenida) y props opcionales `marcadorParadero="P"` y `estiloUnidad="burbuja"` (solo Inicio); `CardParadero` recibe `proximas` de `getResumenParadero`; `ListItem enTarjeta`.
+- **4.5C:** `OpcionGrande`/`OpcionRadio` como tarjetas con sombra (radio elegido en redSoft + borde red); `BotonMantener` con `shadows.danger`; `PinUnidad` con ícono Radio y prop `pista`; `ItemNotificacion` con caja canvas (seguridad: círculo redSoft con borde red); `ListItem amplio`; `typography.bodyBold`. Íconos de avisos: Bus, Split, TrafficCone, TriangleAlert, Star relleno.
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.
 

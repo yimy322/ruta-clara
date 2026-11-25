@@ -8,7 +8,7 @@ import { BarraProgreso, Button, Header, ListItem, useToast } from "@/components"
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { buscarLineas, getLineasSugeridas, getUbicacionUsuario } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { colors, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Linea, LineaSugerida } from "@/types";
 import { textoLineaSugerida } from "@/utils/formato";
 
@@ -163,10 +163,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
+    borderRadius: radii.control,
     backgroundColor: colors.surface,
+    ...shadows.card,
   },
   input: {
     flex: 1,

@@ -14,7 +14,7 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Flujo 1 en alta fidelidad (4.5B). Falta pasar los Flujos 2 y 3 (**4.5C**).
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Siguiente: estados E1–E10 (**4.7**).
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -46,8 +46,8 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.5A | Tokens y componentes de alta fidelidad | ✅ (22/11) |
 | 4.4 | Ajustes, Mapa de seguridad, Menú lateral (F3_05–F3_07) + TODO | ✅ (24/11) |
 | 4.5B | Pantallas del Flujo 1 en alta fidelidad | ✅ (25/11) |
-| **4.5C** | **Pantallas de los Flujos 2 y 3 en alta fidelidad** | 📝 **siguiente** |
-| 4.7 | Estados E1–E10 en la app | 📝 |
+| 4.5C | Pantallas de los Flujos 2 y 3 en alta fidelidad | ✅ (25/11) |
+| **4.7** | **Estados E1–E10 en la app** | 📝 **siguiente** |
 | 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | 📝 |
 | 4.8 | Módulo de accesibilidad (A1/A2) | 📝 |
 | 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | 📝 |
@@ -116,7 +116,7 @@ Actualizar `src/theme` y `src/components` a los estilos y componentes de la pág
 ### 4.4 · Ajustes, Mapa de seguridad, Menú lateral — ✅
 F3_05, F3_06, F3_07 y conectar los TODO (menú ☰, chip Seguridad, `/ajustes` provisional). Incluye la confirmación de «Cerrar sesión» (mejora pendiente del AP2).
 
-### 4.5B / 4.5C · Pantallas en alta fidelidad — 4.5B ✅ · 4.5C 📝 siguiente
+### 4.5B / 4.5C · Pantallas en alta fidelidad — ✅
 Pantalla por pantalla contra los frames de alta fidelidad. Incluye la tarjeta de Inicio con próximas unidades, marcadores «P», burbujas de unidades y el esqueleto de carga entre Búsqueda y Resultados.
 
 ### 4.7 · Estados — 📝
