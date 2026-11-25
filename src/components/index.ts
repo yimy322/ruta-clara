@@ -8,6 +8,8 @@ export { CardParadero, type DatosCardParadero } from "./CardParadero";
 export { CardRuta } from "./CardRuta";
 export { Chip, type ChipState } from "./Chip";
 export { FilaAjuste } from "./FilaAjuste";
+export { EsqueletoRuta } from "./EsqueletoRuta";
+export { EstadoPantalla } from "./EstadoPantalla";
 export { GraficoAfluencia } from "./GraficoAfluencia";
 export { Header } from "./Header";
 export { IconButton } from "./IconButton";

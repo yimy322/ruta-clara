@@ -4,18 +4,28 @@ import {
   Briefcase,
   GraduationCap,
   House,
+  ChevronRight,
   History,
   LocateFixed,
+  MapPin,
+  Search,
+  X,
   type LucideIcon,
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Chip, IconButton, ListItem } from "@/components";
+import { Button, Chip, EstadoPantalla, IconButton, ListItem, useToast } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
-import { buscarDestinos, getDestinosComunes, getDestinosRecientes, getLugaresGuardados } from "@/data/repositorio";
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import {
+  buscarDestinos,
+  getDestinosComunes,
+  getDestinosRecientes,
+  getLugaresGuardados,
+  sugerirDestino,
+} from "@/data/repositorio";
+import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { Destino, LugarGuardado } from "@/types";
 import { partirCoincidencia } from "@/utils/formato";
 
@@ -31,6 +41,8 @@ const DEBOUNCE_MS = 250;
 type Resultado = {
   consulta: string;
   destinos: Destino[];
+  // Destino más parecido cuando no hay resultados (E1)
+  sugerencia: Destino | null;
 };
 
 // "Jockey Pla" sobre "Jockey Plaza" → la parte que coincide va en negrita
@@ -53,6 +65,7 @@ function tituloResaltado(nombre: string, consulta: string) {
 export default function Buscar() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { mostrar } = useToast();
 
   const [texto, setTexto] = useState("");
   // Última respuesta de buscarDestinos; puede ser de una consulta anterior
@@ -80,7 +93,13 @@ export default function Buscar() {
     // Si llega la respuesta de una consulta vieja, se descarta
     let activo = true;
     const timer = setTimeout(() => {
-      buscarDestinos(consulta).then((destinos) => activo && setResultado({ consulta, destinos }));
+      (async () => {
+        const destinos = await buscarDestinos(consulta);
+        const sugerencia = destinos.length === 0 ? await sugerirDestino(consulta) : null;
+        if (activo) {
+          setResultado({ consulta, destinos, sugerencia });
+        }
+      })();
     }, DEBOUNCE_MS);
     return () => {
       activo = false;
@@ -104,10 +123,45 @@ export default function Buscar() {
       return <ActivityIndicator style={styles.cargando} color={colors.ink} />;
     }
     if (resultado.destinos.length === 0) {
+      // E1 · Búsqueda sin resultados
+      const { sugerencia } = resultado;
       return (
-        <Text style={[typography.body, styles.muted, styles.mensaje]}>
-          No encontramos «{consulta}». Prueba con un distrito o centro comercial.
-        </Text>
+        <EstadoPantalla
+          Icono={Search}
+          tamano="compacto"
+          titulo={`No encontramos «${resultado.consulta}»`}
+          texto="Revisa cómo está escrito o prueba con un lugar conocido cerca de tu destino."
+          acciones={
+            <Button
+              label="Elegir el destino en el mapa"
+              variant="secondary"
+              fullWidth
+              // TODO Fase 6: elegir el destino tocando el mapa real
+              onPress={() => mostrar("Elegir en el mapa estará disponible pronto")}
+            />
+          }
+        >
+          {sugerencia && (
+            <View style={styles.sugerencia}>
+              <Text style={[typography.overline, styles.muted]}>¿Quisiste decir…?</Text>
+              <Pressable
+                onPress={() => irARutas(sugerencia.nombre)}
+                accessibilityRole="button"
+                accessibilityLabel={`¿Quisiste decir ${sugerencia.nombre}?`}
+                style={({ pressed }) => [styles.tarjeta, pressed && styles.pressed]}
+              >
+                <View style={styles.insignia}>
+                  <MapPin color={colors.ink} size={sizes.iconGlyph} />
+                </View>
+                <View style={styles.tarjetaTexto}>
+                  <Text style={[typography.bodyStrong, styles.ink]}>{sugerencia.nombre}</Text>
+                  <Text style={[typography.caption, styles.muted]}>{sugerencia.distrito}</Text>
+                </View>
+                <ChevronRight color={colors.ink} size={sizes.chevron} />
+              </Pressable>
+            </View>
+          )}
+        </EstadoPantalla>
       );
     }
     return resultado.destinos.map((destino, i) => (
@@ -147,6 +201,16 @@ export default function Buscar() {
               accessibilityLabel="Destino"
               style={[typography.body, styles.ink, styles.input]}
             />
+            {texto.length > 0 && (
+              <Pressable
+                onPress={() => setTexto("")}
+                hitSlop={spacing.md}
+                accessibilityRole="button"
+                accessibilityLabel="Borrar destino"
+              >
+                <X color={colors.ink} size={sizes.errorIcono} />
+              </Pressable>
+            )}
           </View>
         </View>
       </View>
@@ -167,7 +231,9 @@ export default function Buscar() {
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.contenido}>
         {consulta ? (
           <>
-            <Text style={[typography.overline, styles.muted, styles.seccion]}>Sugerencias</Text>
+            {!(vigente && resultado?.destinos.length === 0) && (
+              <Text style={[typography.overline, styles.muted, styles.seccion]}>Sugerencias</Text>
+            )}
             {renderSugerencias()}
           </>
         ) : (
@@ -196,6 +262,36 @@ export default function Buscar() {
 }
 
 const styles = StyleSheet.create({
+  sugerencia: {
+    alignSelf: "stretch",
+    gap: spacing.sm,
+    paddingTop: spacing.lg,
+  },
+  tarjeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    paddingHorizontal: sizes.cardPadding,
+    paddingVertical: spacing.md,
+    borderRadius: radii.control,
+    backgroundColor: colors.surface,
+    ...shadows.card,
+  },
+  insignia: {
+    width: sizes.badge,
+    height: sizes.badge,
+    borderRadius: radii.badge,
+    backgroundColor: colors.yellowSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tarjetaTexto: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  pressed: {
+    opacity: opacity.pressed,
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,
@@ -272,11 +368,6 @@ const styles = StyleSheet.create({
   },
   cargando: {
     paddingVertical: spacing.xl,
-  },
-  mensaje: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-    textAlign: "center",
   },
   ink: {
     color: colors.ink,

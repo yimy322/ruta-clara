@@ -1,10 +1,10 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { Bus, Settings, Split, Star, TrafficCone, TriangleAlert, type LucideIcon } from "lucide-react-native";
+import { Bell, Bus, Settings, Split, Star, TrafficCone, TriangleAlert, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Chip, IconButton, ItemNotificacion, useToast } from "@/components";
+import { Button, Chip, EstadoPantalla, IconButton, ItemNotificacion, useToast } from "@/components";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { useViaje } from "@/context/ViajeContext";
 import { getNotificaciones, getViajeDeAlerta, marcarNotificacionLeida } from "@/data/repositorio";
@@ -157,6 +157,8 @@ export default function Alertas() {
     }
   };
 
+  // Ningún aviso en ninguna categoría: E6 en vez del texto corto del filtro
+  const sinAvisos = estado.tipo === "ok" && estado.notificaciones.length === 0;
   const { tipos, vacio } = FILTROS.find((f) => f.valor === filtro) ?? FILTROS[0];
   const secciones = estado.tipo === "ok" ? agrupar(estado.notificaciones.filter((n) => tipos.includes(n.tipo))) : [];
 
@@ -169,22 +171,38 @@ export default function Alertas() {
         <IconButton icon={<Settings />} accessibilityLabel="Ajustes" onPress={() => router.push("/ajustes")} />
       </View>
 
-      {/* Una sola fila con scroll horizontal, como en Figma */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filtrosScroll}
-        contentContainerStyle={styles.filtros}
-      >
-        {FILTROS.map(({ valor, label }) => (
-          <Chip
-            key={valor}
-            label={label}
-            state={filtro === valor ? "selected" : "default"}
-            onPress={() => setFiltro(valor)}
+      {/* Una sola fila con scroll horizontal, como en Figma. Sin avisos, E6 no lleva filtros */}
+      {!sinAvisos && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filtrosScroll}
+          contentContainerStyle={styles.filtros}
+        >
+          {FILTROS.map(({ valor, label }) => (
+            <Chip
+              key={valor}
+              label={label}
+              state={filtro === valor ? "selected" : "default"}
+              onPress={() => setFiltro(valor)}
+            />
+          ))}
+        </ScrollView>
+      )}
+
+      {sinAvisos && (
+        // E6 · Alertas vacío
+        <ScrollView contentContainerStyle={styles.centroVertical}>
+          <EstadoPantalla
+            Icono={Bell}
+            titulo="Todavía no tienes alertas"
+            texto="Crea una alerta para tu paradero y te avisaremos cuando tu combi esté cerca."
+            acciones={
+              <Button label="Configurar mi primera alerta" onPress={() => router.push("/alerta")} fullWidth />
+            }
           />
-        ))}
-      </ScrollView>
+        </ScrollView>
+      )}
 
       {estado.tipo === "cargando" && (
         <View style={styles.estado}>
@@ -202,7 +220,7 @@ export default function Alertas() {
         </View>
       )}
 
-      {estado.tipo === "ok" && secciones.length === 0 && (
+      {estado.tipo === "ok" && !sinAvisos && secciones.length === 0 && (
         <View style={styles.estado}>
           <Text style={[typography.body, styles.muted, styles.centrado]}>{vacio}</Text>
         </View>
@@ -240,6 +258,10 @@ export default function Alertas() {
 }
 
 const styles = StyleSheet.create({
+  centroVertical: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,

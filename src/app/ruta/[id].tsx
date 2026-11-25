@@ -1,11 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { MapPin, Star } from "lucide-react-native";
+import { Bus, MapPin, Star } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   Button,
+  EstadoPantalla,
   GraficoAfluencia,
   Header,
   IconButton,
@@ -155,20 +156,58 @@ export default function DetalleRuta() {
     router.push("/viaje/espera");
   };
 
+  const botonFavorito = (
+    <IconButton
+      icon={<Star fill={favorita ? colors.ink : "none"} />}
+      tono={favorita ? "destacado" : undefined}
+      onPress={alternar}
+      accessibilityLabel={favorita ? "Quitar de Favoritos" : "Guardar en Favoritos"}
+    />
+  );
+
+  // E9 · Ruta no disponible: la empresa la suspendió
+  if (linea.suspendida) {
+    const verAlternativas = () => {
+      if (destino) {
+        router.replace({ pathname: "/rutas", params: { destino } });
+      } else {
+        router.back();
+      }
+    };
+    return (
+      <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
+        <Header large title={linea.nombre} subtitle={`${etiquetaTipo(linea.tipo)} · ${linea.tramo}`} right={botonFavorito} />
+        <ScrollView contentContainerStyle={styles.centroVertical}>
+          <EstadoPantalla
+            Icono={Bus}
+            tono="neutro"
+            titulo={`${linea.nombre} ya no está disponible`}
+            texto="La empresa suspendió esta ruta temporalmente. Te mostramos otras formas de llegar a tu destino."
+            acciones={
+              <>
+                <Button label="Ver rutas alternativas" onPress={verAlternativas} fullWidth />
+                <Button
+                  label="Avísame cuando vuelva"
+                  variant="secondary"
+                  fullWidth
+                  // TODO Fase 5: suscripción real al estado de la línea
+                  onPress={() => mostrar(`Te avisaremos cuando ${linea.nombre} vuelva`)}
+                />
+              </>
+            }
+          />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
       <Header
         large
         title={linea.nombre}
         subtitle={`${etiquetaTipo(linea.tipo)} · ${linea.empresa}`}
-        right={
-          <IconButton
-            icon={<Star fill={favorita ? colors.ink : "none"} />}
-            tono={favorita ? "destacado" : undefined}
-            onPress={alternar}
-            accessibilityLabel={favorita ? "Quitar de Favoritos" : "Guardar en Favoritos"}
-          />
-        }
+        right={botonFavorito}
       />
       <ScrollView contentContainerStyle={styles.contenido}>
         <Segmented opciones={SENTIDOS} valor={sentido} onChange={setSentido} />
@@ -212,6 +251,10 @@ export default function DetalleRuta() {
 }
 
 const styles = StyleSheet.create({
+  centroVertical: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,

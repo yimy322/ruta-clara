@@ -51,7 +51,7 @@ Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualiza
 | Frescura de datos | < 5 min = «en vivo»; 5–30 min = «reportado hace N min»; > 30 min = sin datos. Chip Live de ocupación si el reporte tiene < 15 min. Constantes en `src/config` |
 | Avísame para bajar | Vibra un paradero antes; activado por defecto |
 | Alertas diarias | Hora (intervalos de 5 min), días (L–V por defecto), ruta, aviso a 3/5/10 min, tránsito y seguridad |
-| Sin señal | El reporte se guarda en cola y se envía al reconectar (diseñado en E3; **aún no implementado**) |
+| Sin señal | El reporte se guarda en cola (AsyncStorage) y se envía al reconectar (NetInfo) o al reabrir la app (E3, implementado en 4.7) |
 | Eliminación de cuenta | Periodo de gracia de 30 días; se conservan reportes anónimos 12 meses y el registro de la solicitud 6 meses (diseñado; no implementado) |
 | Onboarding | Solo la primera vez |
 | ETA simulada | 12 km/h; ETA cada 5 s; avance de paradero cada 4 s (`src/config/simulacion.ts`) |
@@ -150,6 +150,7 @@ src/
 - **4.3A:** `getParaderosFavoritos`, `esParaderoFavorito`, `alternarParaderoFavorito`, `getResumenParadero(id)`, `getActividadParadero` (renombrado del antiguo `getResumenParadero`), `getAlertas`, `getAlerta`, `getAlertaDeParadero`, `guardarAlerta`, `eliminarAlerta`, `getOpcionesRutaAlerta`.
 - **4.3B:** `getFavoritos`, `getNotificaciones`, `marcarNotificacionLeida`, `contarNoLeidas`, `simularAvisoAlerta`.
 - **4.5B:** `Mapa` con decoración (manzanas, parque, avenida) y props opcionales `marcadorParadero="P"` y `estiloUnidad="burbuja"` (solo Inicio); `CardParadero` recibe `proximas` de `getResumenParadero`; `ListItem enTarjeta`.
+- **4.7:** `EstadoPantalla` y `EsqueletoRuta`; `sugerirDestino` (Levenshtein ≤ 3); `Linea.suspendida` (La 73, E9); cola `src/data/colaReportes.ts` + `ColaReportesProvider`; modo de prueba `src/data/simulacion.ts` (interruptores en /dev/datos); dependencia `@react-native-community/netinfo`.
 - **4.5C:** `OpcionGrande`/`OpcionRadio` como tarjetas con sombra (radio elegido en redSoft + borde red); `BotonMantener` con `shadows.danger`; `PinUnidad` con ícono Radio y prop `pista`; `ItemNotificacion` con caja canvas (seguridad: círculo redSoft con borde red); `ListItem amplio`; `typography.bodyBold`. Íconos de avisos: Bus, Split, TrafficCone, TriangleAlert, Star relleno.
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.

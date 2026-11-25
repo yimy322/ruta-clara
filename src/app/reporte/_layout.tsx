@@ -15,6 +15,8 @@ export default function ReporteLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         {/* El reporte ya se envió: no se vuelve atrás con el gesto */}
         <Stack.Screen name="gracias" options={{ gestureEnabled: false }} />
+        {/* Reporte guardado en la cola (E3): se sale con la X o «Volver al mapa» */}
+        <Stack.Screen name="sin-conexion" options={{ gestureEnabled: false }} />
       </Stack>
     </ReporteProvider>
   );

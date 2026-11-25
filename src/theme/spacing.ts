@@ -157,6 +157,22 @@ export const sizes = {
   chevron: 18,
   drawerWidth: 288,
   menuRowHeight: 65,
+  // Estados vacíos y de error (E1–E10): círculo de la señal visual y su ícono
+  estadoCirculo: 104,
+  estadoCirculoGrande: 112,
+  estadoCirculoCompacto: 96,
+  estadoIcono: 44,
+  estadoIconoGrande: 48,
+  estadoIconoCompacto: 40,
+  // Cuadro del ícono de la tarjeta de permiso de ubicación (E10)
+  permisoIcono: 48,
+  permisoGlyph: 24,
+  // Ícono del mensaje de validación junto al campo (E8)
+  errorIcono: 18,
+  // Esqueleto de carga de rutas (E2)
+  esqueletoTexto: 14,
+  esqueletoChip: 24,
+  esqueletoLinea: 10,
   // Mapa de seguridad (F3_06): manchas de calor y leyenda
   zonaAlta: 144,
   zonaMedia: 92,

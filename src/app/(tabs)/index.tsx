@@ -173,9 +173,14 @@ export default function Inicio() {
             </View>
           </View>
           {!permiso.concedido && (
-            <BannerUbicacion puedePedir={permiso.puedePedir} onPress={permiso.activar} />
+            <BannerUbicacion
+              puedePedir={permiso.puedePedir}
+              onPress={permiso.activar}
+              onBuscar={() => router.push("/buscar")}
+            />
           )}
-          {cercano !== null && (
+          {/* Sin permiso, la tarjeta de ubicación ocupa el lugar del paradero cercano (E10) */}
+          {permiso.concedido && cercano !== null && (
             <CardParadero
               datos={cercano ?? null}
               onPress={(id) => router.push({ pathname: "/paradero/[id]", params: { id } })}

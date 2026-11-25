@@ -1,10 +1,10 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { Bell, Check, Pencil, Plus, X } from "lucide-react-native";
+import { Bell, Check, Pencil, Plus, Star, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Chip, IconButton, ListItem, useToast } from "@/components";
+import { Button, Chip, EstadoPantalla, IconButton, ListItem, useToast } from "@/components";
 import {
   alternarFavorita,
   alternarParaderoFavorito,
@@ -148,13 +148,20 @@ export default function Favoritos() {
 
   const ver = (seccion: Exclude<Filtro, "todos">) => filtro === "todos" || filtro === seccion;
 
+  // E4 · Favoritos vacío: sin lugares, paraderos ni rutas guardadas
+  const vacio =
+    estado.tipo === "ok" &&
+    estado.datos.lugares.length === 0 &&
+    estado.datos.paraderos.length === 0 &&
+    estado.datos.rutas.length === 0;
+
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right"]}>
       <View style={[styles.barra, { paddingTop: insets.top + spacing.sm }]}>
         <Text style={[typography.h1, styles.ink]} accessibilityRole="header">
           Favoritos
         </Text>
-        {estado.tipo === "ok" && (
+        {estado.tipo === "ok" && !vacio && (
           <IconButton
             icon={editando ? <Check /> : <Pencil />}
             active={editando}
@@ -164,16 +171,34 @@ export default function Favoritos() {
         )}
       </View>
 
-      <View style={styles.filtros}>
-        {FILTROS.map(({ valor, label }) => (
-          <Chip
-            key={valor}
-            label={label}
-            state={filtro === valor ? "selected" : "default"}
-            onPress={() => setFiltro(valor)}
+      {!vacio && (
+        <View style={styles.filtros}>
+          {FILTROS.map(({ valor, label }) => (
+            <Chip
+              key={valor}
+              label={label}
+              state={filtro === valor ? "selected" : "default"}
+              onPress={() => setFiltro(valor)}
+            />
+          ))}
+        </View>
+      )}
+
+      {vacio && (
+        <ScrollView contentContainerStyle={styles.centroVertical}>
+          <EstadoPantalla
+            Icono={Star}
+            titulo="Aún no tienes favoritos"
+            texto="Guarda tus paraderos y rutas de siempre para verlos aquí y recibir alertas."
+            acciones={
+              <>
+                <Button label="Buscar un paradero cercano" onPress={abrirParaderoCercano} fullWidth />
+                <Button label="Buscar una ruta" variant="secondary" onPress={() => router.push("/buscar")} fullWidth />
+              </>
+            }
           />
-        ))}
-      </View>
+        </ScrollView>
+      )}
 
       {estado.tipo === "cargando" && (
         <View style={styles.estado}>
@@ -191,7 +216,7 @@ export default function Favoritos() {
         </View>
       )}
 
-      {estado.tipo === "ok" && (
+      {estado.tipo === "ok" && !vacio && (
         <ScrollView contentContainerStyle={styles.contenido}>
           {ver("lugares") && (
             <>
@@ -300,6 +325,10 @@ export default function Favoritos() {
 }
 
 const styles = StyleSheet.create({
+  centroVertical: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,

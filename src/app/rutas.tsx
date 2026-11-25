@@ -1,13 +1,18 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { CircleAlert, Clock } from "lucide-react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, CardRuta, Chip, Header, Mapa } from "@/components";
+import { Button, CardRuta, Chip, EsqueletoRuta, EstadoPantalla, Header, Mapa, useToast } from "@/components";
 import { buscarRutas, getUbicacionUsuario } from "@/data/repositorio";
 import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
 import type { Coordenada, OpcionRuta, TipoUnidad } from "@/types";
 import { etiquetaTipo } from "@/utils/formato";
+import { abrirWhatsApp } from "@/utils/soporte";
+
+// Tarjetas del esqueleto de carga (E2)
+const ESQUELETOS = [0, 1, 2];
 
 type Estado = { tipo: "cargando" } | { tipo: "error" } | { tipo: "ok"; opciones: OpcionRuta[] };
 
@@ -23,6 +28,7 @@ const FILTROS: { valor: FiltroTipo; label: string }[] = [
 // F1_06 · Resultados de rutas
 export default function Rutas() {
   const router = useRouter();
+  const { mostrar } = useToast();
   const { origen = "Mi ubicación", destino = "" } = useLocalSearchParams<{ origen?: string; destino?: string }>();
 
   const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
@@ -64,25 +70,13 @@ export default function Rutas() {
     ? [...filtradas].sort((a, b) => a.linea.pasaje - b.linea.pasaje || a.etaMin - b.etaMin)
     : filtradas;
 
+  const contactar = async () => {
+    if (!(await abrirWhatsApp())) {
+      mostrar("No se pudo abrir WhatsApp. Inténtalo de nuevo.");
+    }
+  };
+
   const renderLista = () => {
-    if (estado.tipo === "cargando") {
-      return (
-        <View style={styles.estado}>
-          <ActivityIndicator color={colors.ink} />
-          <Text style={[typography.body, styles.muted, styles.centrado]}>Buscando rutas…</Text>
-        </View>
-      );
-    }
-    if (estado.tipo === "error") {
-      return (
-        <View style={styles.estado}>
-          <Text style={[typography.body, styles.muted, styles.centrado]}>
-            No pudimos cargar las rutas. Revisa tu conexión e inténtalo otra vez.
-          </Text>
-          <Button label="Reintentar" variant="secondary" onPress={reintentar} />
-        </View>
-      );
-    }
     if (opciones.length === 0) {
       return (
         <View style={styles.estado}>
@@ -114,9 +108,54 @@ export default function Rutas() {
     ));
   };
 
+  const titulo = `${origen} → ${destino}`;
+
+  // E2 · Cargando rutas: esqueleto en vez de spinner, sin mapa ni filtros
+  if (estado.tipo === "cargando") {
+    return (
+      <SafeAreaView style={[styles.screen, styles.canvas]} edges={["left", "right", "bottom"]}>
+        <Header title={titulo} subtitle="Hoy, salir ahora" />
+        <ScrollView contentContainerStyle={styles.contenido} accessibilityLabel="Buscando las mejores rutas">
+          <View style={styles.buscando}>
+            <Clock color={colors.inkMuted} size={sizes.chipIcon} />
+            <Text style={[typography.captionStrong, styles.muted]} accessibilityLiveRegion="polite">
+              Buscando las mejores rutas…
+            </Text>
+          </View>
+          {ESQUELETOS.map((i) => (
+            <EsqueletoRuta key={i} indice={i} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // E7 · Error del sistema: reemplaza el mapa y los filtros
+  if (estado.tipo === "error") {
+    return (
+      <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
+        <Header title={titulo} subtitle="Hoy, salir ahora · Hora punta" />
+        <ScrollView contentContainerStyle={styles.centroVertical}>
+          <EstadoPantalla
+            Icono={CircleAlert}
+            tono="error"
+            titulo="No pudimos cargar las rutas"
+            texto="Disculpa, el servicio no responde en este momento. No es un problema de tu celular."
+            acciones={
+              <>
+                <Button label="Reintentar" onPress={reintentar} fullWidth />
+                <Button label="Escríbenos por WhatsApp" variant="tertiary" onPress={contactar} fullWidth />
+              </>
+            }
+          />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
-      <Header title={`${origen} → ${destino}`} subtitle="Hoy, salir ahora · Hora punta" />
+      <Header title={titulo} subtitle="Hoy, salir ahora · Hora punta" />
       <ScrollView contentContainerStyle={styles.contenido}>
         {/* TODO Fase 6: trazos de las rutas y marcador del destino */}
         <Mapa usuario={usuario} estilo={styles.mapa} />
@@ -152,6 +191,19 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.surface,
+  },
+  canvas: {
+    backgroundColor: colors.canvas,
+  },
+  buscando: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+  },
+  centroVertical: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   contenido: {
     gap: spacing.md,

@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Avatar, BarraProgreso, Button, Chip, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
-import { RANGOS } from "@/config/gamificacion";
+import { Avatar, BarraProgreso, Button, Chip, EstadoPantalla, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
+import { PUNTOS_POR_TIPO, RANGOS } from "@/config/gamificacion";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getHistorialReportes, getInsignias, getUsuario, simularAvisoAlerta } from "@/data/repositorio";
@@ -66,6 +66,8 @@ export default function Perfil() {
   const verInsignia = (insignia: Insignia) =>
     Alert.alert(insignia.nombre, insignia.obtenida ? `Lograda: ${insignia.requisito}` : insignia.requisito);
 
+  const sinHistorial = datos?.historial.length === 0;
+
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right"]}>
       <View style={[styles.barra, { paddingTop: insets.top + spacing.sm }]}>
@@ -78,58 +80,66 @@ export default function Perfil() {
       {!datos ? (
         <ActivityIndicator style={styles.cargando} color={colors.ink} />
       ) : (
-        <ScrollView contentContainerStyle={styles.contenido}>
-          <Encabezado usuario={datos.usuario} />
-
-          <View style={styles.escala}>
-            <View style={styles.rangos}>
-              {RANGOS.map((rango) => (
-                <Text key={rango.nombre} style={[typography.caption, styles.muted]} numberOfLines={1}>
-                  {rango.nombreCorto}
-                </Text>
-              ))}
-            </View>
-            <BarraProgreso progreso={progresoEscala(datos.usuario.puntos)} />
-          </View>
-
-          <View style={styles.fila}>
-            <TarjetaEstadistica valor={String(datos.usuario.reportesMes)} label="reportes del mes" />
-            <TarjetaEstadistica valor={formatearPuntos(datos.usuario.puntos)} label="puntos" />
-            <TarjetaEstadistica valor={`${datos.usuario.porcentajeConfirmados}%`} label="confirmados" />
-          </View>
-
-          <Text style={[typography.overline, styles.muted]}>Insignias</Text>
-          <View style={styles.fila}>
-            {datos.insignias.map((insignia) => {
-              const Icono = insignia.obtenida ? (ICONOS[insignia.id] ?? ShieldCheck) : Lock;
-              return (
-                <Tile
-                  key={insignia.id}
-                  label={insignia.obtenida ? insignia.nombre : "Bloqueada"}
-                  icon={<Icono />}
-                  atenuado={!insignia.obtenida}
-                  onPress={() => verInsignia(insignia)}
-                  fill
-                />
-              );
-            })}
-          </View>
-
-          <Text style={[typography.overline, styles.muted]}>Historial</Text>
-          {datos.historial.length === 0 ? (
-            <Text style={[typography.body, styles.muted]}>Aún no tienes reportes</Text>
+        <ScrollView contentContainerStyle={[styles.contenido, sinHistorial && styles.centroVertical]}>
+          {sinHistorial ? (
+            // E5 · Perfil sin historial: el cuerpo se reemplaza por la bienvenida
+            <EstadoPantalla
+              Icono={Sunrise}
+              titulo="Te damos la bienvenida a RutaClara"
+              texto={`Todavía no tienes reportes. Cada aporte ayuda a otros pasajeros y te suma puntos: el primero vale ${PUNTOS_POR_TIPO.ubicacion} pts.`}
+              acciones={<Button label="Hacer mi primer reporte" onPress={() => router.push("/reporte")} fullWidth />}
+            />
           ) : (
-            <View>
-              {datos.historial.map((item) => (
-                <ListItem
-                  key={item.reporte.id}
-                  title={tituloHistorial(item)}
-                  subtitle={`${formatearDia(item.reporte.creadoEn)} · +${item.puntos} pts`}
-                  trailing={item.vencido ? "Vencido" : `✓ ${item.reporte.confirmaciones} confirman`}
-                  enTarjeta
-                />
-              ))}
-            </View>
+            <>
+              <Encabezado usuario={datos.usuario} />
+
+              <View style={styles.escala}>
+                <View style={styles.rangos}>
+                  {RANGOS.map((rango) => (
+                    <Text key={rango.nombre} style={[typography.caption, styles.muted]} numberOfLines={1}>
+                      {rango.nombreCorto}
+                    </Text>
+                  ))}
+                </View>
+                <BarraProgreso progreso={progresoEscala(datos.usuario.puntos)} />
+              </View>
+
+              <View style={styles.fila}>
+                <TarjetaEstadistica valor={String(datos.usuario.reportesMes)} label="reportes del mes" />
+                <TarjetaEstadistica valor={formatearPuntos(datos.usuario.puntos)} label="puntos" />
+                <TarjetaEstadistica valor={`${datos.usuario.porcentajeConfirmados}%`} label="confirmados" />
+              </View>
+
+              <Text style={[typography.overline, styles.muted]}>Insignias</Text>
+              <View style={styles.fila}>
+                {datos.insignias.map((insignia) => {
+                  const Icono = insignia.obtenida ? (ICONOS[insignia.id] ?? ShieldCheck) : Lock;
+                  return (
+                    <Tile
+                      key={insignia.id}
+                      label={insignia.obtenida ? insignia.nombre : "Bloqueada"}
+                      icon={<Icono />}
+                      atenuado={!insignia.obtenida}
+                      onPress={() => verInsignia(insignia)}
+                      fill
+                    />
+                  );
+                })}
+              </View>
+
+              <Text style={[typography.overline, styles.muted]}>Historial</Text>
+              <View>
+                {datos.historial.map((item) => (
+                  <ListItem
+                    key={item.reporte.id}
+                    title={tituloHistorial(item)}
+                    subtitle={`${formatearDia(item.reporte.creadoEn)} · +${item.puntos} pts`}
+                    trailing={item.vencido ? "Vencido" : `✓ ${item.reporte.confirmaciones} confirman`}
+                    enTarjeta
+                  />
+                ))}
+              </View>
+            </>
           )}
 
           {__DEV__ && (
@@ -166,6 +176,10 @@ function Encabezado({ usuario }: { usuario: Usuario }) {
 }
 
 const styles = StyleSheet.create({
+  centroVertical: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,

@@ -54,6 +54,8 @@ export type Linea = {
   recorridoVuelta: string[];
   // 9 valores (0–100) de 6am a 10pm, cada 2 h, para el gráfico de afluencia
   afluencia: number[];
+  // La empresa suspendió la ruta: el detalle muestra E9 y no llegan unidades
+  suspendida?: boolean;
 };
 
 export type TipoReporte = "ubicacion" | "paradero" | "transito" | "seguridad" | "desvio" | "valoracion";

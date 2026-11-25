@@ -1,8 +1,8 @@
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, usePreventRemove, useRouter } from "expo-router";
-import { ChevronDown, X } from "lucide-react-native";
+import { ChevronDown, CircleAlert, X } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, Chip, Header, IconButton, ListItem, Toggle, useToast } from "@/components";
@@ -10,6 +10,8 @@ import { eliminarAlerta, getAlerta, getOpcionesRutaAlerta, guardarAlerta } from 
 import { colors, minTouch, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
 import type { AlertaDiaria, MinutosAntes, OpcionRutaAlerta } from "@/types";
 import { formatoDias, formatoHora } from "@/utils/formato";
+
+const MENSAJE_SIN_DIAS = "Elige al menos un día para recibir la alerta.";
 
 // Valores de Date.getDay(), en el orden de la semana (lunes primero)
 const DIAS: { valor: number; inicial: string; nombre: string }[] = [
@@ -165,6 +167,14 @@ export default function Alerta() {
     />
   );
 
+  // Lector de pantalla: avisa del error apenas se desmarca el último día (E8)
+  const quedoSinDias = form?.dias.length === 0;
+  useEffect(() => {
+    if (quedoSinDias) {
+      AccessibilityInfo.announceForAccessibility(MENSAJE_SIN_DIAS);
+    }
+  }, [quedoSinDias]);
+
   if (carga.tipo !== "ok" || !form) {
     return (
       <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
@@ -222,11 +232,13 @@ export default function Alerta() {
       onValueChange: (_, fecha) => cambiarHora(fecha),
     });
 
+  // E8 · Validación junto al campo: sin días, la alerta no se puede guardar
+  const sinDias = form.dias.length === 0;
   let falta: string | null = null;
   if (!opcion) {
     falta = "Elige una ruta favorita para guardar la alerta";
-  } else if (form.dias.length === 0) {
-    falta = "Elige al menos un día";
+  } else if (sinDias) {
+    falta = MENSAJE_SIN_DIAS;
   }
 
   const guardar = async () => {
@@ -333,6 +345,12 @@ export default function Alerta() {
             );
           })}
         </View>
+        {sinDias && (
+          <View style={styles.error} accessibilityRole="alert" accessibilityLiveRegion="polite">
+            <CircleAlert color={colors.redStrong} size={sizes.errorIcono} />
+            <Text style={[typography.captionStrong, styles.errorTexto]}>{MENSAJE_SIN_DIAS}</Text>
+          </View>
+        )}
 
         <Text style={[typography.overline, styles.muted]}>Ruta favorita</Text>
         {opciones.length === 0 ? (
@@ -409,7 +427,8 @@ export default function Alerta() {
       </ScrollView>
 
       <View style={styles.pie}>
-        {falta && <Text style={[typography.caption, styles.muted, styles.centrado]}>{falta}</Text>}
+        {/* El error de días ya se muestra junto a los días (E8) */}
+        {falta && !sinDias && <Text style={[typography.caption, styles.muted, styles.centrado]}>{falta}</Text>}
         <Button
           label={guardando ? "Guardando…" : "Guardar alerta"}
           onPress={guardar}
@@ -423,6 +442,20 @@ export default function Alerta() {
 }
 
 const styles = StyleSheet.create({
+  error: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: sizes.legendPadding,
+    borderRadius: radii.md,
+    backgroundColor: colors.redSoft,
+  },
+  // Rojo sobre redSoft: redStrong (contraste AA)
+  errorTexto: {
+    flex: 1,
+    color: colors.redStrong,
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.surface,

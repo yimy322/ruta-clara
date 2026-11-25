@@ -58,6 +58,7 @@ export const lineas: Linea[] = [
     recorridoIda: ["proceres-sjl", "puente-nuevo", "centro-lima", "angamos"],
     recorridoVuelta: ["angamos", "centro-lima", "puente-nuevo", "proceres-sjl"],
     afluencia: [35, 100, 90, 55, 45, 50, 95, 85, 30], // supuesto
+    suspendida: true, // supuesto: Figma E9 muestra La 73 suspendida
   },
   {
     id: "santa-cruz",

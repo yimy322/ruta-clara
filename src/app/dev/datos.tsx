@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Chip, Header, ListItem } from "@/components";
+import { Chip, FilaAjuste, Header, ListItem } from "@/components";
+import { useColaReportes } from "@/context/ColaReportesContext";
 import { buscarRutas } from "@/data/repositorio";
+import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { OpcionRuta, TipoUnidad } from "@/types";
 import { formatearEta, formatearPasaje } from "@/utils/formato";
 
-// Pantalla de desarrollo: verifica que el repositorio devuelva datos.
-// Se abre desde "Ver datos" en Inicio.
+// Pantalla de desarrollo: verifica que el repositorio devuelva datos y
+// permite forzar los estados de error, vacío y sin conexión (E3–E7).
+// Se abre desde "Ver datos" en Mi perfil.
 const ORIGEN = "Mi ubicación";
 const DESTINO = "Jockey Plaza";
 
@@ -19,9 +22,27 @@ const nombreTipo: Record<TipoUnidad, string> = {
   micro: "Micro",
 };
 
+// Interruptores del modo de prueba (src/data/simulacion.ts)
+const INTERRUPTORES: { clave: keyof Simulacion; titulo: string; subtitulo: string }[] = [
+  { clave: "forzarError", titulo: "Forzar error del sistema", subtitulo: "Resultados de rutas falla (E7)" },
+  { clave: "forzarVacio", titulo: "Forzar listas vacías", subtitulo: "Favoritos, Perfil y Alertas vacíos (E4–E6)" },
+  { clave: "forzarSinRed", titulo: "Simular sin conexión", subtitulo: "Los reportes van a la cola (E3)" },
+];
+
 export default function Datos() {
   const [opciones, setOpciones] = useState<OpcionRuta[] | null>(null);
   const [error, setError] = useState(false);
+  const [simulacion, setEstadoSimulacion] = useState<Simulacion>(getSimulacion);
+  const { reintentar } = useColaReportes();
+
+  const cambiar = (clave: keyof Simulacion, valor: boolean) => {
+    setSimulacion({ [clave]: valor });
+    setEstadoSimulacion(getSimulacion());
+    // Al volver la "conexión" simulada, se envía lo que quedó en la cola
+    if (clave === "forzarSinRed" && !valor) {
+      void reintentar();
+    }
+  };
 
   useEffect(() => {
     let cancelado = false;
@@ -41,6 +62,19 @@ export default function Datos() {
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
       <Header title="Datos de prueba" subtitle={`buscarRutas("${ORIGEN}", "${DESTINO}")`} />
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+        <Text style={styles.seccion}>Modo de prueba</Text>
+        <View style={styles.card}>
+          {INTERRUPTORES.map(({ clave, titulo, subtitulo }) => (
+            <FilaAjuste
+              key={clave}
+              titulo={titulo}
+              subtitulo={subtitulo}
+              valor={simulacion[clave]}
+              onValueChange={(valor) => cambiar(clave, valor)}
+            />
+          ))}
+        </View>
+        <Text style={styles.seccion}>Rutas a {DESTINO}</Text>
         {error ? (
           <Text style={styles.muted}>No se pudieron cargar las rutas.</Text>
         ) : opciones == null ? (
@@ -98,6 +132,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
+  },
+  seccion: {
+    ...typography.overline,
+    color: colors.inkMuted,
   },
   muted: {
     ...typography.body,

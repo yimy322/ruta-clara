@@ -49,6 +49,8 @@ import type {
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
+import { getSimulacion, SinConexionError } from "./simulacion";
+
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
 const RADIO_LUGAR_M = 5000;
@@ -182,6 +184,42 @@ export async function buscarDestinos(texto: string): Promise<Destino[]> {
   return destinos.filter((destino) => normalizar(destino.nombre).includes(consulta));
 }
 
+// Distancia de edición (Levenshtein): cuántas letras hay que cambiar,
+// agregar o quitar para pasar de `a` a `b`
+function distanciaEdicion(a: string, b: string): number {
+  let anterior = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const actual = [i];
+    for (let j = 1; j <= b.length; j++) {
+      const costo = a[i - 1] === b[j - 1] ? 0 : 1;
+      actual[j] = Math.min(anterior[j] + 1, actual[j - 1] + 1, anterior[j - 1] + costo);
+    }
+    anterior = actual;
+  }
+  return anterior[b.length];
+}
+
+// Letras de diferencia que se toleran para sugerir un destino (E1)
+const MAX_DIFERENCIA_SUGERENCIA = 3;
+
+// Destino con el nombre más parecido a lo escrito («Jokey Plasa» → Jockey
+// Plaza), para cuando la búsqueda no encuentra nada (E1). null si ninguno se
+// parece lo suficiente.
+export async function sugerirDestino(texto: string): Promise<Destino | null> {
+  await esperar();
+  const consulta = normalizar(texto);
+  let mejor: Destino | null = null;
+  let menor = MAX_DIFERENCIA_SUGERENCIA + 1;
+  for (const destino of destinos) {
+    const distancia = distanciaEdicion(consulta, normalizar(destino.nombre));
+    if (distancia < menor) {
+      menor = distancia;
+      mejor = destino;
+    }
+  }
+  return mejor;
+}
+
 const porIds = (ids: string[]) => ids.flatMap((id) => destinos.find((destino) => destino.id === id) ?? []);
 
 export async function getDestinosRecientes(): Promise<Destino[]> {
@@ -222,6 +260,9 @@ function resolverDestino(nombre: string): Destino | null {
 // `origen` todavía no se usa: por ahora siempre es "Mi ubicación".
 export async function buscarRutas(origen: string, destino: string): Promise<OpcionRuta[]> {
   await esperar();
+  if (getSimulacion().forzarError) {
+    throw new Error("El servicio de rutas no responde");
+  }
   const encontrado = resolverDestino(destino);
   if (!encontrado) {
     return [];
@@ -362,6 +403,8 @@ function proximaUnidad(linea: Linea, paradero: Paradero): ProximaUnidad {
 // Unidades de cada línea del paradero, de la que llega primero a la última
 const proximasDelParadero = (paradero: Paradero) =>
   lineasDelParadero(paradero.id)
+    // Una línea suspendida (E9) no tiene unidades que lleguen
+    .filter((linea) => !linea.suspendida)
     .map((linea) => proximaUnidad(linea, paradero))
     .sort((a, b) => a.minutos - b.minutos);
 
@@ -488,6 +531,9 @@ const TIPOS_EN_PARADERO: Reporte["tipo"][] = ["paradero", "seguridad"];
 // Guarda el reporte en memoria y suma los puntos al usuario.
 export async function crearReporte(borrador: BorradorReporte): Promise<ResultadoReporte> {
   await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
   const { tipo } = borrador;
   if (!tipo) {
     throw new Error("El reporte no tiene tipo");
@@ -588,6 +634,9 @@ export async function getZonasSeguridad(horas: number, tipo?: TipoSeguridad): Pr
 // Reportes del usuario, del más reciente al más antiguo (F2_09).
 export async function getHistorialReportes(): Promise<ReporteHistorial[]> {
   await esperar();
+  if (getSimulacion().forzarVacio) {
+    return [];
+  }
   return reportes
     .filter((reporte) => reporte.usuarioId === usuarioActual.id)
     .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
@@ -715,6 +764,9 @@ export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<Opcion
 // marcaron; rutas: primero las alertas y luego las líneas favoritas sin alerta.
 export async function getFavoritos(): Promise<Favoritos> {
   await esperar();
+  if (getSimulacion().forzarVacio) {
+    return { lugares: [], paraderos: [], rutas: [] };
+  }
 
   const favoritos: ParaderoFavorito[] = [...paraderosMarcados].flatMap((id) => {
     const paradero = paraderos.find((p) => p.id === id);
@@ -765,6 +817,9 @@ const notificaciones: Notificacion[] = notificacionesIniciales.map((n) => ({ ...
 // De la más reciente a la más antigua
 export async function getNotificaciones(): Promise<Notificacion[]> {
   await esperar();
+  if (getSimulacion().forzarVacio) {
+    return [];
+  }
   return [...notificaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
 }
 

@@ -46,6 +46,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_05 · Espera en paradero | reporte/paradero.tsx | /reporte/paradero | Paso del modal (provisional) |
 | F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
 | F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal |
+| E3 · Reporte sin conexión | reporte/sin-conexion.tsx | /reporte/sin-conexion | Paso del modal, sin gesto atrás. Param `id` del reporte en cola (`useColaReportes()`) |
 | F2_08 · Confirmación y agradecimiento | reporte/gracias.tsx | /reporte/gracias | Paso del modal, sin gesto atrás. Recibe `puntos`, `total`, `personas` por params (también se abre desde F1_10) |
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab. Recarga al recibir foco; el punto rojo de la tab sale de `useNotificaciones()` |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
@@ -79,6 +80,8 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
 - Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
+- Estados vacíos y de error (E1–E10): componente `EstadoPantalla`. Sin conexión, los reportes van a la cola de /src/data/colaReportes.ts (AsyncStorage) y `ColaReportesProvider` los reenvía al volver la red (NetInfo).
+- Modo de prueba solo en desarrollo: /src/data/simulacion.ts (`forzarError`, `forzarVacio`, `forzarSinRed`), con interruptores en /dev/datos.
 
 ## Reglas de trabajo
 - Textos de la interfaz en español peruano, tal como aparecen en Figma.

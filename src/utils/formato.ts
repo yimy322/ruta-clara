@@ -233,6 +233,18 @@ const TIPO_REPORTE: Record<TipoReporte, string> = {
   valoracion: "Valoración",
 };
 
+// Nombre del reporte como en el panel de reporte rápido (F2_01, E3)
+const REPORTE_RAPIDO: Record<TipoReporte, string> = {
+  ubicacion: "Ubicación de combi",
+  paradero: "Paradero lleno",
+  transito: "Tránsito pesado",
+  seguridad: "Seguridad / Peligro",
+  desvio: "Desvío de ruta",
+  valoracion: "Valoración del viaje",
+};
+
+export const etiquetaReporteRapido = (tipo: TipoReporte) => REPORTE_RAPIDO[tipo];
+
 // "Ubicación · La 50", "Trancadera · Evitamiento", "Robo en unidad"
 export function tituloHistorial({ reporte, linea }: ReporteHistorial) {
   let tipo = TIPO_REPORTE[reporte.tipo];

@@ -5,7 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const CLAVES = {
   onboardingVisto: "rutaclara:onboardingVisto",
   ajustes: "rutaclara:ajustes",
+  // Reportes que no se pudieron enviar por falta de conexión (E3)
+  colaReportes: "rutaclara:colaReportes",
 } as const;
+
+// La cola de reportes la maneja src/data/colaReportes.ts
+export const CLAVE_COLA_REPORTES = CLAVES.colaReportes;
 
 // Ajustes del usuario (F3_05, F3_06). Fase 5: las notificaciones se
 // sincronizan con el perfil en Supabase.
