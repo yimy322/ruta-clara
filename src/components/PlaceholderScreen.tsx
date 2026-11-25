@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
-import { colors, spacing } from "@/theme";
+import { useEstilos } from "@/context/TemaContext";
+import { spacing, type Tema } from "@/theme";
 
 import { Button, type ButtonVariant } from "./Button";
 import { Header } from "./Header";
@@ -31,6 +32,8 @@ export function PlaceholderScreen({
   edges = ["left", "right", "bottom"],
   children,
 }: PlaceholderScreenProps) {
+  const styles = useEstilos(crearEstilos);
+
   return (
     <SafeAreaView style={styles.screen} edges={edges}>
       <Header title={title} subtitle={subtitle} />
@@ -50,16 +53,17 @@ export function PlaceholderScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.canvas,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.canvas,
+    },
+    content: {
+      flex: 1,
+      justifyContent: "flex-end",
+      alignItems: "center",
+      gap: spacing.md,
+      padding: spacing.lg,
+    },
+  });

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 
 type OpcionRadioProps = {
   label: string;
@@ -12,6 +13,9 @@ type OpcionRadioProps = {
 // en F2_07). Tarjeta con sombra; la elegida va en rojo suave con borde rojo
 // y el radio relleno en rojo.
 export function OpcionRadio({ label, selected = false, onPress }: OpcionRadioProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <Pressable
       onPress={onPress}
@@ -29,46 +33,47 @@ export function OpcionRadio({ label, selected = false, onPress }: OpcionRadioPro
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: sizes.optionHeightLarge,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radii.control,
-    // Borde transparente para que la elegida no cambie de tamaño
-    borderWidth: borderWidths.medium,
-    borderColor: "transparent",
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  selected: {
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-  radio: {
-    width: sizes.radio,
-    height: sizes.radio,
-    borderRadius: radii.pill,
-    backgroundColor: colors.canvas,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioSelected: {
-    backgroundColor: colors.red,
-  },
-  punto: {
-    width: sizes.radioDot,
-    height: sizes.radioDot,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surface,
-  },
-  label: {
-    flex: 1,
-    color: colors.ink,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      height: sizes.optionHeightLarge,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      borderRadius: radii.control,
+      // Borde transparente para que la elegida no cambie de tamaño
+      borderWidth: borderWidths.medium,
+      borderColor: "transparent",
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    selected: {
+      borderColor: colors.red,
+      backgroundColor: colors.redSoft,
+    },
+    radio: {
+      width: sizes.radio,
+      height: sizes.radio,
+      borderRadius: radii.pill,
+      backgroundColor: colors.canvas,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    radioSelected: {
+      backgroundColor: colors.red,
+    },
+    punto: {
+      width: sizes.radioDot,
+      height: sizes.radioDot,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+    },
+    label: {
+      flex: 1,
+      color: colors.ink,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

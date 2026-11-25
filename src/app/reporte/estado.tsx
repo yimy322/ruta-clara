@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button, Header, Segmented, Tile } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
 import { useViaje } from "@/context/ViajeContext";
 import { getLinea } from "@/data/repositorio";
-import { colors, spacing, typography } from "@/theme";
+import { spacing, type Tema } from "@/theme";
 import type { EnUnidad, Linea, Ocupacion, Velocidad } from "@/types";
 
 type Opcion<T> = { valor: T; label: string; icono: LucideIcon };
@@ -32,6 +33,9 @@ const VELOCIDADES: Opcion<Velocidad>[] = [
 
 // F2_03 · Estado del carro (paso 2 de 3)
 export default function EstadoUnidad() {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { viaje } = useViaje();
   const { borrador, actualizar } = useReporte();
@@ -102,26 +106,27 @@ export default function EstadoUnidad() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  fila: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  abajo: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  ink: {
-    color: colors.ink,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.lg,
+    },
+    fila: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    abajo: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    ink: {
+      color: colors.ink,
+    },
+  });

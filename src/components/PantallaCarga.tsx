@@ -10,7 +10,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos } from "@/context/TemaContext";
+import { radii, sizes, spacing, type Tema, paletaClara } from "@/theme";
 
 const isotipo = require("../../assets/images/isotipo.png");
 
@@ -19,6 +20,8 @@ const DURACION_BARRIDO_MS = 1200;
 // F1_01 · Splash / Carga. La muestra el layout raíz mientras cargan las
 // fuentes y las preferencias locales; no es una ruta.
 export function PantallaCarga() {
+  const styles = useEstilos(crearEstilos);
+
   const avance = useSharedValue(0);
 
   useEffect(() => {
@@ -57,49 +60,54 @@ export function PantallaCarga() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    alignItems: "center",
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
-    backgroundColor: colors.ink,
-  },
-  spacer: {
-    flex: 1,
-  },
-  isotipo: {
-    width: sizes.isotipo,
-    height: sizes.isotipo,
-    borderRadius: radii.xxl,
-  },
-  marca: {
-    ...typography.display,
-    color: colors.surface,
-    textAlign: "center",
-  },
-  slogan: {
-    ...typography.body,
-    color: colors.line,
-    textAlign: "center",
-  },
-  riel: {
-    width: sizes.progressTrack,
-    height: sizes.progressHeight,
-    borderRadius: radii.pill,
-    overflow: "hidden",
-    backgroundColor: colors.inkMuted,
-  },
-  relleno: {
-    width: sizes.progressFill,
-    height: sizes.progressHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellow,
-  },
-  cargando: {
-    ...typography.caption,
-    color: colors.inkMuted,
-    textAlign: "center",
-  },
-});
+// El splash es siempre oscuro (F1_01), sin importar el tema: usa la paleta
+// clara fija, donde ink es el fondo oscuro de la marca
+const colors = paletaClara;
+
+const crearEstilos = ({ typography }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      alignItems: "center",
+      gap: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xxxl,
+      backgroundColor: colors.ink,
+    },
+    spacer: {
+      flex: 1,
+    },
+    isotipo: {
+      width: sizes.isotipo,
+      height: sizes.isotipo,
+      borderRadius: radii.xxl,
+    },
+    marca: {
+      ...typography.display,
+      color: colors.surface,
+      textAlign: "center",
+    },
+    slogan: {
+      ...typography.body,
+      color: colors.line,
+      textAlign: "center",
+    },
+    riel: {
+      width: sizes.progressTrack,
+      height: sizes.progressHeight,
+      borderRadius: radii.pill,
+      overflow: "hidden",
+      backgroundColor: colors.inkMuted,
+    },
+    relleno: {
+      width: sizes.progressFill,
+      height: sizes.progressHeight,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellow,
+    },
+    cargando: {
+      ...typography.caption,
+      color: colors.inkMuted,
+      textAlign: "center",
+    },
+  });

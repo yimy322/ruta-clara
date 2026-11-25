@@ -1,7 +1,8 @@
 import { Radio } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 
 import { Chip } from "./Chip";
 
@@ -18,6 +19,9 @@ const SOLAPE = 10;
 // Pin de la unidad que se reporta (F2_04): chip en vivo, palito y halo de
 // precisión GPS. La punta del palito marca la posición.
 export function PinUnidad({ etiqueta, pista }: PinUnidadProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <View style={styles.base} accessibilityLabel={`Unidad ${etiqueta}`}>
       <Chip label={etiqueta} icon={<Radio />} state="live" />
@@ -32,36 +36,37 @@ export function PinUnidad({ etiqueta, pista }: PinUnidadProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    alignItems: "center",
-  },
-  palito: {
-    zIndex: 1,
-    width: sizes.pinStemWidth,
-    height: sizes.pinStem,
-    backgroundColor: colors.ink,
-  },
-  halo: {
-    width: sizes.pinHalo,
-    height: sizes.pinHalo,
-    marginTop: -SOLAPE,
-    borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderStyle: "dashed",
-    borderColor: colors.blue,
-    backgroundColor: colors.blueHalo,
-  },
-  pista: {
-    marginTop: spacing.xs,
-    paddingHorizontal: sizes.mapLabelPaddingX,
-    paddingVertical: sizes.mapLabelPaddingY,
-    borderRadius: radii.xs,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-  },
-  pistaTexto: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      alignItems: "center",
+    },
+    palito: {
+      zIndex: 1,
+      width: sizes.pinStemWidth,
+      height: sizes.pinStem,
+      backgroundColor: colors.ink,
+    },
+    halo: {
+      width: sizes.pinHalo,
+      height: sizes.pinHalo,
+      marginTop: -SOLAPE,
+      borderRadius: radii.pill,
+      borderWidth: borderWidths.regular,
+      borderStyle: "dashed",
+      borderColor: colors.blue,
+      backgroundColor: colors.blueHalo,
+    },
+    pista: {
+      marginTop: spacing.xs,
+      paddingHorizontal: sizes.mapLabelPaddingX,
+      paddingVertical: sizes.mapLabelPaddingY,
+      borderRadius: radii.xs,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+      backgroundColor: colors.surface,
+    },
+    pistaTexto: {
+      color: colors.inkMuted,
+    },
+  });

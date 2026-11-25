@@ -4,10 +4,11 @@ import { useCallback, useState } from "react";
 import { Alert, BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, IconButton, TarjetaEstadistica, Tile } from "@/components";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
 import { crearReporte } from "@/data/repositorio";
-import { colors, radii, sizes, spacing, typography } from "@/theme";
+import { radii, sizes, spacing, type Tema } from "@/theme";
 import { formatearEta, formatearHora, formatearPasaje } from "@/utils/formato";
 
 const VALORACIONES: { valor: number; label: string; icono: LucideIcon }[] = [
@@ -22,6 +23,9 @@ const ETIQUETAS = ["Llegó rápido", "Lleno", "Conductor prudente", "Cobrador am
 
 // F1_10 · Finalización del viaje
 export default function FinViaje() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { viaje, limpiar } = useViaje();
 
@@ -103,7 +107,7 @@ export default function FinViaje() {
 
       <ScrollView contentContainerStyle={styles.contenido}>
         <View style={styles.exito}>
-          <Check color={colors.ink} size={sizes.successGlyph} />
+          <Check color={colors.onYellow} size={sizes.successGlyph} />
         </View>
         <Text style={[typography.h1, styles.ink, styles.centrado]} accessibilityRole="header">
           ¡Llegaste a tu destino!
@@ -161,65 +165,66 @@ export default function FinViaje() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  arriba: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  contenido: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  exito: {
-    width: sizes.successIcon,
-    height: sizes.successIcon,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stats: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-    gap: spacing.sm,
-  },
-  pregunta: {
-    alignSelf: "stretch",
-    gap: spacing.xxs,
-  },
-  valoraciones: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-    gap: spacing.sm,
-  },
-  etiquetas: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignSelf: "stretch",
-    gap: spacing.sm,
-  },
-  pie: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    arriba: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+    },
+    contenido: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    exito: {
+      width: sizes.successIcon,
+      height: sizes.successIcon,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stats: {
+      flexDirection: "row",
+      alignSelf: "stretch",
+      gap: spacing.sm,
+    },
+    pregunta: {
+      alignSelf: "stretch",
+      gap: spacing.xxs,
+    },
+    valoraciones: {
+      flexDirection: "row",
+      alignSelf: "stretch",
+      gap: spacing.sm,
+    },
+    etiquetas: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignSelf: "stretch",
+      gap: spacing.sm,
+    },
+    pie: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

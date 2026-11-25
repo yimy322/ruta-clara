@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { colors, minTouch, opacity, radii, shadows, sizes } from "@/theme";
+import { useEstilos } from "@/context/TemaContext";
+import { minTouch, opacity, radii, sizes, type Tema } from "@/theme";
 
 type ToggleProps = {
   value: boolean;
@@ -15,6 +16,8 @@ const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 // Interruptor on/off (Figma 69:469). On: pista ink con perilla blanca a la
 // derecha. Off: pista controlOff (3,3:1) con perilla blanca a la izquierda.
 export function Toggle({ value, onValueChange, accessibilityLabel }: ToggleProps) {
+  const styles = useEstilos(crearEstilos);
+
   return (
     <Pressable
       onPress={() => onValueChange(!value)}
@@ -29,30 +32,31 @@ export function Toggle({ value, onValueChange, accessibilityLabel }: ToggleProps
   );
 }
 
-const styles = StyleSheet.create({
-  track: {
-    width: sizes.toggleWidth,
-    height: sizes.toggleHeight,
-    borderRadius: radii.pill,
-    justifyContent: "center",
-    paddingHorizontal: sizes.toggleInset,
-  },
-  trackOn: {
-    backgroundColor: colors.ink,
-    alignItems: "flex-end",
-  },
-  trackOff: {
-    backgroundColor: colors.controlOff,
-    alignItems: "flex-start",
-  },
-  knob: {
-    width: sizes.toggleKnob,
-    height: sizes.toggleKnob,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    track: {
+      width: sizes.toggleWidth,
+      height: sizes.toggleHeight,
+      borderRadius: radii.pill,
+      justifyContent: "center",
+      paddingHorizontal: sizes.toggleInset,
+    },
+    trackOn: {
+      backgroundColor: colors.ink,
+      alignItems: "flex-end",
+    },
+    trackOff: {
+      backgroundColor: colors.controlOff,
+      alignItems: "flex-start",
+    },
+    knob: {
+      width: sizes.toggleKnob,
+      height: sizes.toggleKnob,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

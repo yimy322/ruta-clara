@@ -1,6 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { ActividadParadero, Paradero, ProximaUnidad } from "@/types";
 import { etiquetaOcupacion, formatearDistancia, formatearEta, haceCuanto } from "@/utils/formato";
 
@@ -35,6 +36,9 @@ function textoReportes({ reportesActivos, ultimoReporte }: ActividadParadero) {
 // Card del paradero más cercano (F1_04): distancia, reportes, ocupación y
 // las próximas unidades que llegan.
 export function CardParadero({ datos, onPress }: CardParaderoProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   if (!datos) {
     return (
       <View style={[styles.base, styles.cargando]} accessibilityLabel="Buscando paradero cercano">
@@ -98,64 +102,65 @@ export function CardParadero({ datos, onPress }: CardParaderoProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radii.xl,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  cargando: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  fila: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.md,
-  },
-  proximas: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  proxima: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: sizes.statPadding,
-    borderRadius: radii.lg,
-    backgroundColor: colors.canvas,
-  },
-  linea: {
-    flexShrink: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  punto: {
-    width: sizes.legendDot,
-    height: sizes.legendDot,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellowDeep,
-  },
-  puntoEstimado: {
-    backgroundColor: colors.line,
-  },
-  texto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      gap: spacing.md,
+      padding: spacing.lg,
+      borderRadius: radii.xl,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    cargando: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    fila: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+    },
+    proximas: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    proxima: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: sizes.statPadding,
+      borderRadius: radii.lg,
+      backgroundColor: colors.canvas,
+    },
+    linea: {
+      flexShrink: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    punto: {
+      width: sizes.legendDot,
+      height: sizes.legendDot,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellowDeep,
+    },
+    puntoEstimado: {
+      backgroundColor: colors.line,
+    },
+    texto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

@@ -2,7 +2,8 @@ import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View, type AccessibilityActionEvent } from "react-native";
 
-import { colors, radii, shadows, sizes, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { radii, sizes, type Tema } from "@/theme";
 
 type BotonMantenerProps = {
   label: string;
@@ -27,6 +28,9 @@ export function BotonMantener({
   accessibilityLabel,
   accessibilityHint,
 }: BotonMantenerProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const [progreso] = useState(() => new Animated.Value(0));
 
   useEffect(() => () => progreso.stopAnimation(), [progreso]);
@@ -82,30 +86,31 @@ export function BotonMantener({
   );
 }
 
-const styles = StyleSheet.create({
-  sombra: {
-    alignSelf: "stretch",
-    borderRadius: radii.control,
-    ...shadows.danger,
-  },
-  base: {
-    height: sizes.buttonHeight,
-    paddingHorizontal: sizes.buttonPaddingX,
-    borderRadius: radii.control,
-    backgroundColor: colors.red,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "stretch",
-    overflow: "hidden",
-  },
-  relleno: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: colors.redDeep,
-  },
-  label: {
-    color: colors.surface,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    sombra: {
+      alignSelf: "stretch",
+      borderRadius: radii.control,
+      ...shadows.danger,
+    },
+    base: {
+      height: sizes.buttonHeight,
+      paddingHorizontal: sizes.buttonPaddingX,
+      borderRadius: radii.control,
+      backgroundColor: colors.red,
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "stretch",
+      overflow: "hidden",
+    },
+    relleno: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: colors.redDeep,
+    },
+    label: {
+      color: colors.surface,
+    },
+  });

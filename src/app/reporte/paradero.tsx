@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, Header, ListItem, Mapa, OpcionGrande, Tile } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
 import {
@@ -14,7 +15,7 @@ import {
   getUbicacionUsuario,
 } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, Linea, Ocupacion, Paradero, TiempoEspera } from "@/types";
 import { etiquetaEspera, formatearDistancia } from "@/utils/formato";
 import { distanciaMetros } from "@/utils/geo";
@@ -33,6 +34,9 @@ type Lista = "paraderos" | "lineas";
 // F2_05 · Espera en paradero. Desde el detalle de paradero (F3_02) se abre
 // directo en este paso con `paraderoId`; si no, se detecta el más cercano.
 export default function ReporteParadero() {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { paraderoId: paraderoInicial } = useLocalSearchParams<{ paraderoId?: string }>();
   const { borrador, actualizar } = useReporte();
   const { enviar, enviando } = useEnviarReporte();
@@ -198,49 +202,50 @@ export default function ReporteParadero() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  lista: {
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    overflow: "hidden",
-    ...shadows.card,
-  },
-  mapa: {
-    height: sizes.paraderoMap,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-  },
-  opciones: {
-    gap: spacing.md,
-  },
-  fila: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  linea: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  abajo: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.lg,
+    },
+    lista: {
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      overflow: "hidden",
+      ...shadows.card,
+    },
+    mapa: {
+      height: sizes.paraderoMap,
+      borderRadius: radii.lg,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+    },
+    opciones: {
+      gap: spacing.md,
+    },
+    fila: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    linea: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    abajo: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

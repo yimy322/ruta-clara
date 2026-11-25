@@ -1,10 +1,11 @@
 import { Alert, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { BotonMantener, Button, Header, OpcionRadio, Toggle } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { colors, spacing, typography } from "@/theme";
+import { spacing, type Tema } from "@/theme";
 import type { TipoSeguridad } from "@/types";
 import { etiquetaSeguridad } from "@/utils/formato";
 
@@ -12,6 +13,9 @@ const OPCIONES: TipoSeguridad[] = ["paradero_peligroso", "robo", "acoso", "condu
 
 // F2_07 · Reporte de seguridad
 export default function ReporteSeguridad() {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { borrador, actualizar } = useReporte();
   const { enviar, enviando } = useEnviarReporte();
 
@@ -89,39 +93,40 @@ export default function ReporteSeguridad() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    flexGrow: 1,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  opciones: {
-    gap: spacing.md,
-  },
-  anonima: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  anonimaTexto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  espacio: {
-    flex: 1,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      flexGrow: 1,
+      gap: spacing.md,
+      padding: spacing.lg,
+    },
+    opciones: {
+      gap: spacing.md,
+    },
+    anonima: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    anonimaTexto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    espacio: {
+      flex: 1,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

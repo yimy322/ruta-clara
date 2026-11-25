@@ -25,9 +25,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { getUsuario } from "@/data/repositorio";
 import { useCerrarSesion } from "@/hooks/useCerrarSesion";
-import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Usuario } from "@/types";
 import { formatearPuntos } from "@/utils/formato";
 import { calcularRango } from "@/utils/gamificacion";
@@ -77,6 +78,9 @@ const VELOCIDAD_CIERRE = 0.5;
 // tocar fuera, al deslizarlo a la izquierda, con «Atrás» de Android o con la X.
 // Con «reducir movimiento» aparece con un fundido en vez de deslizarse.
 export function MenuLateral({ visible, onCerrar }: MenuLateralProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -250,100 +254,101 @@ export function MenuLateral({ visible, onCerrar }: MenuLateralProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: colors.scrim,
-  },
-  fila: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  panel: {
-    width: sizes.drawerWidth,
-    backgroundColor: colors.surface,
-    borderRightWidth: borderWidths.regular,
-    borderRightColor: colors.ink,
-  },
-  contenido: {
-    flexGrow: 1,
-  },
-  perfil: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-    borderBottomWidth: borderWidths.regular,
-    borderBottomColor: colors.ink,
-  },
-  perfilArriba: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  cargando: {
-    alignSelf: "flex-start",
-    marginVertical: spacing.lg,
-  },
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    minHeight: sizes.menuRowHeight,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-  },
-  // Mismo aspecto que IconButton, pero sin ser otro botón dentro de la fila
-  icono: {
-    width: sizes.iconButton,
-    height: sizes.iconButton,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadows.card,
-  },
-  iconoSeguridad: {
-    borderWidth: borderWidths.regular,
-    borderColor: colors.red,
-  },
-  texto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  espacio: {
-    flex: 1,
-    minHeight: spacing.xl,
-  },
-  salir: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    minHeight: sizes.minTouchRow,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  fuera: {
-    flex: 1,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  red: {
-    color: colors.red,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    scrim: {
+      ...StyleSheet.absoluteFill,
+      backgroundColor: colors.scrim,
+    },
+    fila: {
+      flex: 1,
+      flexDirection: "row",
+    },
+    panel: {
+      width: sizes.drawerWidth,
+      backgroundColor: colors.surface,
+      borderRightWidth: borderWidths.regular,
+      borderRightColor: colors.ink,
+    },
+    contenido: {
+      flexGrow: 1,
+    },
+    perfil: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.lg,
+      borderBottomWidth: borderWidths.regular,
+      borderBottomColor: colors.ink,
+    },
+    perfilArriba: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    cargando: {
+      alignSelf: "flex-start",
+      marginVertical: spacing.lg,
+    },
+    item: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      minHeight: sizes.menuRowHeight,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+    },
+    // Mismo aspecto que IconButton, pero sin ser otro botón dentro de la fila
+    icono: {
+      width: sizes.iconButton,
+      height: sizes.iconButton,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
+      ...shadows.card,
+    },
+    iconoSeguridad: {
+      borderWidth: borderWidths.regular,
+      borderColor: colors.red,
+    },
+    texto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    espacio: {
+      flex: 1,
+      minHeight: spacing.xl,
+    },
+    salir: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      minHeight: sizes.minTouchRow,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    fuera: {
+      flex: 1,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    red: {
+      color: colors.red,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

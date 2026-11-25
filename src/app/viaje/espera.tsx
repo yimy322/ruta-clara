@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, IconButton, Mapa, useToast } from "@/components";
 import { INTERVALO_ETA_MS } from "@/config/simulacion";
 import { useViaje } from "@/context/ViajeContext";
 import { getReportesCercanos, getUnidadEnCamino } from "@/data/repositorio";
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Reporte, UnidadEnCamino } from "@/types";
 import {
   etiquetaOcupacion,
@@ -31,6 +32,9 @@ const TIPOS_COMENTARIO: Reporte["tipo"][] = ["transito", "desvio", "seguridad"];
 
 // F1_08 · Monitoreo en vivo
 export default function Espera() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -216,86 +220,87 @@ export default function Espera() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.map,
-  },
-  capa: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  arriba: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  paradero: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: sizes.stepPillPaddingY,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  zona: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    borderWidth: borderWidths.regular,
-    borderBottomWidth: 0,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
-  },
-  grabber: {
-    alignSelf: "center",
-    width: sizes.grabberWidth,
-    height: sizes.grabberHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.line,
-  },
-  eta: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: spacing.sm,
-  },
-  fuente: {
-    flexShrink: 1,
-    textAlign: "right",
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  card: {
-    padding: spacing.md,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  acciones: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  principal: {
-    flex: 1,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.map,
+    },
+    capa: {
+      flex: 1,
+      justifyContent: "space-between",
+    },
+    arriba: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    paradero: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingVertical: sizes.stepPillPaddingY,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    zona: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+    },
+    sheet: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      borderTopLeftRadius: radii.xl,
+      borderTopRightRadius: radii.xl,
+      borderWidth: borderWidths.regular,
+      borderBottomWidth: 0,
+      borderColor: colors.ink,
+      backgroundColor: colors.surface,
+    },
+    grabber: {
+      alignSelf: "center",
+      width: sizes.grabberWidth,
+      height: sizes.grabberHeight,
+      borderRadius: radii.pill,
+      backgroundColor: colors.line,
+    },
+    eta: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    fuente: {
+      flexShrink: 1,
+      textAlign: "right",
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    card: {
+      padding: spacing.md,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    acciones: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    principal: {
+      flex: 1,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

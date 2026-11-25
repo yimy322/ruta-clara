@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { NivelTrafico, OpcionRuta } from "@/types";
 import {
   etiquetaOcupacion,
@@ -29,6 +30,9 @@ const CHIP_TRAFICO: Record<NivelTrafico, ChipState> = {
 // Card de una opción de ruta (F1_06): línea, ETA, pasaje, tráfico, ocupación
 // y reportes. Si no hay reportes, el ETA es estimado y va en gris.
 export function CardRuta({ opcion, recomendada = false, onPress }: CardRutaProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { linea, etaMin, trafico, ocupacion, reportesActivos, ultimoReporteMin, estimado } = opcion;
 
   return (
@@ -55,41 +59,42 @@ export function CardRuta({ opcion, recomendada = false, onPress }: CardRutaProps
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    gap: spacing.sm,
-    padding: sizes.cardPadding,
-    borderRadius: radii.control,
-    // Borde transparente para que la recomendada no cambie de tamaño
-    borderWidth: borderWidths.medium,
-    borderColor: "transparent",
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  recomendada: {
-    borderColor: colors.yellowDeep,
-  },
-  cabecera: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.sm,
-  },
-  nombre: {
-    flexShrink: 1,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      gap: spacing.sm,
+      padding: sizes.cardPadding,
+      borderRadius: radii.control,
+      // Borde transparente para que la recomendada no cambie de tamaño
+      borderWidth: borderWidths.medium,
+      borderColor: "transparent",
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    recomendada: {
+      borderColor: colors.yellowDeep,
+    },
+    cabecera: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    nombre: {
+      flexShrink: 1,
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

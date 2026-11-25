@@ -3,7 +3,8 @@ import { useState, type ReactNode } from "react";
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
-import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 import type { Coordenada, Linea, NivelZona, Paradero } from "@/types";
 
 import { Chip } from "./Chip";
@@ -26,10 +27,10 @@ type ZonaMapa = {
 };
 
 // Diámetro y color de cada nivel (manchas de F3_06)
-const ZONA: Record<NivelZona, { diametro: number; color: string; texto: string }> = {
+const estiloZonas = (colors: Paleta): Record<NivelZona, { diametro: number; color: string; texto: string }> => ({
   alto: { diametro: sizes.zonaAlta, color: colors.red, texto: "Zona de riesgo alto" },
   medio: { diametro: sizes.zonaMedia, color: colors.amber, texto: "Zona de riesgo medio" },
-};
+  });
 
 type MapaProps = {
   usuario?: Coordenada;
@@ -85,7 +86,7 @@ const fraccion = ([left, top, width, height]: [number, number, number, number]):
   top: `${top * 100}%`,
   width: `${width * 100}%`,
   height: `${height * 100}%`,
-});
+  });
 
 // Mapa PROVISIONAL que imita los wireframes: fondo plano, calles fijas y los
 // puntos ubicados con una proyección simple que encuadra todo lo recibido.
@@ -104,6 +105,9 @@ export function Mapa({
   margen,
   estilo,
 }: MapaProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const [tamano, setTamano] = useState({ ancho: 0, alto: 0 });
 
   const handleLayout = (e: LayoutChangeEvent) => {
@@ -130,7 +134,7 @@ export function Mapa({
 
       {proyectar &&
         zonas.map((zona) => {
-          const { diametro, color, texto } = ZONA[zona.nivel];
+          const { diametro, color, texto } = estiloZonas(colors)[zona.nivel];
           const radio = diametro / 2;
           return (
             <View
@@ -205,7 +209,7 @@ export function Mapa({
                   {/* supuesto: Figma no deja ver el color del ícono; amarillo sobre el círculo negro */}
                   <Bus color={colors.yellow} size={sizes.mapBusGlyph} />
                 </View>
-                <Text style={[typography.captionStrong, styles.ink]} numberOfLines={1}>
+                <Text style={[typography.captionStrong, styles.sobreAmarillo]} numberOfLines={1}>
                   {unidad.etiqueta ?? unidad.linea.nombre}
                 </Text>
               </View>
@@ -294,148 +298,152 @@ function crearProyeccion(
   });
 }
 
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: colors.map,
-    overflow: "hidden",
-  },
-  calle: {
-    position: "absolute",
-    backgroundColor: colors.surface,
-  },
-  manzana: {
-    position: "absolute",
-    borderRadius: radii.md,
-    backgroundColor: colors.block,
-  },
-  parque: {
-    position: "absolute",
-    borderRadius: radii.control,
-    backgroundColor: colors.park,
-  },
-  // Más ancha que el mapa para que el giro no deje puntas visibles
-  avenida: {
-    position: "absolute",
-    left: "-25%",
-    right: "-25%",
-    top: `${AVENIDA.top * 100}%`,
-    height: sizes.mapAvenue,
-    backgroundColor: colors.avenue,
-    transform: [{ rotate: AVENIDA.angulo }],
-  },
-  calleHorizontal: {
-    left: 0,
-    right: 0,
-    height: sizes.mapRoad,
-  },
-  calleVertical: {
-    top: 0,
-    bottom: 0,
-    width: sizes.mapRoad,
-  },
-  // Cada marcador se centra sobre su coordenada
-  marcador: {
-    position: "absolute",
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
-  },
-  paradero: {
-    width: sizes.mapStop,
-    height: sizes.mapStop,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surface,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  paraderoP: {
-    width: sizes.mapStopP,
-    height: sizes.mapStopP,
-    borderRadius: radii.md,
-    backgroundColor: colors.ink,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadows.pin,
-  },
-  paraderoLetra: {
-    color: colors.surface,
-  },
-  burbuja: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.chipGap,
-    paddingLeft: sizes.mapBusPadding,
-    paddingRight: spacing.md,
-    paddingVertical: sizes.mapBusPadding,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellow,
-    ...shadows.pin,
-  },
-  burbujaIcono: {
-    width: sizes.mapBusCircle,
-    height: sizes.mapBusCircle,
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  paraderoCentro: {
-    width: sizes.mapStop / 2,
-    height: sizes.mapStop / 2,
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
-  },
-  halo: {
-    width: sizes.mapUserHalo,
-    height: sizes.mapUserHalo,
-    borderRadius: radii.pill,
-    backgroundColor: colors.blueHalo,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  usuario: {
-    width: sizes.mapUser,
-    height: sizes.mapUser,
-    borderRadius: radii.pill,
-    backgroundColor: colors.blue,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.surface,
-  },
-  unidad: {
-    alignItems: "center",
-  },
-  tramo: {
-    position: "absolute",
-    height: sizes.mapRoute,
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
-  },
-  etiqueta: {
-    position: "absolute",
-    top: spacing.sm,
-    left: spacing.sm,
-    paddingHorizontal: sizes.mapLabelPaddingX,
-    paddingVertical: sizes.mapLabelPaddingY,
-    borderRadius: radii.xs,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-  },
-  etiquetaTexto: {
-    color: colors.inkMuted,
-  },
-  // Debajo del halo del usuario: se baja medio halo más un margen
-  etiquetaUsuario: {
-    marginTop: sizes.mapUserHalo / 2 + spacing.xs,
-    transform: [{ translateX: "-50%" }],
-    paddingHorizontal: sizes.mapLabelPaddingX,
-    paddingVertical: sizes.mapLabelPaddingY,
-    borderRadius: radii.xs,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      backgroundColor: colors.map,
+      overflow: "hidden",
+    },
+    calle: {
+      position: "absolute",
+      backgroundColor: colors.surface,
+    },
+    manzana: {
+      position: "absolute",
+      borderRadius: radii.md,
+      backgroundColor: colors.block,
+    },
+    parque: {
+      position: "absolute",
+      borderRadius: radii.control,
+      backgroundColor: colors.park,
+    },
+    // Más ancha que el mapa para que el giro no deje puntas visibles
+    avenida: {
+      position: "absolute",
+      left: "-25%",
+      right: "-25%",
+      top: `${AVENIDA.top * 100}%`,
+      height: sizes.mapAvenue,
+      backgroundColor: colors.avenue,
+      transform: [{ rotate: AVENIDA.angulo }],
+    },
+    calleHorizontal: {
+      left: 0,
+      right: 0,
+      height: sizes.mapRoad,
+    },
+    calleVertical: {
+      top: 0,
+      bottom: 0,
+      width: sizes.mapRoad,
+    },
+    // Cada marcador se centra sobre su coordenada
+    marcador: {
+      position: "absolute",
+      transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    },
+    paradero: {
+      width: sizes.mapStop,
+      height: sizes.mapStop,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.ink,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    paraderoP: {
+      width: sizes.mapStopP,
+      height: sizes.mapStopP,
+      borderRadius: radii.md,
+      backgroundColor: colors.ink,
+      alignItems: "center",
+      justifyContent: "center",
+      ...shadows.pin,
+    },
+    paraderoLetra: {
+      color: colors.surface,
+    },
+    burbuja: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.chipGap,
+      paddingLeft: sizes.mapBusPadding,
+      paddingRight: spacing.md,
+      paddingVertical: sizes.mapBusPadding,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellow,
+      ...shadows.pin,
+    },
+    burbujaIcono: {
+      width: sizes.mapBusCircle,
+      height: sizes.mapBusCircle,
+      borderRadius: radii.pill,
+      backgroundColor: colors.onYellow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sobreAmarillo: {
+      color: colors.onYellow,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    paraderoCentro: {
+      width: sizes.mapStop / 2,
+      height: sizes.mapStop / 2,
+      borderRadius: radii.pill,
+      backgroundColor: colors.ink,
+    },
+    halo: {
+      width: sizes.mapUserHalo,
+      height: sizes.mapUserHalo,
+      borderRadius: radii.pill,
+      backgroundColor: colors.blueHalo,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    usuario: {
+      width: sizes.mapUser,
+      height: sizes.mapUser,
+      borderRadius: radii.pill,
+      backgroundColor: colors.blue,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.surface,
+    },
+    unidad: {
+      alignItems: "center",
+    },
+    tramo: {
+      position: "absolute",
+      height: sizes.mapRoute,
+      borderRadius: radii.pill,
+      backgroundColor: colors.ink,
+    },
+    etiqueta: {
+      position: "absolute",
+      top: spacing.sm,
+      left: spacing.sm,
+      paddingHorizontal: sizes.mapLabelPaddingX,
+      paddingVertical: sizes.mapLabelPaddingY,
+      borderRadius: radii.xs,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+      backgroundColor: colors.surface,
+    },
+    etiquetaTexto: {
+      color: colors.inkMuted,
+    },
+    // Debajo del halo del usuario: se baja medio halo más un margen
+    etiquetaUsuario: {
+      marginTop: sizes.mapUserHalo / 2 + spacing.xs,
+      transform: [{ translateX: "-50%" }],
+      paddingHorizontal: sizes.mapLabelPaddingX,
+      paddingVertical: sizes.mapLabelPaddingY,
+      borderRadius: radii.xs,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+      backgroundColor: colors.surface,
+    },
+  });

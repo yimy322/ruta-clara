@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, EstadoPantalla, IconButton, ListItem, useToast } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import {
@@ -25,7 +26,7 @@ import {
   getLugaresGuardados,
   sugerirDestino,
 } from "@/data/repositorio";
-import { borderWidths, colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Destino, LugarGuardado } from "@/types";
 import { partirCoincidencia } from "@/utils/formato";
 
@@ -46,7 +47,7 @@ type Resultado = {
 };
 
 // "Jockey Pla" sobre "Jockey Plaza" → la parte que coincide va en negrita
-function tituloResaltado(nombre: string, consulta: string) {
+function tituloResaltado(nombre: string, consulta: string, typography: Tema["typography"]) {
   const partes = partirCoincidencia(nombre, consulta);
   if (!partes) {
     return nombre;
@@ -63,6 +64,9 @@ function tituloResaltado(nombre: string, consulta: string) {
 
 // F1_05 · Búsqueda de destino
 export default function Buscar() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -168,7 +172,7 @@ export default function Buscar() {
       <ListItem
         key={destino.id}
         badge={<LocateFixed />}
-        title={tituloResaltado(destino.nombre, resultado.consulta)}
+        title={tituloResaltado(destino.nombre, resultado.consulta, typography)}
         subtitle={destino.distrito}
         destacado={i === 0}
         onPress={() => irARutas(destino.nombre)}
@@ -261,118 +265,119 @@ export default function Buscar() {
   );
 }
 
-const styles = StyleSheet.create({
-  sugerencia: {
-    alignSelf: "stretch",
-    gap: spacing.sm,
-    paddingTop: spacing.lg,
-  },
-  tarjeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: sizes.cardPadding,
-    paddingVertical: spacing.md,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  insignia: {
-    width: sizes.badge,
-    height: sizes.badge,
-    borderRadius: radii.badge,
-    backgroundColor: colors.yellowSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tarjetaTexto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  arriba: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  campos: {
-    flex: 1,
-    gap: spacing.sm,
-  },
-  campo: {
-    height: sizes.fieldHeight,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.regular,
-    backgroundColor: colors.surface,
-  },
-  campoOrigen: {
-    borderColor: colors.line,
-  },
-  // Campo activo: tarjeta con sombra, sin borde
-  campoDestino: {
-    borderColor: "transparent",
-    borderRadius: radii.control,
-    ...shadows.card,
-  },
-  punto: {
-    width: sizes.fieldDot,
-    height: sizes.fieldDot,
-    borderRadius: radii.pill,
-  },
-  puntoOrigen: {
-    backgroundColor: colors.blue,
-  },
-  puntoDestino: {
-    backgroundColor: colors.red,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    paddingVertical: 0,
-  },
-  // Sin esto el ScrollView horizontal se estira y empuja la lista hacia abajo
-  lugaresScroll: {
-    flexGrow: 0,
-  },
-  lugares: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  contenido: {
-    paddingBottom: spacing.lg,
-  },
-  seccion: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  comunes: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  cargando: {
-    paddingVertical: spacing.xl,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    sugerencia: {
+      alignSelf: "stretch",
+      gap: spacing.sm,
+      paddingTop: spacing.lg,
+    },
+    tarjeta: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: sizes.cardPadding,
+      paddingVertical: spacing.md,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    insignia: {
+      width: sizes.badge,
+      height: sizes.badge,
+      borderRadius: radii.badge,
+      backgroundColor: colors.yellowSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    tarjetaTexto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    arriba: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    campos: {
+      flex: 1,
+      gap: spacing.sm,
+    },
+    campo: {
+      height: sizes.fieldHeight,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radii.md,
+      borderWidth: borderWidths.regular,
+      backgroundColor: colors.surface,
+    },
+    campoOrigen: {
+      borderColor: colors.line,
+    },
+    // Campo activo: tarjeta con sombra, sin borde
+    campoDestino: {
+      borderColor: "transparent",
+      borderRadius: radii.control,
+      ...shadows.card,
+    },
+    punto: {
+      width: sizes.fieldDot,
+      height: sizes.fieldDot,
+      borderRadius: radii.pill,
+    },
+    puntoOrigen: {
+      backgroundColor: colors.blue,
+    },
+    puntoDestino: {
+      backgroundColor: colors.red,
+    },
+    input: {
+      flex: 1,
+      height: "100%",
+      paddingVertical: 0,
+    },
+    // Sin esto el ScrollView horizontal se estira y empuja la lista hacia abajo
+    lugaresScroll: {
+      flexGrow: 0,
+    },
+    lugares: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    contenido: {
+      paddingBottom: spacing.lg,
+    },
+    seccion: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    comunes: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    cargando: {
+      paddingVertical: spacing.xl,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

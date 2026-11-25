@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button, Header, ListItem, useToast } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { buscarLineas, getLineasSugeridas, getUbicacionUsuario } from "@/data/repositorio";
-import { colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { radii, sizes, spacing, type Tema } from "@/theme";
 import type { Linea, LineaSugerida } from "@/types";
 import { textoLineaSugerida } from "@/utils/formato";
 
@@ -21,6 +22,9 @@ type Resultado = {
 
 // F2_02 · Ubicación de unidad — Línea (paso 1 de 3)
 export default function ElegirLinea() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { mostrar } = useToast();
   const { borrador, actualizar } = useReporte();
@@ -147,50 +151,51 @@ export default function ElegirLinea() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  arriba: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  buscador: {
-    height: sizes.searchHeight,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    paddingVertical: 0,
-  },
-  lista: {
-    flex: 1,
-  },
-  cargando: {
-    paddingVertical: spacing.xl,
-  },
-  mensaje: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  abajo: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    arriba: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    buscador: {
+      height: sizes.searchHeight,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    input: {
+      flex: 1,
+      height: "100%",
+      paddingVertical: 0,
+    },
+    lista: {
+      flex: 1,
+    },
+    cargando: {
+      paddingVertical: spacing.xl,
+    },
+    mensaje: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    abajo: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

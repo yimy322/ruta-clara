@@ -5,9 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 import { AccessibilityInfo, ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, Header, IconButton, ListItem, Toggle, useToast } from "@/components";
 import { eliminarAlerta, getAlerta, getOpcionesRutaAlerta, guardarAlerta } from "@/data/repositorio";
-import { colors, minTouch, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { minTouch, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { AlertaDiaria, MinutosAntes, OpcionRutaAlerta } from "@/types";
 import { formatoDias, formatoHora } from "@/utils/formato";
 
@@ -82,6 +83,9 @@ function fechaConHora(hora: number, minuto: number) {
 // F3_03 · Configurar alerta diaria. Con `paraderoId` crea una alerta que sube
 // en ese paradero; con `id` edita una existente.
 export default function Alerta() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const navigation = useNavigation();
   const { id, paraderoId } = useLocalSearchParams<{ id?: string; paraderoId?: string }>();
@@ -441,115 +445,116 @@ export default function Alerta() {
   );
 }
 
-const styles = StyleSheet.create({
-  error: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: sizes.legendPadding,
-    borderRadius: radii.md,
-    backgroundColor: colors.redSoft,
-  },
-  // Rojo sobre redSoft: redStrong (contraste AA)
-  errorTexto: {
-    flex: 1,
-    color: colors.redStrong,
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-  },
-  hora: {
-    alignItems: "center",
-    paddingHorizontal: sizes.cardPadding,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  horaFila: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: spacing.lg,
-  },
-  dias: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dia: {
-    width: sizes.dayCircle,
-    height: sizes.dayCircle,
-    borderRadius: radii.pill,
-    backgroundColor: colors.canvas,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  diaElegido: {
-    backgroundColor: colors.ink,
-  },
-  selector: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    padding: spacing.md,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  selectorTexto: {
-    flex: 1,
-  },
-  lista: {
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    overflow: "hidden",
-    ...shadows.card,
-  },
-  chips: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  ajuste: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  ajusteTexto: {
-    flex: 1,
-  },
-  pie: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  estado: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  blanco: {
-    color: colors.surface,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    error: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: sizes.legendPadding,
+      borderRadius: radii.md,
+      backgroundColor: colors.redSoft,
+    },
+    // Rojo sobre redSoft: redStrong (contraste AA)
+    errorTexto: {
+      flex: 1,
+      color: colors.redStrong,
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.lg,
+    },
+    hora: {
+      alignItems: "center",
+      paddingHorizontal: sizes.cardPadding,
+      paddingVertical: spacing.sm,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    horaFila: {
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: spacing.lg,
+    },
+    dias: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    dia: {
+      width: sizes.dayCircle,
+      height: sizes.dayCircle,
+      borderRadius: radii.pill,
+      backgroundColor: colors.canvas,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    diaElegido: {
+      backgroundColor: colors.ink,
+    },
+    selector: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      padding: spacing.md,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    selectorTexto: {
+      flex: 1,
+    },
+    lista: {
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      overflow: "hidden",
+      ...shadows.card,
+    },
+    chips: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    ajuste: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    ajusteTexto: {
+      flex: 1,
+    },
+    pie: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    estado: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.xl,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    blanco: {
+      color: colors.surface,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

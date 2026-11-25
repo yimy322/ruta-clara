@@ -5,18 +5,19 @@ import { useEffect, useState } from "react";
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, Header, IconButton } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
 import { getUbicacionUsuario, getViaCercana } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 import type { CausaTransito, NivelCongestion } from "@/types";
 import { etiquetaCausa, etiquetaCongestion, textoVia } from "@/utils/formato";
 
 const MAX_NOTA = 120;
 
 // Color de la barra de intensidad de cada nivel
-const NIVELES: { valor: NivelCongestion; barra: string }[] = [
+const niveles = (colors: Paleta): { valor: NivelCongestion; barra: string }[] => [
   { valor: "fluido", barra: colors.line },
   { valor: "moderado", barra: colors.inkMuted },
   { valor: "pesado", barra: colors.ink },
@@ -29,6 +30,9 @@ const OPCIONES_FOTO: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], 
 
 // F2_06 · Tránsito / Trancadera
 export default function ReporteTransito() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { borrador, actualizar } = useReporte();
   const { enviar, enviando } = useEnviarReporte();
 
@@ -140,7 +144,7 @@ export default function ReporteTransito() {
 
         <Text style={[typography.bodyStrong, styles.ink]}>Nivel de congestión</Text>
         <View style={styles.niveles} accessibilityRole="radiogroup">
-          {NIVELES.map(({ valor, barra }) => {
+          {niveles(colors).map(({ valor, barra }) => {
             const elegido = borrador.congestion === valor;
             const trancadera = valor === "trancadera";
             return (
@@ -162,7 +166,7 @@ export default function ReporteTransito() {
                 <Text
                   style={[
                     elegido ? typography.captionStrong : typography.caption,
-                    elegido && trancadera ? styles.red : styles.ink,
+                    elegido ? (trancadera ? styles.red : styles.sobreAmarillo) : styles.ink,
                   ]}
                   numberOfLines={1}
                 >
@@ -228,103 +232,107 @@ export default function ReporteTransito() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-  },
-  niveles: {
-    flexDirection: "row",
-    gap: sizes.congestionGap,
-  },
-  nivel: {
-    flex: 1,
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: sizes.congestionPaddingX,
-    paddingVertical: sizes.congestionPaddingY,
-    borderRadius: sizes.optionRadius,
-    // Borde transparente para que el elegido no cambie de tamaño
-    borderWidth: borderWidths.regular,
-    borderColor: "transparent",
-    backgroundColor: colors.canvas,
-  },
-  nivelElegido: {
-    borderRadius: radii.control,
-    borderColor: colors.ink,
-    backgroundColor: colors.yellow,
-  },
-  nivelTrancadera: {
-    borderRadius: radii.control,
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-  barra: {
-    alignSelf: "stretch",
-    height: sizes.congestionBar,
-    borderRadius: sizes.congestionBar / 2,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  campo: {
-    borderRadius: sizes.optionRadius,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-  },
-  campoVia: {
-    height: sizes.optionHeight,
-    paddingHorizontal: spacing.md,
-  },
-  nota: {
-    height: sizes.noteHeight,
-    padding: spacing.md,
-  },
-  notaTexto: {
-    flex: 1,
-    padding: 0,
-    textAlignVertical: "top",
-  },
-  contador: {
-    textAlign: "right",
-  },
-  foto: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  miniatura: {
-    width: sizes.photoThumb,
-    height: sizes.photoThumb,
-    borderRadius: radii.md,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-  },
-  abajo: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  // Rojo sobre redSoft: redStrong (contraste AA)
-  red: {
-    color: colors.redStrong,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.lg,
+    },
+    niveles: {
+      flexDirection: "row",
+      gap: sizes.congestionGap,
+    },
+    nivel: {
+      flex: 1,
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: sizes.congestionPaddingX,
+      paddingVertical: sizes.congestionPaddingY,
+      borderRadius: sizes.optionRadius,
+      // Borde transparente para que el elegido no cambie de tamaño
+      borderWidth: borderWidths.regular,
+      borderColor: "transparent",
+      backgroundColor: colors.canvas,
+    },
+    nivelElegido: {
+      borderRadius: radii.control,
+      borderColor: colors.ink,
+      backgroundColor: colors.yellow,
+    },
+    nivelTrancadera: {
+      borderRadius: radii.control,
+      borderColor: colors.red,
+      backgroundColor: colors.redSoft,
+    },
+    barra: {
+      alignSelf: "stretch",
+      height: sizes.congestionBar,
+      borderRadius: sizes.congestionBar / 2,
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    campo: {
+      borderRadius: sizes.optionRadius,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.line,
+      backgroundColor: colors.surface,
+    },
+    campoVia: {
+      height: sizes.optionHeight,
+      paddingHorizontal: spacing.md,
+    },
+    nota: {
+      height: sizes.noteHeight,
+      padding: spacing.md,
+    },
+    notaTexto: {
+      flex: 1,
+      padding: 0,
+      textAlignVertical: "top",
+    },
+    contador: {
+      textAlign: "right",
+    },
+    foto: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    miniatura: {
+      width: sizes.photoThumb,
+      height: sizes.photoThumb,
+      borderRadius: radii.md,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+    },
+    abajo: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    // Rojo sobre redSoft: redStrong (contraste AA)
+    red: {
+      color: colors.redStrong,
+    },
+    sobreAmarillo: {
+      color: colors.onYellow,
+    },
+  });

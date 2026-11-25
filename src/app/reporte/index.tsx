@@ -4,15 +4,19 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { IconButton, Mapa, Tile } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { BorradorReporte, Coordenada, Paradero } from "@/types";
 
 // F2_01 · Panel de reporte rápido
 export default function PanelReporte() {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { reiniciar, actualizar, cerrar } = useReporte();
@@ -113,56 +117,57 @@ export default function PanelReporte() {
   );
 }
 
-const styles = StyleSheet.create({
-  velo: {
-    backgroundColor: colors.scrim,
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.map,
-  },
-  capa: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    borderWidth: borderWidths.regular,
-    borderBottomWidth: 0,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
-  },
-  grabber: {
-    alignSelf: "center",
-    width: sizes.grabberWidth,
-    height: sizes.grabberHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.line,
-  },
-  encabezado: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.md,
-  },
-  titulos: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  fila: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  nota: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    velo: {
+      backgroundColor: colors.scrim,
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.map,
+    },
+    capa: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
+    sheet: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      borderTopLeftRadius: radii.xl,
+      borderTopRightRadius: radii.xl,
+      borderWidth: borderWidths.regular,
+      borderBottomWidth: 0,
+      borderColor: colors.ink,
+      backgroundColor: colors.surface,
+    },
+    grabber: {
+      alignSelf: "center",
+      width: sizes.grabberWidth,
+      height: sizes.grabberHeight,
+      borderRadius: radii.pill,
+      backgroundColor: colors.line,
+    },
+    encabezado: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+    },
+    titulos: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    fila: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    nota: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

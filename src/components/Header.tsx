@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { borderWidths, colors, opacity, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, spacing, type Tema } from "@/theme";
 
 import { IconButton } from "./IconButton";
 
@@ -39,6 +40,9 @@ export function Header({
   titleHint,
   tono,
 }: HeaderProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -88,34 +92,35 @@ export function Header({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  seguridad: {
-    backgroundColor: colors.redSoft,
-    borderBottomWidth: borderWidths.regular,
-    borderBottomColor: colors.red,
-  },
-  text: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  // Rojo sobre redSoft: redStrong (contraste AA)
-  red: {
-    color: colors.redStrong,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    seguridad: {
+      backgroundColor: colors.redSoft,
+      borderBottomWidth: borderWidths.regular,
+      borderBottomColor: colors.red,
+    },
+    text: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    // Rojo sobre redSoft: redStrong (contraste AA)
+    red: {
+      color: colors.redStrong,
+    },
+  });

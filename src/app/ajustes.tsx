@@ -5,12 +5,21 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Avatar, Button, FilaAjuste, IconButton, useToast } from "@/components";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { Avatar, Button, FilaAjuste, IconButton, Segmented, useToast } from "@/components";
 import { usePreferencias } from "@/context/PreferenciasContext";
+import type { Ajustes as PreferenciasAjustes } from "@/data/preferencias";
 import { getUsuario } from "@/data/repositorio";
-import { borderWidths, colors, opacity, sizes, spacing, typography } from "@/theme";
+import { borderWidths, opacity, sizes, spacing, type Tema } from "@/theme";
 import type { Usuario } from "@/types";
 import { abrirWhatsApp } from "@/utils/soporte";
+
+// Tema de la app: "Sistema" sigue el modo claro u oscuro del celular
+const TEMAS: { valor: PreferenciasAjustes["tema"]; label: string }[] = [
+  { valor: "sistema", label: "Sistema" },
+  { valor: "claro", label: "Claro" },
+  { valor: "oscuro", label: "Oscuro" },
+];
 
 // «1.0.0» → «1.0», como en Figma
 const VERSION = (Constants.expoConfig?.version ?? "1.0").split(".").slice(0, 2).join(".");
@@ -18,6 +27,9 @@ const VERSION = (Constants.expoConfig?.version ?? "1.0").split(".").slice(0, 2).
 // F3_05 · Ajustes: notificaciones, uso en la calle, accesibilidad y soporte.
 // Los interruptores se guardan en el dispositivo (PreferenciasContext).
 export default function Ajustes() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -106,6 +118,16 @@ export default function Ajustes() {
           onValueChange={(v) => cambiarAjuste("logrosPuntos", v)}
         />
 
+        {/* supuesto: F3_05 no dibuja la apariencia; la decisión 42 pide Sistema / Claro / Oscuro */}
+        <Seccion titulo="Apariencia" />
+        <View style={styles.apariencia}>
+          <Segmented
+            opciones={TEMAS}
+            valor={ajustes.tema}
+            onChange={(tema) => cambiarAjuste("tema", tema)}
+          />
+        </View>
+
         <Seccion titulo="Uso en la calle" />
         <FilaAjuste
           titulo="Ahorro de datos"
@@ -138,6 +160,9 @@ export default function Ajustes() {
 }
 
 function Seccion({ titulo }: { titulo: string }) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <Text style={[typography.overline, styles.muted, styles.seccion]} accessibilityRole="header">
       {titulo}
@@ -145,57 +170,62 @@ function Seccion({ titulo }: { titulo: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  barra: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xs,
-  },
-  contenido: {
-    flexGrow: 1,
-  },
-  perfil: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    minHeight: sizes.menuRowHeight,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-  },
-  perfilTexto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  seccion: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  espacio: {
-    flex: 1,
-    minHeight: spacing.xl,
-  },
-  pie: {
-    textAlign: "center",
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.sm,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    barra: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xs,
+    },
+    contenido: {
+      flexGrow: 1,
+    },
+    perfil: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      minHeight: sizes.menuRowHeight,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+    },
+    perfilTexto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    apariencia: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+    },
+    seccion: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    espacio: {
+      flex: 1,
+      minHeight: spacing.xl,
+    },
+    pie: {
+      textAlign: "center",
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.sm,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

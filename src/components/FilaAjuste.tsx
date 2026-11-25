@@ -2,7 +2,8 @@ import { ChevronRight } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, sizes, spacing, type Tema } from "@/theme";
 
 import { Toggle } from "./Toggle";
 
@@ -22,6 +23,9 @@ type FilaAjusteProps = {
 // Fila de Ajustes (F3_05): título, subtítulo opcional y a la derecha un
 // Toggle o un chevron. Toda la fila es el área táctil.
 export function FilaAjuste({ titulo, subtitulo, icono, simple = false, valor, onValueChange, onPress }: FilaAjusteProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const esInterruptor = valor !== undefined;
   const alternar = () => onValueChange?.(!valor);
 
@@ -50,29 +54,30 @@ export function FilaAjuste({ titulo, subtitulo, icono, simple = false, valor, on
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    minHeight: sizes.minTouchRow,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-    backgroundColor: colors.surface,
-  },
-  texto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      minHeight: sizes.minTouchRow,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+      backgroundColor: colors.surface,
+    },
+    texto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

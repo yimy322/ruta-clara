@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
-import { borderWidths, colors, opacity, radii, shadows, sizes } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 type IconButtonProps = {
@@ -19,8 +20,11 @@ type IconButtonProps = {
 // Pensado para íconos de lucide-react-native: si el ícono no define color ni
 // tamaño, se le asignan según el estado.
 export function IconButton({ icon, onPress, active = false, tono, accessibilityLabel }: IconButtonProps) {
+  const { colors } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const destacado = tono === "destacado";
-  const color = active ? colors.surface : colors.ink;
+  const color = active ? colors.surface : destacado ? colors.onYellow : colors.ink;
 
   return (
     <Pressable
@@ -41,27 +45,28 @@ export function IconButton({ icon, onPress, active = false, tono, accessibilityL
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    width: sizes.iconButton,
-    height: sizes.iconButton,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadows.card,
-  },
-  active: {
-    backgroundColor: colors.ink,
-  },
-  destacado: {
-    backgroundColor: colors.yellow,
-  },
-  seguridad: {
-    borderWidth: borderWidths.regular,
-    borderColor: colors.red,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      width: sizes.iconButton,
+      height: sizes.iconButton,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
+      ...shadows.card,
+    },
+    active: {
+      backgroundColor: colors.ink,
+    },
+    destacado: {
+      backgroundColor: colors.yellow,
+    },
+    seguridad: {
+      borderWidth: borderWidths.regular,
+      borderColor: colors.red,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

@@ -2,7 +2,8 @@ import { Bell, CircleAlert, CircleUser, House, Star, type LucideIcon } from "luc
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 
 export type BottomNavTab = "inicio" | "favoritos" | "reportar" | "alertas" | "perfil";
 
@@ -25,6 +26,9 @@ const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
 // píldora amarilla de 52 × 30 detrás del ícono. Es solo visual: (tabs)/_layout.tsx la
 // conecta a las Tabs de Expo Router. Respeta el borde seguro inferior.
 export function BottomNav({ active, onSelect, badge }: BottomNavProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const insets = useSafeAreaInsets();
 
   return (
@@ -45,7 +49,7 @@ export function BottomNav({ active, onSelect, badge }: BottomNavProps) {
             style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
           >
             <View style={[styles.pill, selected && styles.pillActive]}>
-              <Icon color={selected ? colors.ink : colors.inkMuted} size={sizes.navIcon} />
+              <Icon color={selected ? colors.onYellow : colors.inkMuted} size={sizes.navIcon} />
               {pendientes > 0 && <View style={styles.badge} />}
             </View>
             <Text
@@ -61,51 +65,52 @@ export function BottomNav({ active, onSelect, badge }: BottomNavProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    paddingHorizontal: spacing.xs,
-    paddingTop: spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopWidth: borderWidths.thin,
-    borderTopColor: colors.line,
-  },
-  tab: {
-    flex: 1,
-    gap: spacing.xs,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pill: {
-    width: sizes.navPill,
-    height: sizes.navPillHeight,
-    borderRadius: radii.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pillActive: {
-    backgroundColor: colors.yellow,
-  },
-  label: {
-    color: colors.inkMuted,
-  },
-  labelActive: {
-    color: colors.ink,
-  },
-  badge: {
-    position: "absolute",
-    top: 0,
-    // Sobre la esquina del ícono de 22 centrado en la píldora de 52
-    right: (sizes.navPill - sizes.navIcon) / 2 - sizes.badgeDot / 2,
-    width: sizes.badgeDot,
-    height: sizes.badgeDot,
-    borderRadius: radii.pill,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.surface,
-    backgroundColor: colors.red,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      paddingHorizontal: spacing.xs,
+      paddingTop: spacing.sm,
+      backgroundColor: colors.surface,
+      borderTopWidth: borderWidths.thin,
+      borderTopColor: colors.line,
+    },
+    tab: {
+      flex: 1,
+      gap: spacing.xs,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    pill: {
+      width: sizes.navPill,
+      height: sizes.navPillHeight,
+      borderRadius: radii.pill,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    pillActive: {
+      backgroundColor: colors.yellow,
+    },
+    label: {
+      color: colors.inkMuted,
+    },
+    labelActive: {
+      color: colors.ink,
+    },
+    badge: {
+      position: "absolute",
+      top: 0,
+      // Sobre la esquina del ícono de 22 centrado en la píldora de 52
+      right: (sizes.navPill - sizes.navIcon) / 2 - sizes.badgeDot / 2,
+      width: sizes.badgeDot,
+      height: sizes.badgeDot,
+      borderRadius: radii.pill,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.surface,
+      backgroundColor: colors.red,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

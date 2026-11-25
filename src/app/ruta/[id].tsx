@@ -16,9 +16,10 @@ import {
   TarjetaDato,
   useToast,
 } from "@/components";
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { useViaje } from "@/context/ViajeContext";
 import { alternarFavorita, esFavorita, getLinea, getRecorrido, getUbicacionUsuario } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, Linea, Paradero, Sentido } from "@/types";
 import { etiquetaTipo, formatearDistancia, formatearPasaje, textoRecorrido } from "@/utils/formato";
 import { distanciaMetros } from "@/utils/geo";
@@ -37,6 +38,9 @@ const PARADEROS_VISIBLES = 2;
 
 // F1_07 · Detalle de ruta
 export default function DetalleRuta() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { id, destino = "" } = useLocalSearchParams<{ id: string; destino?: string }>();
   const { mostrar } = useToast();
@@ -250,50 +254,51 @@ export default function DetalleRuta() {
   );
 }
 
-const styles = StyleSheet.create({
-  centroVertical: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-  },
-  mapa: {
-    height: sizes.routeMap,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-  },
-  datos: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  // ListItem trae su propio margen lateral de 16
-  pie: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  estado: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    centroVertical: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.lg,
+    },
+    mapa: {
+      height: sizes.routeMap,
+      borderRadius: radii.lg,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+    },
+    datos: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    // ListItem trae su propio margen lateral de 16
+    pie: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    estado: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.xl,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

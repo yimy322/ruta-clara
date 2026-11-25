@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, EstadoPantalla, IconButton, ListItem, useToast } from "@/components";
 import {
   alternarFavorita,
@@ -13,7 +14,7 @@ import {
   getParaderoCercano,
   getUbicacionUsuario,
 } from "@/data/repositorio";
-import { colors, spacing, typography } from "@/theme";
+import { spacing, type Tema } from "@/theme";
 import type { Favoritos as DatosFavoritos, ParaderoFavorito, RutaGuardada } from "@/types";
 import { etiquetaOcupacion, formatoDias, formatoHora, textoRutaAlerta } from "@/utils/formato";
 import { ICONO_LUGAR } from "@/utils/icons";
@@ -51,6 +52,9 @@ const tituloRuta = (ruta: RutaGuardada) =>
 
 // F3_01 · Favoritos
 export default function Favoritos() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -324,60 +328,61 @@ export default function Favoritos() {
   );
 }
 
-const styles = StyleSheet.create({
-  centroVertical: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  barra: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  // Una sola fila, como en Figma (los 4 chips entran en 360 pt)
-  filtros: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xs,
-  },
-  estado: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xl,
-  },
-  contenido: {
-    paddingBottom: spacing.lg,
-  },
-  seccion: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  vacio: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  anadir: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    centroVertical: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    barra: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    // Una sola fila, como en Figma (los 4 chips entran en 360 pt)
+    filtros: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xs,
+    },
+    estado: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.lg,
+      paddingHorizontal: spacing.xl,
+    },
+    contenido: {
+      paddingBottom: spacing.lg,
+    },
+    seccion: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    vacio: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    anadir: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

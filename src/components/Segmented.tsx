@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, minTouch, opacity, radii, shadows, sizes, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { minTouch, opacity, radii, sizes, type Tema } from "@/theme";
 
 type Opcion<T extends string> = {
   valor: T;
@@ -20,6 +21,9 @@ const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 // Control segmentado de ancho completo (p. ej. Ida / Vuelta en F1_07).
 // Tarjeta con sombra; la opción elegida va en ink.
 export function Segmented<T extends string>({ opciones, valor, onChange }: SegmentedProps<T>) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <View style={styles.base} accessibilityRole="tablist">
       {opciones.map((opcion, i) => {
@@ -49,39 +53,40 @@ export function Segmented<T extends string>({ opciones, valor, onChange }: Segme
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  // El recorte va en cada extremo: overflow hidden en la tarjeta cortaría la sombra
-  primera: {
-    borderTopLeftRadius: radii.control,
-    borderBottomLeftRadius: radii.control,
-  },
-  ultima: {
-    borderTopRightRadius: radii.control,
-    borderBottomRightRadius: radii.control,
-  },
-  opcion: {
-    flex: 1,
-    height: sizes.segmentedHeight,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.surface,
-  },
-  elegida: {
-    backgroundColor: colors.ink,
-  },
-  label: {
-    color: colors.ink,
-  },
-  labelElegida: {
-    color: colors.surface,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    // El recorte va en cada extremo: overflow hidden en la tarjeta cortaría la sombra
+    primera: {
+      borderTopLeftRadius: radii.control,
+      borderBottomLeftRadius: radii.control,
+    },
+    ultima: {
+      borderTopRightRadius: radii.control,
+      borderBottomRightRadius: radii.control,
+    },
+    opcion: {
+      flex: 1,
+      height: sizes.segmentedHeight,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
+    },
+    elegida: {
+      backgroundColor: colors.ink,
+    },
+    label: {
+      color: colors.ink,
+    },
+    labelElegida: {
+      color: colors.surface,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

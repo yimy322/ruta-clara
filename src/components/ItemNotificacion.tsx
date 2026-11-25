@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 type ItemNotificacionProps = {
@@ -19,7 +20,11 @@ type ItemNotificacionProps = {
 // líneas, detalle y punto rojo si no está leído. Un aviso de llegada sin leer
 // va con fondo amarillo suave.
 export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }: ItemNotificacionProps) {
-  const colorIcono = tono === "seguridad" ? colors.redStrong : colors.ink;
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+  const iconoStyles = useEstilos(crearIconoStyles);
+
+  const colorIcono = tono === "seguridad" ? colors.redStrong : tono === "llegada" ? colors.onYellow : colors.ink;
 
   return (
     <Pressable
@@ -48,58 +53,60 @@ export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.surface,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-  },
-  destacado: {
-    backgroundColor: colors.yellowSoft,
-  },
-  icono: {
-    width: sizes.notifIcon,
-    height: sizes.notifIcon,
-    borderRadius: radii.badge,
-    backgroundColor: colors.canvas,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  texto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  noLeida: {
-    width: sizes.unreadDot,
-    height: sizes.unreadDot,
-    borderRadius: radii.pill,
-    backgroundColor: colors.red,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+    },
+    destacado: {
+      backgroundColor: colors.yellowSoft,
+    },
+    icono: {
+      width: sizes.notifIcon,
+      height: sizes.notifIcon,
+      borderRadius: radii.badge,
+      backgroundColor: colors.canvas,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    texto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    noLeida: {
+      width: sizes.unreadDot,
+      height: sizes.unreadDot,
+      borderRadius: radii.pill,
+      backgroundColor: colors.red,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });
 
-const iconoStyles = StyleSheet.create({
-  llegada: {
-    backgroundColor: colors.yellow,
-  },
-  // Círculo con borde rojo: la seguridad se distingue también por la forma
-  seguridad: {
-    borderRadius: radii.control,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-});
+const crearIconoStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    llegada: {
+      backgroundColor: colors.yellow,
+    },
+    // Círculo con borde rojo: la seguridad se distingue también por la forma
+    seguridad: {
+      borderRadius: radii.control,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.red,
+      backgroundColor: colors.redSoft,
+    },
+  });

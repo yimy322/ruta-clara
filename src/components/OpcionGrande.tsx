@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
 
 type OpcionGrandeProps = {
   label: string;
@@ -11,6 +12,9 @@ type OpcionGrandeProps = {
 // Opción de 48 pt a todo el ancho, para elegir una entre pocas (p. ej. el
 // tiempo de espera en F2_05). La elegida va en ink con texto blanco.
 export function OpcionGrande({ label, selected = false, onPress }: OpcionGrandeProps) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <Pressable
       onPress={onPress}
@@ -25,25 +29,26 @@ export function OpcionGrande({ label, selected = false, onPress }: OpcionGrandeP
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: sizes.optionHeight,
-    justifyContent: "center",
-    paddingHorizontal: spacing.lg,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  selected: {
-    backgroundColor: colors.ink,
-  },
-  label: {
-    color: colors.ink,
-  },
-  labelSelected: {
-    color: colors.surface,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    base: {
+      height: sizes.optionHeight,
+      justifyContent: "center",
+      paddingHorizontal: spacing.lg,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    selected: {
+      backgroundColor: colors.ink,
+    },
+    label: {
+      color: colors.ink,
+    },
+    labelSelected: {
+      color: colors.surface,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

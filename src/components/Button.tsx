@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
@@ -32,6 +33,15 @@ export function Button({
   pill = false,
   large = false,
 }: ButtonProps) {
+  const { colors, shadows, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+  const containerStyles = useEstilos(crearContainerStyles);
+  const pressedStyles = useEstilos(crearPressedStyles);
+  const disabledStyles = useEstilos(crearDisabledStyles);
+  const labelStyles = useEstilos(crearLabelStyles);
+  // Sombra de color solo en Primary y Danger habilitados
+  const shadowStyles = { primary: shadows.primary, secondary: undefined, tertiary: undefined, danger: shadows.danger };
+
   const [focused, setFocused] = useState(false);
 
   return (
@@ -72,76 +82,73 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: sizes.buttonHeight,
-    paddingHorizontal: sizes.buttonPaddingX,
-    borderRadius: radii.control,
-    flexDirection: "row",
-    gap: spacing.sm,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-start",
-  },
-  fullWidth: {
-    alignSelf: "stretch",
-  },
-  pill: {
-    borderRadius: radii.pill,
-  },
-  large: {
-    height: sizes.buttonHeightLarge,
-  },
-  // Figma no dibuja Tertiary presionado // supuesto: texto atenuado
-  tertiaryPressed: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      height: sizes.buttonHeight,
+      paddingHorizontal: sizes.buttonPaddingX,
+      borderRadius: radii.control,
+      flexDirection: "row",
+      gap: spacing.sm,
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "flex-start",
+    },
+    fullWidth: {
+      alignSelf: "stretch",
+    },
+    pill: {
+      borderRadius: radii.pill,
+    },
+    large: {
+      height: sizes.buttonHeightLarge,
+    },
+    // Figma no dibuja Tertiary presionado // supuesto: texto atenuado
+    tertiaryPressed: {
+      color: colors.inkMuted,
+    },
+  });
 
-const containerStyles = StyleSheet.create({
-  primary: {
-    backgroundColor: colors.ink,
-  },
-  secondary: {
-    backgroundColor: colors.surface,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-  },
-  tertiary: {
-    backgroundColor: "transparent",
-  },
-  danger: {
-    backgroundColor: colors.red,
-  },
-});
+const crearContainerStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    primary: {
+      backgroundColor: colors.ink,
+    },
+    secondary: {
+      backgroundColor: colors.surface,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.ink,
+    },
+    tertiary: {
+      backgroundColor: "transparent",
+    },
+    danger: {
+      backgroundColor: colors.red,
+    },
+  });
 
-// Sombra de color solo en Primary y Danger habilitados
-const shadowStyles = {
-  primary: shadows.primary,
-  secondary: undefined,
-  tertiary: undefined,
-  danger: shadows.danger,
-} as const;
-
-const pressedStyles = StyleSheet.create({
-  primary: { backgroundColor: colors.inkPressed },
-  secondary: { backgroundColor: colors.canvas },
-  tertiary: {},
-  // Figma deja Danger igual al presionar // supuesto: rojo intenso como respuesta
-  danger: { backgroundColor: colors.redStrong },
-});
+const crearPressedStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    primary: { backgroundColor: colors.inkPressed },
+    secondary: { backgroundColor: colors.canvas },
+    tertiary: {},
+    // Figma deja Danger igual al presionar // supuesto: rojo intenso como respuesta
+    danger: { backgroundColor: colors.redStrong },
+  });
 
 // Deshabilitado: fondo line y texto inkMuted (no opacidad), como en Figma
-const disabledStyles = StyleSheet.create({
-  primary: { backgroundColor: colors.line },
-  secondary: { borderColor: colors.line },
-  tertiary: {},
-  danger: { backgroundColor: colors.line },
-});
+const crearDisabledStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    primary: { backgroundColor: colors.line },
+    secondary: { borderColor: colors.line },
+    tertiary: {},
+    danger: { backgroundColor: colors.line },
+  });
 
-const labelStyles = StyleSheet.create({
-  primary: { color: colors.surface },
-  secondary: { color: colors.ink },
-  tertiary: { color: colors.ink },
-  danger: { color: colors.surface },
-});
+const crearLabelStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    primary: { color: colors.surface },
+    secondary: { color: colors.ink },
+    tertiary: { color: colors.ink },
+    danger: { color: colors.surface },
+  });

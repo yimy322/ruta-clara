@@ -20,7 +20,7 @@ type PreferenciasContextValue = {
   reiniciarOnboarding: () => Promise<void>;
   // Ajustes de F3_05 y F3_06; se guardan en el dispositivo al cambiarlos
   ajustes: Ajustes;
-  cambiarAjuste: (clave: keyof Ajustes, valor: boolean) => void;
+  cambiarAjuste: <K extends keyof Ajustes>(clave: K, valor: Ajustes[K]) => void;
 };
 
 const PreferenciasContext = createContext<PreferenciasContextValue | null>(null);
@@ -58,7 +58,7 @@ export function PreferenciasProvider({ children }: { children: ReactNode }) {
 
   // Se actualiza en pantalla al instante; si no se puede guardar, el cambio
   // dura hasta cerrar la app
-  const cambiarAjuste = useCallback((clave: keyof Ajustes, valor: boolean) => {
+  const cambiarAjuste = useCallback(<K extends keyof Ajustes>(clave: K, valor: Ajustes[K]) => {
     setEstadoAjustes((anteriores) => {
       const nuevos = { ...anteriores, [clave]: valor };
       setAjustes(nuevos).catch(() => {});

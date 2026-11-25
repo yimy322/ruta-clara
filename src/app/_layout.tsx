@@ -14,6 +14,7 @@ import { PantallaCarga, ToastProvider } from "@/components";
 import { ColaReportesProvider } from "@/context/ColaReportesContext";
 import { NotificacionesProvider } from "@/context/NotificacionesContext";
 import { PreferenciasProvider, usePreferencias } from "@/context/PreferenciasContext";
+import { TemaProvider, useTema } from "@/context/TemaContext";
 import { ViajeProvider } from "@/context/ViajeContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -21,20 +22,23 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   return (
     <PreferenciasProvider>
-      <ViajeProvider>
-        <NotificacionesProvider>
-          <ToastProvider>
-            <ColaReportesProvider>
-              <RootNavigator />
-            </ColaReportesProvider>
-          </ToastProvider>
-        </NotificacionesProvider>
-      </ViajeProvider>
+      <TemaProvider>
+        <ViajeProvider>
+          <NotificacionesProvider>
+            <ToastProvider>
+              <ColaReportesProvider>
+                <RootNavigator />
+              </ColaReportesProvider>
+            </ToastProvider>
+          </NotificacionesProvider>
+        </ViajeProvider>
+      </TemaProvider>
     </PreferenciasProvider>
   );
 }
 
 function RootNavigator() {
+  const { esquema } = useTema();
   const [loaded, error] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -64,7 +68,8 @@ function RootNavigator() {
   // Todas las rutas se declaran para que ninguna quede fuera de la protección.
   return (
     <>
-      <StatusBar style="dark" />
+      {/* Barra de estado según el tema: texto claro sobre el fondo oscuro */}
+      <StatusBar style={esquema === "oscuro" ? "light" : "dark"} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!onboardingVisto}>
           <Stack.Screen name="onboarding" />

@@ -29,8 +29,9 @@ import {
   useToast,
   type BottomNavTab,
 } from "@/components";
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { catalogHeader, catalogRoutes } from "@/mocks/catalog";
-import { colors, radii, shadows, sizes, spacing, typography, type ShadowToken } from "@/theme";
+import { radii, sizes, spacing, type ShadowToken, type Tema } from "@/theme";
 
 // Pantalla de desarrollo: catálogo de componentes base con todas sus variantes,
 // como la sección "Componentes" de Figma. Se abre desde "Ver catálogo" en Inicio.
@@ -39,6 +40,9 @@ const noop = () => {};
 const SOMBRAS: ShadowToken[] = ["card", "float", "sheet", "pin", "primary", "danger", "focusRing"];
 
 export default function Catalogo() {
+  const { colors, shadows } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const [alertsOn, setAlertsOn] = useState(true);
   const [shareOn, setShareOn] = useState(false);
   const [tab, setTab] = useState<BottomNavTab>("inicio");
@@ -198,6 +202,9 @@ export default function Catalogo() {
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <View style={styles.section}>
       <Text style={[typography.h2, styles.ink]} accessibilityRole="header">
@@ -209,6 +216,9 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function Variant({ label, children }: { label: string; children: ReactNode }) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   return (
     <View style={styles.variant}>
       <Text style={[typography.overline, styles.muted]}>{label}</Text>
@@ -217,47 +227,48 @@ function Variant({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.canvas,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.xxl,
-  },
-  section: {
-    gap: spacing.md,
-  },
-  variant: {
-    gap: spacing.xs,
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.control,
-    overflow: "hidden",
-  },
-  sombra: {
-    width: sizes.tileWidth,
-    height: sizes.buttonHeightLarge,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  caption: {
-    ...typography.caption,
-    color: colors.inkMuted,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, typography }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.canvas,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.xxl,
+    },
+    section: {
+      gap: spacing.md,
+    },
+    variant: {
+      gap: spacing.xs,
+    },
+    row: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.control,
+      overflow: "hidden",
+    },
+    sombra: {
+      width: sizes.tileWidth,
+      height: sizes.buttonHeightLarge,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    caption: {
+      ...typography.caption,
+      color: colors.inkMuted,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

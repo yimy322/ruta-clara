@@ -4,12 +4,13 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Avatar, BarraProgreso, Button, Chip, EstadoPantalla, IconButton, ListItem, TarjetaEstadistica, Tile, useToast } from "@/components";
 import { PUNTOS_POR_TIPO, RANGOS } from "@/config/gamificacion";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getHistorialReportes, getInsignias, getUsuario, simularAvisoAlerta } from "@/data/repositorio";
-import { colors, sizes, spacing, typography } from "@/theme";
+import { sizes, spacing, type Tema } from "@/theme";
 import type { Insignia, ReporteHistorial, Usuario } from "@/types";
 import { formatearDia, formatearPuntos, tituloHistorial } from "@/utils/formato";
 import { calcularRango, progresoEscala } from "@/utils/gamificacion";
@@ -28,6 +29,9 @@ type Datos = {
 
 // F2_09 · Historial y logros
 export default function Perfil() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { reiniciarOnboarding } = usePreferencias();
@@ -160,6 +164,9 @@ export default function Perfil() {
 
 // Avatar, nombre y rango actual
 function Encabezado({ usuario }: { usuario: Usuario }) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { actual } = calcularRango(usuario.puntos);
 
   return (
@@ -175,60 +182,61 @@ function Encabezado({ usuario }: { usuario: Usuario }) {
   );
 }
 
-const styles = StyleSheet.create({
-  centroVertical: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  barra: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  cargando: {
-    flex: 1,
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-  },
-  encabezado: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.lg,
-  },
-  nombre: {
-    flex: 1,
-    gap: spacing.sm,
-  },
-  escala: {
-    gap: spacing.sm,
-  },
-  rangos: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: spacing.sm,
-  },
-  fila: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  dev: {
-    marginTop: spacing.xl,
-    gap: spacing.xs,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    centroVertical: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    barra: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    cargando: {
+      flex: 1,
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.lg,
+    },
+    encabezado: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.lg,
+    },
+    nombre: {
+      flex: 1,
+      gap: spacing.sm,
+    },
+    escala: {
+      gap: spacing.sm,
+    },
+    rangos: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    fila: {
+      flexDirection: "row",
+      gap: spacing.sm,
+    },
+    dev: {
+      marginTop: spacing.xl,
+      gap: spacing.xs,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

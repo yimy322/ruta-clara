@@ -4,9 +4,10 @@ import { CircleAlert, Clock } from "lucide-react-native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, CardRuta, Chip, EsqueletoRuta, EstadoPantalla, Header, Mapa, useToast } from "@/components";
 import { buscarRutas, getUbicacionUsuario } from "@/data/repositorio";
-import { borderWidths, colors, radii, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, OpcionRuta, TipoUnidad } from "@/types";
 import { etiquetaTipo } from "@/utils/formato";
 import { abrirWhatsApp } from "@/utils/soporte";
@@ -27,6 +28,9 @@ const FILTROS: { valor: FiltroTipo; label: string }[] = [
 
 // F1_06 · Resultados de rutas
 export default function Rutas() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { mostrar } = useToast();
   const { origen = "Mi ubicación", destino = "" } = useLocalSearchParams<{ origen?: string; destino?: string }>();
@@ -187,56 +191,57 @@ export default function Rutas() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  canvas: {
-    backgroundColor: colors.canvas,
-  },
-  buscando: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingTop: spacing.sm,
-  },
-  centroVertical: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-  },
-  mapa: {
-    height: sizes.miniMap,
-    borderRadius: radii.lg,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.line,
-  },
-  // Los chips llegan hasta el borde de la pantalla, como en Figma
-  filtrosScroll: {
-    marginHorizontal: -spacing.lg,
-  },
-  filtros: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-  },
-  estado: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xl,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    canvas: {
+      backgroundColor: colors.canvas,
+    },
+    buscando: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingTop: spacing.sm,
+    },
+    centroVertical: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.lg,
+    },
+    mapa: {
+      height: sizes.miniMap,
+      borderRadius: radii.lg,
+      borderWidth: borderWidths.thin,
+      borderColor: colors.line,
+    },
+    // Los chips llegan hasta el borde de la pantalla, como en Figma
+    filtrosScroll: {
+      marginHorizontal: -spacing.lg,
+    },
+    filtros: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    estado: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: spacing.xl,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

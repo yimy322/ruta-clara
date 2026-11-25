@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, Vibration, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button, Header, Toggle, useToast } from "@/components";
 import { INTERVALO_PARADERO_MS } from "@/config/simulacion";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
 import { getTramoViaje } from "@/data/repositorio";
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { ParaderoTramo } from "@/types";
 import { formatearEta } from "@/utils/formato";
 
@@ -17,6 +18,9 @@ const PROXIMOS_VISIBLES = 3;
 
 // F1_09 · En tránsito (a bordo)
 export default function ABordo() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { mostrar } = useToast();
   const { viaje, avanzarParadero, finalizar, setAvisarParaBajar } = useViaje();
@@ -99,7 +103,7 @@ export default function ABordo() {
       <Header
         leading={
           <View style={styles.enVivo}>
-            <Play color={colors.ink} size={sizes.chipIcon} />
+            <Play color={colors.onYellow} size={sizes.chipIcon} />
           </View>
         }
         eyebrow="A bordo"
@@ -184,78 +188,79 @@ export default function ABordo() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  enVivo: {
-    width: sizes.indicadorViaje,
-    height: sizes.indicadorViaje,
-    borderRadius: radii.badge,
-    backgroundColor: colors.yellow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cargando: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  contenido: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  progreso: {
-    gap: spacing.xs,
-  },
-  fila: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: sizes.timelineRowPaddingY,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-  },
-  punto: {
-    width: sizes.timelineDot,
-    height: sizes.timelineDot,
-    borderRadius: radii.pill,
-    borderWidth: borderWidths.regular,
-    borderColor: colors.ink,
-    backgroundColor: colors.ink,
-  },
-  puntoProximo: {
-    backgroundColor: colors.yellow,
-  },
-  puntoDestino: {
-    backgroundColor: colors.red,
-  },
-  nombre: {
-    flex: 1,
-  },
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    padding: sizes.cardPadding,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  cardTexto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  pie: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    enVivo: {
+      width: sizes.indicadorViaje,
+      height: sizes.indicadorViaje,
+      borderRadius: radii.badge,
+      backgroundColor: colors.yellow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cargando: {
+      flex: 1,
+      justifyContent: "center",
+    },
+    contenido: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.lg,
+    },
+    progreso: {
+      gap: spacing.xs,
+    },
+    fila: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: sizes.timelineRowPaddingY,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+    },
+    punto: {
+      width: sizes.timelineDot,
+      height: sizes.timelineDot,
+      borderRadius: radii.pill,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.ink,
+      backgroundColor: colors.ink,
+    },
+    puntoProximo: {
+      backgroundColor: colors.yellow,
+    },
+    puntoDestino: {
+      backgroundColor: colors.red,
+    },
+    nombre: {
+      flex: 1,
+    },
+    card: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      padding: sizes.cardPadding,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    cardTexto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    pie: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

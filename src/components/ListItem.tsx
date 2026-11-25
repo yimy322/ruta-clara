@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, opacity, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 type ListItemProps = {
@@ -32,6 +33,9 @@ export function ListItem({
   enTarjeta = false,
   amplio = false,
 }: ListItemProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const content = (
     <>
       {badge != null && (
@@ -86,47 +90,48 @@ export function ListItem({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.surface,
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.line,
-  },
-  destacado: {
-    backgroundColor: colors.yellowSoft,
-  },
-  enTarjeta: {
-    paddingHorizontal: 0,
-    paddingVertical: spacing.sm,
-  },
-  amplio: {
-    paddingVertical: spacing.md,
-  },
-  badge: {
-    width: sizes.badge,
-    height: sizes.badge,
-    borderRadius: radii.badge,
-    backgroundColor: colors.canvas,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  text: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+      borderBottomWidth: borderWidths.thin,
+      borderBottomColor: colors.line,
+    },
+    destacado: {
+      backgroundColor: colors.yellowSoft,
+    },
+    enTarjeta: {
+      paddingHorizontal: 0,
+      paddingVertical: spacing.sm,
+    },
+    amplio: {
+      paddingVertical: spacing.md,
+    },
+    badge: {
+      width: sizes.badge,
+      height: sizes.badge,
+      borderRadius: radii.badge,
+      backgroundColor: colors.canvas,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
+    text: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

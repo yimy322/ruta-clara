@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Animated, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colors, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { radii, sizes, spacing, type Tema } from "@/theme";
 
 const DURACION_MS = 2500;
 const ANIMACION_MS = 200;
@@ -17,6 +18,9 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 // ubica por encima de la barra inferior y de los botones fijos. Un mensaje
 // nuevo reemplaza al anterior y reinicia el tiempo.
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const insets = useSafeAreaInsets();
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [visibilidad] = useState(() => new Animated.Value(0));
@@ -65,18 +69,19 @@ export function useToast() {
   return context;
 }
 
-const styles = StyleSheet.create({
-  base: {
-    position: "absolute",
-    alignSelf: "center",
-    maxWidth: "90%",
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
-  },
-  texto: {
-    color: colors.surface,
-    textAlign: "center",
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      position: "absolute",
+      alignSelf: "center",
+      maxWidth: "90%",
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderRadius: radii.pill,
+      backgroundColor: colors.ink,
+    },
+    texto: {
+      color: colors.surface,
+      textAlign: "center",
+    },
+  });

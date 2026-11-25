@@ -2,7 +2,8 @@ import type { LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, radii, sizes, spacing, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 
 type Tamano = "compacto" | "normal" | "grande";
 
@@ -28,11 +29,11 @@ const CIRCULO: Record<Tamano, { circulo: number; icono: number }> = {
   grande: { circulo: sizes.estadoCirculoGrande, icono: sizes.estadoIconoGrande },
 };
 
-const TONO = {
+const tonos = (colors: Paleta) => ({
   aviso: { fondo: colors.yellowSoft, icono: colors.ink },
   error: { fondo: colors.redSoft, icono: colors.redStrong },
   neutro: { fondo: colors.map, icono: colors.inkMuted },
-} as const;
+  });
 
 // Estado vacío, de error o de aviso a pantalla completa (E1–E9): señal visual
 // en un círculo, título, explicación y acciones para salir del estado.
@@ -46,8 +47,11 @@ export function EstadoPantalla({
   acciones,
   children,
 }: EstadoPantallaProps) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { circulo, icono } = CIRCULO[tamano];
-  const colores = TONO[tono];
+  const colores = tonos(colors)[tono];
 
   return (
     <View style={styles.base}>
@@ -68,30 +72,31 @@ export function EstadoPantalla({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    alignItems: "center",
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xl,
-  },
-  circulo: {
-    borderRadius: radii.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  centro: {
-    textAlign: "center",
-  },
-  acciones: {
-    alignSelf: "stretch",
-    gap: spacing.md,
-    paddingTop: spacing.sm,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    base: {
+      alignItems: "center",
+      gap: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.xl,
+    },
+    circulo: {
+      borderRadius: radii.pill,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    centro: {
+      textAlign: "center",
+    },
+    acciones: {
+      alignSelf: "stretch",
+      gap: spacing.md,
+      paddingTop: spacing.sm,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

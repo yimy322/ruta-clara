@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { borderWidths, colors, minTouch, opacity, radii, sizes, typography } from "@/theme";
+import { useEstilos, useTema } from "@/context/TemaContext";
+import { borderWidths, minTouch, opacity, radii, sizes, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type ChipState = "default" | "selected" | "live" | "alert";
@@ -21,6 +22,10 @@ const hitSlop = { top: verticalSlop, bottom: verticalSlop };
 // Chip píldora de 32 pt (Figma 69:459). Live = unidad en vivo (amarillo),
 // Alert = seguridad (rojo).
 export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
+  const { typography } = useTema();
+  const containerStyles = useEstilos(crearContainerStyles);
+  const labelStyles = useEstilos(crearLabelStyles);
+
   const content = (
     <>
       {icon != null && withIconDefaults(icon, { color: labelStyles[state].color, size: sizes.chipIcon })}
@@ -66,28 +71,31 @@ const styles = StyleSheet.create({
 
 // Solo Default lleva borde en Figma; en los demás el borde es transparente
 // para que el chip no cambie de tamaño al seleccionarlo.
-const containerStyles = StyleSheet.create({
-  default: {
-    backgroundColor: colors.surface,
-    borderColor: colors.line,
-  },
-  selected: {
-    backgroundColor: colors.ink,
-    borderColor: "transparent",
-  },
-  live: {
-    backgroundColor: colors.yellow,
-    borderColor: "transparent",
-  },
-  alert: {
-    backgroundColor: colors.redSoft,
-    borderColor: "transparent",
-  },
-});
+const crearContainerStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    default: {
+      backgroundColor: colors.surface,
+      borderColor: colors.line,
+    },
+    selected: {
+      backgroundColor: colors.ink,
+      borderColor: "transparent",
+    },
+    live: {
+      backgroundColor: colors.yellow,
+      borderColor: "transparent",
+    },
+    alert: {
+      backgroundColor: colors.redSoft,
+      borderColor: "transparent",
+    },
+  });
 
-const labelStyles = StyleSheet.create({
-  default: { color: colors.ink },
-  selected: { color: colors.surface },
-  live: { color: colors.ink },
-  alert: { color: colors.redStrong },
-});
+const crearLabelStyles = ({ colors }: Tema) =>
+  StyleSheet.create({
+    default: { color: colors.ink },
+    selected: { color: colors.surface },
+    // Sobre amarillo el texto es siempre oscuro, también en el tema oscuro
+    live: { color: colors.onYellow },
+    alert: { color: colors.redStrong },
+  });

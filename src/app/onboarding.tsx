@@ -15,9 +15,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Paginador } from "@/components";
 import { usePreferencias } from "@/context/PreferenciasContext";
-import { borderWidths, colors, minTouch, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, minTouch, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 
 const ilustracionRutas = require("../../assets/images/onboarding-1.png");
 const ilustracionReportes = require("../../assets/images/onboarding-2.png");
@@ -26,6 +27,9 @@ const TOTAL_PAGINAS = 2;
 
 // F1_02 · Onboarding 1 y F1_03 · Onboarding 2, en páginas deslizables
 export default function Onboarding() {
+  const { colors } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const { width } = useWindowDimensions();
   const { completarOnboarding } = usePreferencias();
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -119,6 +123,8 @@ export default function Onboarding() {
 }
 
 function Enlace({ label, onPress }: { label: string; onPress: () => void }) {
+  const styles = useEstilos(crearEstilos);
+
   return (
     <Pressable
       onPress={onPress}
@@ -131,6 +137,8 @@ function Enlace({ label, onPress }: { label: string; onPress: () => void }) {
 }
 
 function Ilustracion({ source, alto }: { source: number; alto: number }) {
+  const styles = useEstilos(crearEstilos);
+
   return (
     <View style={[styles.ilustracion, { height: alto }]}>
       <Image source={source} style={styles.ilustracionImagen} resizeMode="cover" accessibilityIgnoresInvertColors />
@@ -138,89 +146,90 @@ function Ilustracion({ source, alto }: { source: number; alto: number }) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  pagina: {
-    flex: 1,
-  },
-  barra: {
-    flexDirection: "row",
-    paddingHorizontal: spacing.lg,
-  },
-  barraDerecha: {
-    justifyContent: "flex-end",
-  },
-  enlace: {
-    minHeight: minTouch,
-    justifyContent: "center",
-  },
-  enlaceTexto: {
-    ...typography.bodyStrong,
-    color: colors.ink,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  contenido: {
-    flex: 1,
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xl,
-  },
-  ilustracion: {
-    overflow: "hidden",
-    borderRadius: radii.art,
-    borderWidth: borderWidths.thin,
-    borderStyle: "dashed",
-    borderColor: colors.line,
-  },
-  ilustracionImagen: {
-    width: "100%",
-    height: "100%",
-  },
-  titulo: {
-    ...typography.h1,
-    color: colors.ink,
-  },
-  subtitulo: {
-    ...typography.body,
-    color: colors.inkMuted,
-  },
-  spacer: {
-    flex: 1,
-  },
-  filaSiguiente: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  paginadorCentrado: {
-    alignItems: "center",
-  },
-  prePermiso: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    padding: sizes.cardPadding,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  prePermisoIcono: {
-    width: sizes.prePermisoIcon,
-    height: sizes.prePermisoIcon,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: radii.pill,
-    backgroundColor: colors.canvas,
-  },
-  prePermisoTexto: {
-    ...typography.caption,
-    flex: 1,
-    color: colors.ink,
-  },
-});
+const crearEstilos = ({ colors, shadows, typography }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    pagina: {
+      flex: 1,
+    },
+    barra: {
+      flexDirection: "row",
+      paddingHorizontal: spacing.lg,
+    },
+    barraDerecha: {
+      justifyContent: "flex-end",
+    },
+    enlace: {
+      minHeight: minTouch,
+      justifyContent: "center",
+    },
+    enlaceTexto: {
+      ...typography.bodyStrong,
+      color: colors.ink,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+    contenido: {
+      flex: 1,
+      gap: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.xl,
+    },
+    ilustracion: {
+      overflow: "hidden",
+      borderRadius: radii.art,
+      borderWidth: borderWidths.thin,
+      borderStyle: "dashed",
+      borderColor: colors.line,
+    },
+    ilustracionImagen: {
+      width: "100%",
+      height: "100%",
+    },
+    titulo: {
+      ...typography.h1,
+      color: colors.ink,
+    },
+    subtitulo: {
+      ...typography.body,
+      color: colors.inkMuted,
+    },
+    spacer: {
+      flex: 1,
+    },
+    filaSiguiente: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    paginadorCentrado: {
+      alignItems: "center",
+    },
+    prePermiso: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      padding: sizes.cardPadding,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    prePermisoIcono: {
+      width: sizes.prePermisoIcon,
+      height: sizes.prePermisoIcon,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: radii.pill,
+      backgroundColor: colors.canvas,
+    },
+    prePermisoTexto: {
+      ...typography.caption,
+      flex: 1,
+      color: colors.ink,
+    },
+  });

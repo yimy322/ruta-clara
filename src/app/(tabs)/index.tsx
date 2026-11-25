@@ -23,14 +23,18 @@ import {
   getUbicacionUsuario,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { usePermisoUbicacion } from "@/hooks/usePermisoUbicacion";
-import { colors, opacity, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, LugarGuardado, Paradero, UnidadEnVivo } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 import { ICONO_LUGAR } from "@/utils/icons";
 
 // F1_04 · Inicio — Principal
 export default function Inicio() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const permiso = usePermisoUbicacion();
@@ -194,59 +198,60 @@ export default function Inicio() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.map,
-  },
-  capa: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-  },
-  buscador: {
-    flex: 1,
-    height: sizes.searchHeight,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.legendPadding,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  punto: {
-    position: "absolute",
-    top: -spacing.xs,
-    right: -spacing.xs,
-    width: sizes.badgeDot,
-    height: sizes.badgeDot,
-    borderRadius: radii.pill,
-    backgroundColor: colors.red,
-  },
-  accesos: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  abajo: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  acciones: {
-    alignItems: "flex-end",
-    gap: spacing.md,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.map,
+    },
+    capa: {
+      flex: 1,
+      justifyContent: "space-between",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    buscador: {
+      flex: 1,
+      height: sizes.searchHeight,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.legendPadding,
+      paddingHorizontal: spacing.md,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    punto: {
+      position: "absolute",
+      top: -spacing.xs,
+      right: -spacing.xs,
+      width: sizes.badgeDot,
+      height: sizes.badgeDot,
+      borderRadius: radii.pill,
+      backgroundColor: colors.red,
+    },
+    accesos: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    abajo: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    acciones: {
+      alignItems: "flex-end",
+      gap: spacing.md,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+    pressed: {
+      opacity: opacity.pressed,
+    },
+  });

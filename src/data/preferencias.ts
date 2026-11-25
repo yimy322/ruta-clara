@@ -21,6 +21,14 @@ export type Ajustes = {
   ahorroDatos: boolean;
   // Solo se guarda por ahora: la búsqueda de rutas todavía no lo usa
   evitarZonasRojas: boolean;
+  // Apariencia (4.6): "sistema" sigue el modo claro/oscuro del celular
+  tema: "sistema" | "claro" | "oscuro";
+  // Accesibilidad (4.8)
+  altoContraste: boolean;
+  // Tamaño del texto: 1 = 100 %, 2 = 200 %
+  escalaTexto: number;
+  reducirMovimiento: boolean;
+  senalesSinColor: boolean;
 };
 
 // Valores de F3_05 y F3_06
@@ -30,6 +38,11 @@ export const AJUSTES_POR_DEFECTO: Ajustes = {
   logrosPuntos: false,
   ahorroDatos: true,
   evitarZonasRojas: true,
+  tema: "sistema",
+  altoContraste: false,
+  escalaTexto: 1,
+  reducirMovimiento: false,
+  senalesSinColor: false,
 };
 
 export async function getOnboardingVisto(): Promise<boolean> {

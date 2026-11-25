@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Animated, BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
-import { colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { radii, sizes, spacing, type Tema } from "@/theme";
 import { formatearPuntos } from "@/utils/formato";
 import { calcularRango } from "@/utils/gamificacion";
 
@@ -23,6 +24,9 @@ type Params = {
 // por params, porque también se abre desde F1_10 (fuera del ReporteProvider
 // del flujo de reporte).
 export default function Gracias() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const { cerrar, reiniciar } = useReporte();
   const params = useLocalSearchParams<Params>();
@@ -94,7 +98,7 @@ export default function Gracias() {
       <ScrollView contentContainerStyle={styles.contenido}>
         <Animated.View style={[styles.halo, { transform: [{ scale: escala }] }]}>
           <View style={styles.exito}>
-            <Check color={colors.ink} size={sizes.successGlyphLarge} strokeWidth={3} />
+            <Check color={colors.onYellow} size={sizes.successGlyphLarge} strokeWidth={3} />
           </View>
         </Animated.View>
 
@@ -137,60 +141,61 @@ export default function Gracias() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contenido: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.lg,
-  },
-  halo: {
-    width: sizes.successHalo,
-    height: sizes.successHalo,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellowSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  exito: {
-    width: sizes.successIconLarge,
-    height: sizes.successIconLarge,
-    borderRadius: radii.pill,
-    backgroundColor: colors.yellow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  card: {
-    alignSelf: "stretch",
-    gap: spacing.sm,
-    padding: sizes.cardPadding,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  cardFila: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: spacing.sm,
-  },
-  pie: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    contenido: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.lg,
+    },
+    halo: {
+      width: sizes.successHalo,
+      height: sizes.successHalo,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellowSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    exito: {
+      width: sizes.successIconLarge,
+      height: sizes.successIconLarge,
+      borderRadius: radii.pill,
+      backgroundColor: colors.yellow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    card: {
+      alignSelf: "stretch",
+      gap: spacing.sm,
+      padding: sizes.cardPadding,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    cardFila: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    pie: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

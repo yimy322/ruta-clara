@@ -4,17 +4,21 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, IconButton, Mapa, PinUnidad, Toggle } from "@/components";
 import { CALLE_USUARIO, PRECISION_GPS_M } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { getLinea, getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
-import { borderWidths, colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Linea, Paradero } from "@/types";
 import { etiquetaOcupacion, etiquetaVelocidad } from "@/utils/formato";
 
 // F2_04 · Confirmar ubicación (paso 3 de 3)
 export default function ConfirmarUbicacion() {
+  const { typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { borrador, actualizar } = useReporte();
@@ -117,71 +121,72 @@ export default function ConfirmarUbicacion() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.map,
-  },
-  arriba: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  paso: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: sizes.stepPillPaddingY,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  centro: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sheet: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    borderWidth: borderWidths.regular,
-    borderBottomWidth: 0,
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
-  },
-  grabber: {
-    alignSelf: "center",
-    width: sizes.grabberWidth,
-    height: sizes.grabberHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.line,
-  },
-  direccion: {
-    gap: spacing.xxs,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  compartir: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  compartirTexto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.map,
+    },
+    arriba: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+    },
+    paso: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingVertical: sizes.stepPillPaddingY,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    centro: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sheet: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      borderTopLeftRadius: radii.xl,
+      borderTopRightRadius: radii.xl,
+      borderWidth: borderWidths.regular,
+      borderBottomWidth: 0,
+      borderColor: colors.ink,
+      backgroundColor: colors.surface,
+    },
+    grabber: {
+      alignSelf: "center",
+      width: sizes.grabberWidth,
+      height: sizes.grabberHeight,
+      borderRadius: radii.pill,
+      backgroundColor: colors.line,
+    },
+    direccion: {
+      gap: spacing.xxs,
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    compartir: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    compartirTexto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

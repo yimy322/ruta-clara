@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Chip, FilaAjuste, Header, ListItem } from "@/components";
 import { useColaReportes } from "@/context/ColaReportesContext";
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { buscarRutas } from "@/data/repositorio";
 import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
-import { colors, radii, spacing, typography } from "@/theme";
+import { radii, spacing, type Tema } from "@/theme";
 import type { OpcionRuta, TipoUnidad } from "@/types";
 import { formatearEta, formatearPasaje } from "@/utils/formato";
 
@@ -30,10 +32,14 @@ const INTERRUPTORES: { clave: keyof Simulacion; titulo: string; subtitulo: strin
 ];
 
 export default function Datos() {
+  const { colors } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const [opciones, setOpciones] = useState<OpcionRuta[] | null>(null);
   const [error, setError] = useState(false);
   const [simulacion, setEstadoSimulacion] = useState<Simulacion>(getSimulacion);
   const { reintentar } = useColaReportes();
+  const { ajustes, cambiarAjuste } = usePreferencias();
 
   const cambiar = (clave: keyof Simulacion, valor: boolean) => {
     setSimulacion({ [clave]: valor });
@@ -74,6 +80,15 @@ export default function Datos() {
             />
           ))}
         </View>
+        {/* Alto contraste: en 4.8 pasa a la pantalla de Accesibilidad */}
+        <View style={styles.card}>
+          <FilaAjuste
+            titulo="Alto contraste"
+            subtitulo="Paleta RC-HF-HC (P1)"
+            valor={ajustes.altoContraste}
+            onValueChange={(valor) => cambiarAjuste("altoContraste", valor)}
+          />
+        </View>
         <Text style={styles.seccion}>Rutas a {DESTINO}</Text>
         {error ? (
           <Text style={styles.muted}>No se pudieron cargar las rutas.</Text>
@@ -112,33 +127,34 @@ function describir(opcion: OpcionRuta) {
   return `${pasaje} · ${opcion.reportesActivos} reportes activos${ultimo}`;
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.canvas,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    overflow: "hidden",
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  seccion: {
-    ...typography.overline,
-    color: colors.inkMuted,
-  },
-  muted: {
-    ...typography.body,
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, typography }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.canvas,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.lg,
+      overflow: "hidden",
+    },
+    chips: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+    },
+    seccion: {
+      ...typography.overline,
+      color: colors.inkMuted,
+    },
+    muted: {
+      ...typography.body,
+      color: colors.inkMuted,
+    },
+  });

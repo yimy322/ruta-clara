@@ -4,11 +4,12 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, EstadoPantalla, IconButton, ItemNotificacion, useToast } from "@/components";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { useViaje } from "@/context/ViajeContext";
 import { getNotificaciones, getViajeDeAlerta, marcarNotificacionLeida } from "@/data/repositorio";
-import { colors, spacing, typography } from "@/theme";
+import { spacing, type Tema } from "@/theme";
 import type { Notificacion, TipoNotificacion } from "@/types";
 import { formatearDia, formatearHora } from "@/utils/formato";
 
@@ -61,6 +62,9 @@ type Estado = { tipo: "cargando" } | { tipo: "error" } | { tipo: "ok"; notificac
 
 // F3_04 · Centro de notificaciones
 export default function Alertas() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mostrar } = useToast();
@@ -257,52 +261,53 @@ export default function Alertas() {
   );
 }
 
-const styles = StyleSheet.create({
-  centroVertical: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  barra: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  filtrosScroll: {
-    flexGrow: 0,
-  },
-  filtros: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xs,
-  },
-  estado: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xl,
-  },
-  contenido: {
-    paddingBottom: spacing.lg,
-  },
-  seccion: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  centrado: {
-    textAlign: "center",
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    centroVertical: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    barra: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    filtrosScroll: {
+      flexGrow: 0,
+    },
+    filtros: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xs,
+    },
+    estado: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.lg,
+      paddingHorizontal: spacing.xl,
+    },
+    contenido: {
+      paddingBottom: spacing.lg,
+    },
+    seccion: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    centrado: {
+      textAlign: "center",
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

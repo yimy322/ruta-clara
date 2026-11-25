@@ -12,31 +12,35 @@ export const fonts = {
 // lineHeight 130 % en todos los RC/Type
 const lh = (size: number) => Math.round(size * 1.3);
 
-const style = (fontFamily: string, fontSize: number): TextStyle => ({
-  fontFamily,
-  fontSize,
-  lineHeight: lh(fontSize),
-});
+// RC/Type/* (Figma). `escala` es el tamaño de texto elegido en Accesibilidad
+// (1 = 100 %, 2 = 200 %). React Native además aplica el tamaño del sistema.
+export function crearTipografia(escala = 1) {
+  const style = (fontFamily: string, fontSize: number): TextStyle => ({
+    fontFamily,
+    fontSize: Math.round(fontSize * escala),
+    lineHeight: lh(fontSize * escala),
+  });
 
-// RC/Type/* (Figma)
-export const typography = {
-  display: style(fonts.bold, 40),
-  h1: style(fonts.bold, 22),
-  h2: style(fonts.bold, 18),
-  title: style(fonts.semiBold, 15),
-  body: style(fonts.regular, 14),
-  bodyStrong: style(fonts.semiBold, 14),
-  // Nombre de la línea en el selector de ruta (F3_03)
-  bodyBold: style(fonts.bold, 14),
-  caption: style(fonts.regular, 12),
-  captionStrong: style(fonts.semiBold, 12),
-  overline: {
-    ...style(fonts.semiBold, 11),
-    textTransform: "uppercase",
-    letterSpacing: 0.66, // 6 % de 11
-  },
-  button: style(fonts.semiBold, 15),
-  tab: style(fonts.medium, 11),
-} satisfies Record<string, TextStyle>;
+  return {
+    display: style(fonts.bold, 40),
+    h1: style(fonts.bold, 22),
+    h2: style(fonts.bold, 18),
+    title: style(fonts.semiBold, 15),
+    body: style(fonts.regular, 14),
+    bodyStrong: style(fonts.semiBold, 14),
+    // Nombre de la línea en el selector de ruta (F3_03)
+    bodyBold: style(fonts.bold, 14),
+    caption: style(fonts.regular, 12),
+    captionStrong: style(fonts.semiBold, 12),
+    overline: {
+      ...style(fonts.semiBold, 11),
+      textTransform: "uppercase",
+      letterSpacing: 0.66, // 6 % de 11
+    },
+    button: style(fonts.semiBold, 15),
+    tab: style(fonts.medium, 11),
+  } satisfies Record<string, TextStyle>;
+}
 
-export type TypographyToken = keyof typeof typography;
+export type Tipografia = ReturnType<typeof crearTipografia>;
+export type TypographyToken = keyof Tipografia;

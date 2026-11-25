@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, EstadoPantalla, IconButton, useToast } from "@/components";
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { useColaReportes } from "@/context/ColaReportesContext";
 import { useReporte } from "@/context/ReporteContext";
 import { getLinea } from "@/data/repositorio";
-import { colors, radii, sizes, spacing, typography } from "@/theme";
+import { radii, sizes, spacing, type Tema } from "@/theme";
 import type { Linea, TipoReporte } from "@/types";
 import { etiquetaReporteRapido, formatearHora } from "@/utils/formato";
 
@@ -27,6 +28,9 @@ const ICONO: Record<TipoReporte, LucideIcon> = {
 // E3 · Reporte sin conexión: el reporte quedó en la cola del dispositivo y
 // se enviará solo cuando vuelva la señal (ColaReportesProvider).
 export default function SinConexion() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { cerrar } = useReporte();
@@ -119,58 +123,59 @@ export default function SinConexion() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.canvas,
-  },
-  arriba: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: spacing.lg,
-  },
-  contenido: {
-    flexGrow: 1,
-  },
-  tarjeta: {
-    alignSelf: "stretch",
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-  },
-  fila: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  insignia: {
-    width: sizes.badge,
-    height: sizes.badge,
-    borderRadius: radii.badge,
-    backgroundColor: colors.canvas,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  texto: {
-    flex: 1,
-    gap: spacing.xxs,
-  },
-  puntos: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.chipGap,
-  },
-  pie: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.canvas,
+    },
+    arriba: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      paddingHorizontal: spacing.lg,
+    },
+    contenido: {
+      flexGrow: 1,
+    },
+    tarjeta: {
+      alignSelf: "stretch",
+      gap: spacing.md,
+      padding: spacing.lg,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+    },
+    fila: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    insignia: {
+      width: sizes.badge,
+      height: sizes.badge,
+      borderRadius: radii.badge,
+      backgroundColor: colors.canvas,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    texto: {
+      flex: 1,
+      gap: spacing.xxs,
+    },
+    puntos: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.chipGap,
+    },
+    pie: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });

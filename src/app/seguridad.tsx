@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, IconButton, Mapa, Toggle } from "@/components";
 import { VENTANAS_SEGURIDAD_H } from "@/config/reportes";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getUbicacionUsuario, getZonasSeguridad } from "@/data/repositorio";
-import { colors, radii, shadows, sizes, spacing, typography } from "@/theme";
+import { radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 import type { Coordenada, NivelZona, TipoSeguridad, ZonaSeguridad } from "@/types";
 import { cantidadReportes, haceCuanto, seguridadEnFrase } from "@/utils/formato";
 
@@ -22,7 +23,7 @@ const FILTROS: { valor: TipoSeguridad | null; label: string }[] = [
 ];
 
 // Leyenda: punto de color + texto (el nivel nunca depende solo del color)
-const LEYENDA: { label: string; color: string }[] = [
+const leyenda = (colors: Paleta): { label: string; color: string }[] => [
   { label: "Alto", color: colors.red },
   { label: "Medio", color: colors.amber },
   { label: "Sin reportes", color: colors.inkMuted },
@@ -40,6 +41,9 @@ type Estado = ZonaSeguridad[] | null | undefined;
 // paradero. Desde el chip Seguridad de Inicio, el menú lateral o un aviso de
 // seguridad (param `paraderoId`: la hoja muestra ese paradero).
 export default function Seguridad() {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { paraderoId } = useLocalSearchParams<{ paraderoId?: string }>();
@@ -141,7 +145,7 @@ export default function Seguridad() {
               />
             </View>
             <View style={styles.leyenda} accessibilityLabel="Leyenda: rojo alto, ámbar medio, gris sin reportes">
-              {LEYENDA.map(({ label, color }) => (
+              {leyenda(colors).map(({ label, color }) => (
                 <View key={label} style={styles.leyendaFila}>
                   <View style={[styles.leyendaPunto, { backgroundColor: color }]} />
                   <Text style={[typography.caption, styles.ink]}>{label}</Text>
@@ -180,6 +184,9 @@ function Hoja({
   horas: number;
   onReintentar: () => void;
 }) {
+  const { colors, typography } = useTema();
+  const styles = useEstilos(crearEstilos);
+
   if (estado === undefined) {
     return <ActivityIndicator color={colors.ink} style={styles.cargando} />;
   }
@@ -222,93 +229,94 @@ function Hoja({
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.map,
-  },
-  capa: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-  },
-  titulo: {
-    flex: 1,
-    gap: spacing.xxs,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + spacing.xxs,
-    borderRadius: radii.control,
-    backgroundColor: colors.surface,
-    ...shadows.card,
-  },
-  filtros: {
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  acciones: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  leyenda: {
-    gap: spacing.xs,
-    padding: sizes.legendPadding,
-    borderRadius: radii.lg,
-    backgroundColor: colors.canvas,
-  },
-  leyendaFila: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.chipGap,
-  },
-  leyendaPunto: {
-    width: sizes.legendDot,
-    height: sizes.legendDot,
-    borderRadius: radii.pill,
-  },
-  hoja: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    backgroundColor: colors.surface,
-    ...shadows.sheet,
-  },
-  grabber: {
-    alignSelf: "center",
-    width: sizes.grabberWidth,
-    height: sizes.grabberHeight,
-    borderRadius: radii.pill,
-    backgroundColor: colors.line,
-  },
-  fila: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  texto: {
-    gap: spacing.xxs,
-  },
-  flex: {
-    flex: 1,
-  },
-  cargando: {
-    alignSelf: "flex-start",
-    marginVertical: spacing.sm,
-  },
-  ink: {
-    color: colors.ink,
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
-});
+const crearEstilos = ({ colors, shadows }: Tema) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.map,
+    },
+    capa: {
+      flex: 1,
+      justifyContent: "space-between",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    titulo: {
+      flex: 1,
+      gap: spacing.xxs,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + spacing.xxs,
+      borderRadius: radii.control,
+      backgroundColor: colors.surface,
+      ...shadows.card,
+    },
+    filtros: {
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    acciones: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    leyenda: {
+      gap: spacing.xs,
+      padding: sizes.legendPadding,
+      borderRadius: radii.lg,
+      backgroundColor: colors.canvas,
+    },
+    leyendaFila: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.chipGap,
+    },
+    leyendaPunto: {
+      width: sizes.legendDot,
+      height: sizes.legendDot,
+      borderRadius: radii.pill,
+    },
+    hoja: {
+      gap: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      borderTopLeftRadius: radii.xl,
+      borderTopRightRadius: radii.xl,
+      backgroundColor: colors.surface,
+      ...shadows.sheet,
+    },
+    grabber: {
+      alignSelf: "center",
+      width: sizes.grabberWidth,
+      height: sizes.grabberHeight,
+      borderRadius: radii.pill,
+      backgroundColor: colors.line,
+    },
+    fila: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    texto: {
+      gap: spacing.xxs,
+    },
+    flex: {
+      flex: 1,
+    },
+    cargando: {
+      alignSelf: "flex-start",
+      marginVertical: spacing.sm,
+    },
+    ink: {
+      color: colors.ink,
+    },
+    muted: {
+      color: colors.inkMuted,
+    },
+  });
