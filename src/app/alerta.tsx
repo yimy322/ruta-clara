@@ -1,5 +1,5 @@
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useLocalSearchParams, useNavigation, usePreventRemove, useRouter } from "expo-router";
+import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
 import { ChevronDown, CircleAlert, X } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { AccessibilityInfo, ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -87,7 +87,6 @@ export default function Alerta() {
   const styles = useEstilos(crearEstilos);
 
   const router = useRouter();
-  const navigation = useNavigation();
   const { id, paraderoId } = useLocalSearchParams<{ id?: string; paraderoId?: string }>();
   const { mostrar } = useToast();
 
@@ -97,6 +96,8 @@ export default function Alerta() {
   const [guardando, setGuardando] = useState(false);
   // Ya se guardó o eliminó: se cierra sin pedir confirmación
   const [cerrando, setCerrando] = useState(false);
+  // Se tocó «Descartar»: se deja salir sin volver a preguntar
+  const [descartado, setDescartado] = useState(false);
 
   const cargar = useCallback(() => {
     let activo = true;
@@ -148,10 +149,18 @@ export default function Alerta() {
   const hayCambios = carga.tipo === "ok" && form !== null && !iguales(form, carga.inicial);
 
   // ✕, gesto de bajar el modal o atrás de Android con cambios sin guardar
-  usePreventRemove(hayCambios && !cerrando, ({ data }) => {
+  // SDK 58: para continuar la salida bloqueada se apaga la condición y se llama a repeat()
+  usePreventRemove(hayCambios && !cerrando && !descartado, ({ repeat }) => {
     Alert.alert("¿Descartar cambios?", "Lo que cambiaste en la alerta no se guardará.", [
       { text: "Seguir editando", style: "cancel" },
-      { text: "Descartar", style: "destructive", onPress: () => navigation.dispatch(data.action) },
+      {
+        text: "Descartar",
+        style: "destructive",
+        onPress: () => {
+          setDescartado(true);
+          repeat();
+        },
+      },
     ]);
   });
 

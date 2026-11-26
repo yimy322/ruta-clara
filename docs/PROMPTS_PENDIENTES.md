@@ -22,7 +22,7 @@ Actualizado: **22 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 5 | 4.7 · Estados E1–E10 | ✅ ejecutado el 25/11 |
 | 6 | 4.6 + 4.8 · Tema dinámico y módulo de accesibilidad | ✅ (26/11) |
 | 7 | 4.9 · Cuenta y eliminación de cuenta | ✅ (26/11) |
-| 8 | Revisión de SDK 58 (si no se hizo) | ❓ |
+| 8 | Revisión de SDK 58 (si no se hizo) | ✅ (26/11) |
 | — | Fases 5, 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 ---

@@ -72,6 +72,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 
 Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext). Toda ruta nueva debe declararse dentro del grupo protegido.
 Cerrar sesión: `useCerrarSesion()` (/src/hooks) pide confirmación y vuelve al onboarding.
+Confirmar antes de salir: `usePreventRemove(condición, ({ repeat }) => …)`; para dejar salir, poner la condición en false y llamar a `repeat()` (SDK 58; no usar `navigation.dispatch(data.action)`).
 Cerrar el modal de reporte desde cualquier paso: `cerrar()` de `useReporte()` (`router.dismissAll()` solo vuelve al primer paso del stack anidado).
 Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.
 SafeAreaView en todas las pantallas: Header ya cubre el borde superior y BottomNav el inferior, así que se usan `edges` (tabs: left/right; stack y modales: left/right/bottom).

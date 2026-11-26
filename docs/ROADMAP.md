@@ -36,7 +36,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 1.1–1.6 | Entorno, Expo, Figma MCP, CLAUDE.md | ✅ |
 | 2.1–2.5 | Tokens, componentes, catálogo, ESLint | ✅ |
 | 3.1–3.5B | Flujo 1 completo + onboarding y permisos | ✅ / 🟢 |
-| I3 | Actualización a SDK 58 | ✅ commit `353ee42` en `main` y subido; doctor 20/20 (22/11) |
+| I3 | Actualización a SDK 58 | ✅ commit `353ee42` en `main` y subido; doctor 20/20 (22/11); changelog revisado (26/11) |
 | R1 | README y `.gitignore` | ✅ subidos; «Avance» actualizado el 22/11 |
 | 4.1A–B | Reporte de ubicación (F2_01–F2_04, F2_08) | ✅ |
 | 4.2A | Paradero (F2_05) + Tránsito (F2_06) | ✅ |
@@ -99,7 +99,7 @@ El Proyecto Final evalúa un **MVP funcional, usable e innovador**, no solo la a
 
 ## Fases 1–3 · Entorno, sistema de diseño y Flujo 1
 ✅ Completas. Detalle histórico en `RUTACLARA_CONTEXT.md` (§6 y §10). Pendientes menores de esa etapa:
-- I3: la actualización está en `main` (no existe rama aparte). No consta si se hizo la revisión del changelog (prompt 8 de `PROMPTS_PENDIENTES.md`); tsc, lint y doctor pasan.
+- I3: la actualización está en `main` (no existe rama aparte). Revisión del changelog hecha el 26/11 (prompt 8): el único cambio necesario fue `usePreventRemove` en `alerta.tsx` (condición en false + `repeat()`); lo demás (Stack.Protected, safe-area, gesture-handler v3, svg, lucide, splash, RN 0.88) no afecta al código.
 - R1: la tabla «Equipo» del README lleva solo al usuario (proyecto individual).
 
 ## Fase 4 · Flujos 2 y 3 + alta fidelidad en código
