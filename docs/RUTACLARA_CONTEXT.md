@@ -1,6 +1,6 @@
 # RUTACLARA_CONTEXT.md
 
-Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualizado el **22 de noviembre de 2026**. Úsalo junto con `ROADMAP.md` (estado de cada paso) y `PROMPTS_PENDIENTES.md` (prompts listos para Claude Code).
+Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualizado el **26 de noviembre de 2026**. Úsalo junto con `ROADMAP.md` (estado de cada paso) y `PROMPTS_PENDIENTES.md` (prompts listos para Claude Code).
 
 ## 0. Cómo leer este documento
 
@@ -119,20 +119,21 @@ src/
 │   ├── alerta.tsx       # F3_03 (modal; params paraderoId | id)
 │   ├── viaje/           # espera, a-bordo, fin
 │   ├── reporte/         # _layout (Stack + ReporteProvider): index, linea, estado, ubicacion, paradero, transito, seguridad, gracias
-│   ├── ajustes.tsx      # F3_05 (interruptores en PreferenciasContext.ajustes)
+│   ├── ajustes.tsx      # F3_05 (interruptores en PreferenciasContext.ajustes; Apariencia Sistema/Claro/Oscuro)
+│   ├── accesibilidad.tsx # A1/A2 (texto, alto contraste, reducir movimiento, señales sin color)
 │   ├── seguridad.tsx    # F3_06 (param opcional paraderoId)
 │   ├── onboarding.tsx, buscar.tsx, rutas.tsx
 │   └── dev/             # catalogo, datos (solo __DEV__)
 ├── components/          # Base: Button, Chip, IconButton (tono="destacado" | "seguridad"), Toggle, Tile, ListItem, Header, BottomNav (badge), Mapa, Segmented, Toast (+ ToastProvider)
 │                        # Pantallas: BannerUbicacion, BarraProgreso, BotonMantener, CardParadero, CardRuta, GraficoAfluencia,
 │                        # ItemNotificacion, OpcionGrande, OpcionRadio, Paginador, PantallaCarga, PinUnidad, PlaceholderScreen,
-│                        # TarjetaDato, TarjetaEstadistica · F3: Avatar, FilaAjuste, MenuLateral (F3_07, Modal sobre Inicio)
+│                        # TarjetaDato, TarjetaEstadistica · F3: Avatar, FilaAjuste, MenuLateral (F3_07, Modal sobre Inicio) · 4.8: PildoraNivel
 │                        # index.ts (barril)
-├── context/             # ViajeContext, ReporteContext, NotificacionesContext, PreferenciasContext
-├── hooks/               # usePermisoUbicacion, useEnviarReporte, useCerrarSesion
+├── context/             # ViajeContext, ReporteContext, NotificacionesContext, PreferenciasContext, TemaContext (useTema, useEstilos)
+├── hooks/               # usePermisoUbicacion, useEnviarReporte, useCerrarSesion, useReducirMovimiento
 ├── data/                # repositorio.ts (única puerta a los datos), preferencias.ts
 ├── config/              # gamificacion.ts, reportes.ts, simulacion.ts
-├── mocks/  theme/ (colors, spacing, typography)  types/  utils/
+├── mocks/  theme/ (colors: paletas clara/oscura/alto contraste, shadows: crearSombras, typography: crearTipografia, spacing)  types/  utils/
 ```
 
 **Principios:**
@@ -153,6 +154,8 @@ src/
 - **4.7:** `EstadoPantalla` y `EsqueletoRuta`; `sugerirDestino` (Levenshtein ≤ 3); `Linea.suspendida` (La 73, E9); cola `src/data/colaReportes.ts` + `ColaReportesProvider`; modo de prueba `src/data/simulacion.ts` (interruptores en /dev/datos); dependencia `@react-native-community/netinfo`.
 - **4.5C:** `OpcionGrande`/`OpcionRadio` como tarjetas con sombra (radio elegido en redSoft + borde red); `BotonMantener` con `shadows.danger`; `PinUnidad` con ícono Radio y prop `pista`; `ItemNotificacion` con caja canvas (seguridad: círculo redSoft con borde red); `ListItem amplio`; `typography.bodyBold`. Íconos de avisos: Bus, Split, TrafficCone, TriangleAlert, Star relleno.
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
+- **4.6:** estilos por tema: `const crearEstilos = ({ colors, shadows, typography }: Tema) => StyleSheet.create({...})` + `useEstilos(crearEstilos)`; `@/theme` ya no exporta `colors`, `shadows` ni `typography` estáticos. Texto sobre amarillo: `colors.onYellow`. `Ajustes` suma `tema`, `altoContraste`, `escalaTexto` (1–2), `reducirMovimiento`, `senalesSinColor`; `cambiarAjuste` es genérico.
+- **4.8:** `/accesibilidad`; alturas fijas de controles pasan a `minHeight` (texto al 200 % sin cortes) y botones/títulos admiten 2 líneas; `useReducirMovimiento()` = preferencia de la app ∨ del sistema (splash, Toast, Gracias, MenuLateral).
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.
 
 **Contexts:** `ViajeContext` (linea, paraderoEspera, destino, sentido, estado, avisarParaBajar, finEn…), `ReporteContext` (tipo, lineaId, enUnidad, ocupacion, velocidad, posicion, compartirEnVivo…), `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`), `PreferenciasContext` (`onboardingVisto`…), y `ToastProvider` (en `components/Toast.tsx`).
@@ -245,9 +248,9 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | avenue | #F7F1D6 | scrim | #000 al 45 % |
 | controlOff | #8E8D87 (Toggle apagado, 3,3:1) | | |
 
-**Oscuro (`RC-HF-Dark/*`, propuesta):** ink #F2F1EC, inkMuted #A3A29C, line #3A3A37, surface #1F1F1D, canvas #141413, map #22221F, yellow #FFE15C, yellowSoft #3A3212, red #FF6B57, redSoft #3D1E1A, blue #5B9BEB, park #1F2A1E, block #2A2A27, avenue #3A3524, controlOff #7A7974, **onYellow #1C1C1C** (el texto sobre amarillo siempre es oscuro). Botón primario invertido (claro con texto oscuro).
+**Oscuro (`RC-HF-Dark/*`, propuesta):** ink #F2F1EC, inkMuted #A3A29C, line #3A3A37, surface #1F1F1D, canvas #141413, map #22221F, yellow #FFE15C, yellowSoft #3A3212, red #FF6B57, redSoft #3D1E1A, blue #5B9BEB, park #1F2A1E, block #2A2A27, avenue #3A3524, controlOff #7A7974, yellowDeep #E8B400, blueHalo #5B9BEB al 22 %, **onYellow #1C1C1C** (el texto sobre amarillo siempre es oscuro). Botón primario invertido (claro con texto oscuro). Sombras negras más fuertes. Sin valor en Figma (`// supuesto` en el código): redStrong = red, inkPressed #D9D8D2, amber igual que en claro, scrim negro al 60 %, redDeep #E0533F.
 
-**Alto contraste (`RC-HF-HC/*`):** ink #000000, inkMuted #333333, line #000000, surface/canvas #FFFFFF, red #A3271A, redStrong #8F1F14, blue #1453A8, yellowDeep #7A5E00, controlOff #555555. Sin sombras; tarjetas con borde ink de 2 px.
+**Alto contraste (`RC-HF-HC/*`):** ink #000000, inkMuted #333333, line #000000, surface/canvas #FFFFFF, red #A3271A, redStrong #8F1F14, blue #1453A8, yellowDeep #7A5E00, redSoft #FBE3DF, map #EDEDED, park #BFD9B0, block #C9C9C9, avenue #E3D9A8, controlOff #555555. Solo sobre el tema claro. **Mantiene las sombras** (según Figma) y suma un borde negro de 2 en tarjetas, botones flotantes, buscador y FAB.
 
 **Sombras:** card (0 1 2 ink 6 % + 0 8 24 ink 8 %), float (… 12 %), sheet (0 −8 24, 8 %), pin (0 6 16, 18 %), primary (0 8 20, 20 %), danger (0 10 24 red 35 %). **Anillo de foco:** separación blanca de 2 px + azul de 4 px.
 
@@ -291,10 +294,10 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | F3_05 | `/ajustes` | Stack ✅ |
 | F3_06 | `/seguridad` | Stack ✅ |
 | F3_07 | `MenuLateral` (componente, ☰ de Inicio) | Modal ✅ |
-| A1/A2 | `/accesibilidad` (propuesta) | 4.8 |
+| A1/A2 | `/accesibilidad` | Stack ✅ |
 | D1–D5 | `/cuenta`, `/cuenta/eliminar/*` (propuesta) | 4.9 |
 
-**TODO pendientes en el código (verificado el 24/11/2026):** Accesibilidad desde Ajustes (4.8); Mi cuenta desde la fila de perfil (4.9); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
+**TODO pendientes en el código (verificado el 26/11/2026):** Mi cuenta desde la fila de perfil (4.9); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
 
 ---
 

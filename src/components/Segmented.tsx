@@ -72,7 +72,8 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
     },
     opcion: {
       flex: 1,
-      height: sizes.segmentedHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.segmentedHeight,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: colors.surface,

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, Vibration, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button, Header, Toggle, useToast } from "@/components";
 import { INTERVALO_PARADERO_MS } from "@/config/simulacion";
@@ -20,6 +21,7 @@ const PROXIMOS_VISIBLES = 3;
 export default function ABordo() {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
+  const { ajustes } = usePreferencias();
 
   const router = useRouter();
   const { mostrar } = useToast();
@@ -155,7 +157,11 @@ export default function ABordo() {
                         style={[esProximo || esDestino ? typography.bodyStrong : typography.body, styles.ink, styles.nombre]}
                         numberOfLines={1}
                       >
-                        {esDestino ? `${paradero.nombre} · bajas aquí` : paradero.nombre}
+                        {esDestino
+                          ? `${paradero.nombre} · bajas aquí`
+                          : esProximo && ajustes.senalesSinColor
+                            ? `${paradero.nombre} · siguiente`
+                            : paradero.nombre}
                       </Text>
                       <Text style={[typography.caption, styles.muted]}>
                         {formatearEta(minutos - tramo[posicion].minutos)}

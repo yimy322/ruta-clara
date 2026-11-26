@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { borderWidths, minTouch, opacity, radii, sizes, type Tema } from "@/theme";
+import { borderWidths, minTouch, opacity, radii, sizes, type Tema, spacing } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
 
 export type ChipState = "default" | "selected" | "live" | "alert";
@@ -54,8 +54,10 @@ export function Chip({ label, state = "default", icon, onPress }: ChipProps) {
 
 const styles = StyleSheet.create({
   base: {
-    height: sizes.chipHeight,
+    // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+    minHeight: sizes.chipHeight,
     paddingHorizontal: sizes.chipPaddingX,
+    paddingVertical: spacing.xs,
     borderRadius: radii.pill,
     borderWidth: borderWidths.thin,
     flexDirection: "row",

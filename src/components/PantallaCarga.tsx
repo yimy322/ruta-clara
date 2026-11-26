@@ -10,26 +10,35 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useReducirMovimiento } from "@/hooks/useReducirMovimiento";
 import { useEstilos } from "@/context/TemaContext";
 import { radii, sizes, spacing, type Tema, paletaClara } from "@/theme";
 
 const isotipo = require("../../assets/images/isotipo.png");
 
 const DURACION_BARRIDO_MS = 1200;
+// Posición del relleno cuando no se anima (centrado en la pista)
+const BARRA_QUIETA = 0.5;
 
 // F1_01 · Splash / Carga. La muestra el layout raíz mientras cargan las
 // fuentes y las preferencias locales; no es una ruta.
 export function PantallaCarga() {
   const styles = useEstilos(crearEstilos);
 
+  const reducirMovimiento = useReducirMovimiento();
   const avance = useSharedValue(0);
 
   useEffect(() => {
+    // Con «reducir movimiento» la barra queda quieta, a media pista
+    if (reducirMovimiento) {
+      avance.value = BARRA_QUIETA;
+      return;
+    }
     avance.value = withRepeat(
       withTiming(1, { duration: DURACION_BARRIDO_MS, easing: Easing.inOut(Easing.quad) }),
       -1,
     );
-  }, [avance]);
+  }, [avance, reducirMovimiento]);
 
   // El relleno entra por la izquierda y sale por la derecha del riel
   const rellenoStyle = useAnimatedStyle(() => ({

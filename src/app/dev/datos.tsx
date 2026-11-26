@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { Chip, FilaAjuste, Header, ListItem } from "@/components";
 import { useColaReportes } from "@/context/ColaReportesContext";
-import { usePreferencias } from "@/context/PreferenciasContext";
 import { buscarRutas } from "@/data/repositorio";
 import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
 import { radii, spacing, type Tema } from "@/theme";
@@ -39,7 +38,6 @@ export default function Datos() {
   const [error, setError] = useState(false);
   const [simulacion, setEstadoSimulacion] = useState<Simulacion>(getSimulacion);
   const { reintentar } = useColaReportes();
-  const { ajustes, cambiarAjuste } = usePreferencias();
 
   const cambiar = (clave: keyof Simulacion, valor: boolean) => {
     setSimulacion({ [clave]: valor });
@@ -79,15 +77,6 @@ export default function Datos() {
               onValueChange={(valor) => cambiar(clave, valor)}
             />
           ))}
-        </View>
-        {/* Alto contraste: en 4.8 pasa a la pantalla de Accesibilidad */}
-        <View style={styles.card}>
-          <FilaAjuste
-            titulo="Alto contraste"
-            subtitulo="Paleta RC-HF-HC (P1)"
-            valor={ajustes.altoContraste}
-            onValueChange={(valor) => cambiarAjuste("altoContraste", valor)}
-          />
         </View>
         <Text style={styles.seccion}>Rutas a {DESTINO}</Text>
         {error ? (

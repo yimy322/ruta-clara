@@ -167,6 +167,10 @@ export const sizes = {
   // Cuadro del ícono de la tarjeta de permiso de ubicación (E10)
   permisoIcono: 48,
   permisoGlyph: 24,
+  // Píldora de nivel con ícono (señales sin depender del color, A2)
+  leyendaIcono: 14,
+  leyendaPaddingX: 10,
+  leyendaPaddingY: 6,
   // Ícono del mensaje de validación junto al campo (E8)
   errorIcono: 18,
   // Esqueleto de carga de rutas (E2)

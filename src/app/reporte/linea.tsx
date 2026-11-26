@@ -163,7 +163,8 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       paddingBottom: spacing.md,
     },
     buscador: {
-      height: sizes.searchHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.searchHeight,
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.sm,

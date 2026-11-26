@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Animated, BackHandler, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useReducirMovimiento } from "@/hooks/useReducirMovimiento";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { BarraProgreso, Button } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
@@ -38,11 +39,17 @@ export default function Gracias() {
 
   // null cuando el usuario canceló el cierre automático
   const [segundos, setSegundos] = useState<number | null>(CIERRE_AUTOMATICO_S);
-  const [escala] = useState(() => new Animated.Value(ESCALA_INICIAL));
+  const reducirMovimiento = useReducirMovimiento();
+  const [escala] = useState(() => new Animated.Value(reducirMovimiento ? 1 : ESCALA_INICIAL));
 
   useEffect(() => {
+    // Con «reducir movimiento» el círculo aparece ya en su tamaño, sin rebote
+    if (reducirMovimiento) {
+      escala.setValue(1);
+      return;
+    }
     Animated.spring(escala, { toValue: 1, friction: 4, useNativeDriver: true }).start();
-  }, [escala]);
+  }, [escala, reducirMovimiento]);
 
   // Al salir, el siguiente reporte empieza de cero
   useEffect(() => reiniciar, [reiniciar]);

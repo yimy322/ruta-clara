@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { borderWidths, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import { withIconDefaults } from "@/utils/icons";
@@ -22,6 +23,7 @@ type ItemNotificacionProps = {
 export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }: ItemNotificacionProps) {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
+  const { ajustes } = usePreferencias();
   const iconoStyles = useEstilos(crearIconoStyles);
 
   const colorIcono = tono === "seguridad" ? colors.redStrong : tono === "llegada" ? colors.onYellow : colors.ink;
@@ -48,7 +50,16 @@ export function ItemNotificacion({ icon, titulo, detalle, leida, onPress, tono }
           {detalle}
         </Text>
       </View>
-      {!leida && <View style={styles.noLeida} />}
+      {!leida &&
+        (ajustes.senalesSinColor ? (
+          // Señales sin depender del color: el punto rojo lleva texto
+          <View style={styles.nuevo}>
+            <View style={styles.noLeida} />
+            <Text style={[typography.captionStrong, styles.rojo]}>Nuevo</Text>
+          </View>
+        ) : (
+          <View style={styles.noLeida} />
+        ))}
     </Pressable>
   );
 }
@@ -79,6 +90,14 @@ const crearEstilos = ({ colors }: Tema) =>
     texto: {
       flex: 1,
       gap: spacing.xxs,
+    },
+    nuevo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    rojo: {
+      color: colors.redStrong,
     },
     noLeida: {
       width: sizes.unreadDot,

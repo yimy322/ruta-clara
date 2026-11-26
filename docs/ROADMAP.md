@@ -1,6 +1,6 @@
 # ROADMAP.md — RutaClara
 
-Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El estado se basa solo en lo que el usuario reportó.** Que un prompt exista no significa que esté implementado.
+Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El estado se basa solo en lo que el usuario reportó.** Que un prompt exista no significa que esté implementado.
 
 ## Leyenda de estados
 
@@ -14,7 +14,7 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Siguiente: tema dinámico y accesibilidad (**4.6 + 4.8**).
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Siguiente: cuenta y eliminación de cuenta (**4.9**).
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -48,9 +48,9 @@ Actualizado: **22 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.5B | Pantallas del Flujo 1 en alta fidelidad | ✅ (25/11) |
 | 4.5C | Pantallas de los Flujos 2 y 3 en alta fidelidad | ✅ (25/11) |
 | 4.7 | Estados E1–E10 en la app | ✅ (25/11) |
-| **4.6** | **Tema dinámico (claro, oscuro, alto contraste, escala de texto)** | 📝 **siguiente** |
-| 4.8 | Módulo de accesibilidad (A1/A2) | 📝 |
-| 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | 📝 |
+| 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | ✅ (26/11) |
+| 4.8 | Módulo de accesibilidad (A1/A2) | ✅ (26/11) |
+| **4.9** | **Cuenta y eliminación de cuenta (D1–D5) con datos simulados** | 📝 **siguiente** |
 | 5 | Backend con Supabase (login, datos reales, tiempo real, correos) | 🗺️ |
 | 6 | Mapa real, ubicación real y notificaciones | 🗺️ |
 | 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
@@ -122,11 +122,11 @@ Pantalla por pantalla contra los frames de alta fidelidad. Incluye la tarjeta de
 ### 4.7 · Estados — ✅
 E1–E10 de la sección «Estados» de Figma, conectados a condiciones reales de la app.
 
-### 4.6 · Tema dinámico — 📝
-Hook `useTema()` con paletas claro, oscuro y alto contraste, y escala de texto. Base para 4.8.
+### 4.6 · Tema dinámico — ✅
+`TemaProvider` con `useTema()` / `useEstilos()`: paletas clara, oscura y alto contraste, sombras por tema (borde negro de 2 en alto contraste) y escala de texto. Apariencia Sistema / Claro / Oscuro en Ajustes.
 
-### 4.8 · Módulo de accesibilidad — 📝
-Pantalla `/accesibilidad` (A1/A2): texto hasta 200 %, alto contraste 7:1, reducir movimiento y señales sin depender del color. Preferencias persistentes.
+### 4.8 · Módulo de accesibilidad — ✅
+Pantalla `/accesibilidad` (A1/A2): texto hasta 200 %, alto contraste 7:1, reducir movimiento (`useReducirMovimiento`, también el del sistema) y señales sin depender del color (`PildoraNivel`, íconos en el mapa, segmentos, «siguiente», «Nuevo»). Preferencias persistentes. Pendiente menor: al 200 % las filas de próximas unidades de F3_02 no apilan la hora como en P2.
 
 ### 4.9 · Cuenta y eliminación — 📝
 D1–D5 con funciones simuladas en el repositorio; se conectan a Supabase en la Fase 5.

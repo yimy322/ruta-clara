@@ -216,7 +216,8 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
     },
     buscador: {
       flex: 1,
-      height: sizes.searchHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.searchHeight,
       flexDirection: "row",
       alignItems: "center",
       gap: sizes.legendPadding,

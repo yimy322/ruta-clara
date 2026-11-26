@@ -20,6 +20,7 @@ export { MenuLateral } from "./MenuLateral";
 export { OpcionGrande } from "./OpcionGrande";
 export { OpcionRadio } from "./OpcionRadio";
 export { Paginador } from "./Paginador";
+export { PildoraNivel, type NivelPildora } from "./PildoraNivel";
 export { PinUnidad } from "./PinUnidad";
 export { PantallaCarga } from "./PantallaCarga";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";

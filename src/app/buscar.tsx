@@ -313,7 +313,8 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       gap: spacing.sm,
     },
     campo: {
-      height: sizes.fieldHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.fieldHeight,
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.sm,

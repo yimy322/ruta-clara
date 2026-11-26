@@ -36,7 +36,8 @@ export function OpcionRadio({ label, selected = false, onPress }: OpcionRadioPro
 const crearEstilos = ({ colors, shadows }: Tema) =>
   StyleSheet.create({
     base: {
-      height: sizes.optionHeightLarge,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.optionHeightLarge,
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.md,

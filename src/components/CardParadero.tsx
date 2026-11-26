@@ -1,5 +1,7 @@
+import { Radio } from "lucide-react-native";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { ActividadParadero, Paradero, ProximaUnidad } from "@/types";
@@ -38,6 +40,7 @@ function textoReportes({ reportesActivos, ultimoReporte }: ActividadParadero) {
 export function CardParadero({ datos, onPress }: CardParaderoProps) {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
+  const { ajustes } = usePreferencias();
 
   if (!datos) {
     return (
@@ -85,7 +88,12 @@ export function CardParadero({ datos, onPress }: CardParaderoProps) {
               >
                 <View style={styles.linea}>
                   {/* Punto amarillo = hay reporte de ubicación; gris = estimado */}
-                  <View style={[styles.punto, sinDatos && styles.puntoEstimado]} />
+                  {ajustes.senalesSinColor && !sinDatos ? (
+                    // Señales sin depender del color: ícono «en vivo» en vez del punto
+                    <Radio color={colors.ink} size={sizes.leyendaIcono} />
+                  ) : (
+                    <View style={[styles.punto, sinDatos && styles.puntoEstimado]} />
+                  )}
                   <Text style={[typography.captionStrong, styles.ink]} numberOfLines={1}>
                     {unidad.linea.nombre}
                   </Text>

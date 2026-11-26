@@ -53,6 +53,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F3_02 · Detalle de paradero | paradero/[id].tsx | /paradero/puente-nuevo | Stack (desde la card de Inicio). Recarga al recibir foco |
 | F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
 | F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (desde ⚙ en Mi perfil y en Alertas, y desde el menú lateral). Los interruptores van en `ajustes` de `usePreferencias()` |
+| A1/A2 · Accesibilidad | accesibilidad.tsx | /accesibilidad | Stack (desde la fila Accesibilidad de Ajustes). Tamaño del texto, alto contraste, reducir movimiento y señales sin depender del color (`ajustes` de `usePreferencias()`) |
 | F3_06 · Mapa de seguridad | seguridad.tsx | /seguridad | Stack (chip Seguridad de Inicio, menú lateral, aviso de seguridad). Param opcional `paraderoId` |
 | F3_07 · Menú lateral | components/MenuLateral.tsx | — | No es ruta: Modal sobre Inicio (☰) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
@@ -81,6 +82,8 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 - Estados vacíos y de error (E1–E10): componente `EstadoPantalla`. Sin conexión, los reportes van a la cola de /src/data/colaReportes.ts (AsyncStorage) y `ColaReportesProvider` los reenvía al volver la red (NetInfo).
+- Tema dinámico (4.6): colores, sombras y tipografía salen de `useTema()` (/src/context/TemaContext.tsx); los estilos se escriben como `const crearEstilos = ({ colors }: Tema) => StyleSheet.create({...})` y se usan con `useEstilos(crearEstilos)`. Texto sobre amarillo: `colors.onYellow`. `spacing`, `radii`, `sizes`, `opacity` y `fonts` se importan directo de `@/theme`.
+- Animaciones: respetar `useReducirMovimiento()` (/src/hooks). Señales sin depender del color: `ajustes.senalesSinColor`.
 - Modo de prueba solo en desarrollo: /src/data/simulacion.ts (`forzarError`, `forzarVacio`, `forzarSinRed`), con interruptores en /dev/datos.
 
 ## Reglas de trabajo

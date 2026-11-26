@@ -139,8 +139,7 @@ export default function Ajustes() {
           titulo="Accesibilidad"
           subtitulo="Texto, contraste, movimiento y color"
           icono={<Accessibility color={colors.ink} size={sizes.settingsIcon} />}
-          // TODO 4.8: abrir /accesibilidad (A1/A2)
-          onPress={() => mostrar("Accesibilidad estará disponible pronto")}
+          onPress={() => router.push("/accesibilidad")}
         />
 
         <Seccion titulo="Soporte" />

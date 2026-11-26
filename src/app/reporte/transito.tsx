@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, Header, IconButton } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
@@ -32,6 +33,7 @@ const OPCIONES_FOTO: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], 
 export default function ReporteTransito() {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
+  const { ajustes } = usePreferencias();
 
   const { borrador, actualizar } = useReporte();
   const { enviar, enviando } = useEnviarReporte();
@@ -144,7 +146,7 @@ export default function ReporteTransito() {
 
         <Text style={[typography.bodyStrong, styles.ink]}>Nivel de congestión</Text>
         <View style={styles.niveles} accessibilityRole="radiogroup">
-          {niveles(colors).map(({ valor, barra }) => {
+          {niveles(colors).map(({ valor, barra }, indice) => {
             const elegido = borrador.congestion === valor;
             const trancadera = valor === "trancadera";
             return (
@@ -162,7 +164,19 @@ export default function ReporteTransito() {
                   pressed && styles.pressed,
                 ]}
               >
-                <View style={[styles.barra, { backgroundColor: barra }]} />
+                {ajustes.senalesSinColor ? (
+                  // Señales sin depender del color: el nivel se lee por la cantidad de segmentos
+                  <View style={styles.segmentos}>
+                    {niveles(colors).map((_, i) => (
+                      <View
+                        key={i}
+                        style={[styles.segmento, { backgroundColor: i <= indice ? barra : colors.line }]}
+                      />
+                    ))}
+                  </View>
+                ) : (
+                  <View style={[styles.barra, { backgroundColor: barra }]} />
+                )}
                 <Text
                   style={[
                     elegido ? typography.captionStrong : typography.caption,
@@ -270,6 +284,16 @@ const crearEstilos = ({ colors }: Tema) =>
       borderColor: colors.red,
       backgroundColor: colors.redSoft,
     },
+    segmentos: {
+      alignSelf: "stretch",
+      flexDirection: "row",
+      gap: spacing.xxs,
+    },
+    segmento: {
+      flex: 1,
+      height: sizes.congestionBar,
+      borderRadius: sizes.congestionBar / 2,
+    },
     barra: {
       alignSelf: "stretch",
       height: sizes.congestionBar,
@@ -287,7 +311,8 @@ const crearEstilos = ({ colors }: Tema) =>
       backgroundColor: colors.surface,
     },
     campoVia: {
-      height: sizes.optionHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.optionHeight,
       paddingHorizontal: spacing.md,
     },
     nota: {

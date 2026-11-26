@@ -32,7 +32,8 @@ export function OpcionGrande({ label, selected = false, onPress }: OpcionGrandeP
 const crearEstilos = ({ colors, shadows }: Tema) =>
   StyleSheet.create({
     base: {
-      height: sizes.optionHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.optionHeight,
       justifyContent: "center",
       paddingHorizontal: spacing.lg,
       borderRadius: radii.control,

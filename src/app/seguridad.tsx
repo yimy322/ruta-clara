@@ -5,7 +5,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View, type LayoutChang
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { Button, Chip, IconButton, Mapa, Toggle } from "@/components";
+import { Button, Chip, IconButton, Mapa, PildoraNivel, Toggle } from "@/components";
 import { VENTANAS_SEGURIDAD_H } from "@/config/reportes";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getUbicacionUsuario, getZonasSeguridad } from "@/data/repositorio";
@@ -144,14 +144,23 @@ export default function Seguridad() {
                 onPress={() => router.push("/reporte/seguridad")}
               />
             </View>
-            <View style={styles.leyenda} accessibilityLabel="Leyenda: rojo alto, ámbar medio, gris sin reportes">
-              {leyenda(colors).map(({ label, color }) => (
-                <View key={label} style={styles.leyendaFila}>
-                  <View style={[styles.leyendaPunto, { backgroundColor: color }]} />
-                  <Text style={[typography.caption, styles.ink]}>{label}</Text>
-                </View>
-              ))}
-            </View>
+            {ajustes.senalesSinColor ? (
+              // Señales sin depender del color (A2): ícono + texto en cada nivel
+              <View style={[styles.leyenda, styles.leyendaPildoras]} accessibilityLabel="Leyenda: alto, medio, sin reportes">
+                <PildoraNivel nivel="alto" />
+                <PildoraNivel nivel="medio" />
+                <PildoraNivel nivel="sin" />
+              </View>
+            ) : (
+              <View style={styles.leyenda} accessibilityLabel="Leyenda: alto, medio, sin reportes">
+                {leyenda(colors).map(({ label, color }) => (
+                  <View key={label} style={styles.leyendaFila}>
+                    <View style={[styles.leyendaPunto, { backgroundColor: color }]} />
+                    <Text style={[typography.caption, styles.ink]}>{label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           <View style={[styles.hoja, { paddingBottom: spacing.lg + insets.bottom }]}>
@@ -271,6 +280,9 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       padding: sizes.legendPadding,
       borderRadius: radii.lg,
       backgroundColor: colors.canvas,
+    },
+    leyendaPildoras: {
+      backgroundColor: colors.surface,
     },
     leyendaFila: {
       flexDirection: "row",

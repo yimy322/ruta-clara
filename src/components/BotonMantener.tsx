@@ -78,7 +78,7 @@ export function BotonMantener({
     >
       <View style={styles.base}>
         <Animated.View style={[styles.relleno, { width: ancho }]} />
-        <Text style={[typography.button, styles.label]} numberOfLines={1}>
+        <Text style={[typography.button, styles.label]} numberOfLines={2}>
           {label}
         </Text>
       </View>
@@ -94,7 +94,8 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       ...shadows.danger,
     },
     base: {
-      height: sizes.buttonHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.buttonHeight,
       paddingHorizontal: sizes.buttonPaddingX,
       borderRadius: radii.control,
       backgroundColor: colors.red,
@@ -111,6 +112,7 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       backgroundColor: colors.redDeep,
     },
     label: {
+      textAlign: "center",
       color: colors.surface,
     },
   });

@@ -70,8 +70,8 @@ export function Button({
           <>
             {icon != null && withIconDefaults(icon, { color, size: sizes.iconGlyph })}
             <Text
-              style={[typography.button, { color }, pressed && variant === "tertiary" && styles.tertiaryPressed]}
-              numberOfLines={1}
+              style={[typography.button, styles.label, { color }, pressed && variant === "tertiary" && styles.tertiaryPressed]}
+              numberOfLines={2}
             >
               {label}
             </Text>
@@ -85,14 +85,21 @@ export function Button({
 const crearEstilos = ({ colors }: Tema) =>
   StyleSheet.create({
     base: {
-      height: sizes.buttonHeight,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.buttonHeight,
       paddingHorizontal: sizes.buttonPaddingX,
+      paddingVertical: spacing.sm,
       borderRadius: radii.control,
       flexDirection: "row",
       gap: spacing.sm,
       alignItems: "center",
       justifyContent: "center",
       alignSelf: "flex-start",
+    },
+    // Con texto grande la etiqueta puede ir en 2 líneas, centrada
+    label: {
+      flexShrink: 1,
+      textAlign: "center",
     },
     fullWidth: {
       alignSelf: "stretch",
@@ -101,7 +108,8 @@ const crearEstilos = ({ colors }: Tema) =>
       borderRadius: radii.pill,
     },
     large: {
-      height: sizes.buttonHeightLarge,
+      // Altura mínima: con texto grande (hasta 200 %) el control crece en vez de cortar el texto
+      minHeight: sizes.buttonHeightLarge,
     },
     // Figma no dibuja Tertiary presionado // supuesto: texto atenuado
     tertiaryPressed: {

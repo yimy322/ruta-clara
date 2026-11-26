@@ -50,7 +50,7 @@ export function ListItem({
         </View>
       )}
       <View style={styles.text}>
-        <Text style={[typography.bodyStrong, styles.ink]} numberOfLines={1}>
+        <Text style={[typography.bodyStrong, styles.ink]} numberOfLines={2}>
           {title}
         </Text>
         {subtitle != null && (

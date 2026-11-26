@@ -1,8 +1,9 @@
-import { Bus } from "lucide-react-native";
+import { Bus, Clock, TriangleAlert } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
+import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { borderWidths, opacity, radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 import type { Coordenada, Linea, NivelZona, Paradero } from "@/types";
@@ -107,6 +108,8 @@ export function Mapa({
 }: MapaProps) {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
+  // Señales sin depender del color (Accesibilidad)
+  const senales = usePreferencias().ajustes.senalesSinColor;
 
   const [tamano, setTamano] = useState({ ancho: 0, alto: 0 });
 
@@ -152,6 +155,15 @@ export function Mapa({
                 </Defs>
                 <Circle cx={radio} cy={radio} r={radio} fill={`url(#g${zona.id})`} />
               </Svg>
+              {senales && (
+                <View style={styles.zonaIcono}>
+                  {zona.nivel === "alto" ? (
+                    <TriangleAlert color={colors.redStrong} size={sizes.iconGlyph} />
+                  ) : (
+                    <Clock color={colors.ink} size={sizes.iconGlyph} />
+                  )}
+                </View>
+              )}
             </View>
           );
         })}
@@ -381,6 +393,12 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       height: sizes.mapBusCircle,
       borderRadius: radii.pill,
       backgroundColor: colors.onYellow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    // Ícono centrado sobre la mancha (señales sin depender del color)
+    zonaIcono: {
+      ...StyleSheet.absoluteFill,
       alignItems: "center",
       justifyContent: "center",
     },

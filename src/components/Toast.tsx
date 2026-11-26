@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Animated, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useReducirMovimiento } from "@/hooks/useReducirMovimiento";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { radii, sizes, spacing, type Tema } from "@/theme";
 
@@ -24,20 +25,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [visibilidad] = useState(() => new Animated.Value(0));
+  // Con «reducir movimiento» el mensaje aparece y se va sin fundido
+  const duracion = useReducirMovimiento() ? 0 : ANIMACION_MS;
   const temporizador = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const mostrar = useCallback(
     (texto: string) => {
       clearTimeout(temporizador.current);
       setMensaje(texto);
-      Animated.timing(visibilidad, { toValue: 1, duration: ANIMACION_MS, useNativeDriver: true }).start();
+      Animated.timing(visibilidad, { toValue: 1, duration: duracion, useNativeDriver: true }).start();
       temporizador.current = setTimeout(() => {
-        Animated.timing(visibilidad, { toValue: 0, duration: ANIMACION_MS, useNativeDriver: true }).start(
+        Animated.timing(visibilidad, { toValue: 0, duration: duracion, useNativeDriver: true }).start(
           ({ finished }) => finished && setMensaje(null),
         );
       }, DURACION_MS);
     },
-    [visibilidad],
+    [visibilidad, duracion],
   );
 
   useEffect(() => () => clearTimeout(temporizador.current), []);

@@ -12,7 +12,6 @@ import {
 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  AccessibilityInfo,
   ActivityIndicator,
   Animated,
   Modal,
@@ -25,6 +24,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useReducirMovimiento } from "@/hooks/useReducirMovimiento";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { getUsuario } from "@/data/repositorio";
 import { useCerrarSesion } from "@/hooks/useCerrarSesion";
@@ -87,15 +87,10 @@ export function MenuLateral({ visible, onCerrar }: MenuLateralProps) {
   const cerrarSesion = useCerrarSesion();
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [reducirMovimiento, setReducirMovimiento] = useState(false);
+  // Preferencia de la app (Accesibilidad) o del sistema
+  const reducirMovimiento = useReducirMovimiento();
   const [desplazamiento] = useState(() => new Animated.Value(-sizes.drawerWidth));
   const [visibilidad] = useState(() => new Animated.Value(0));
-
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReducirMovimiento);
-    const sub = AccessibilityInfo.addEventListener("reduceMotionChanged", setReducirMovimiento);
-    return () => sub.remove();
-  }, []);
 
   useEffect(() => {
     if (visible && !usuario) {

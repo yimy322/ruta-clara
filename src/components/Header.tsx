@@ -61,7 +61,7 @@ export function Header({
           {eyebrow}
         </Text>
       )}
-      <Text style={[large ? typography.h2 : typography.title, styles.ink]} numberOfLines={1} accessibilityRole="header">
+      <Text style={[large ? typography.h2 : typography.title, styles.ink]} numberOfLines={2} accessibilityRole="header">
         {title}
       </Text>
       {subtitle != null && (
