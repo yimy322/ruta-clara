@@ -4,6 +4,9 @@ import type { Coordenada, Usuario } from "@/types";
 // Nuevo (F1_04 muestra "Cerca de ti · 180 m").
 export const ubicacionUsuario: Coordenada = { lat: -12.0452, lng: -76.9988 };
 
+// supuesto: correo enmascarado del usuario de prueba (D1, D5)
+export const correoUsuario = "r•••@correo.com";
+
 // Usuario de prueba (F2_09)
 export const usuario: Usuario = {
   id: "u1", // supuesto

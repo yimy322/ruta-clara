@@ -89,6 +89,27 @@ export function formatoDias(dias: number[]) {
 
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
 
+const MESES_LARGOS = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "setiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+
+// Fecha ISO → "8 de diciembre de 2026" (D5)
+export function formatearFechaLarga(fechaISO: string) {
+  const fecha = new Date(fechaISO);
+  return `${fecha.getDate()} de ${MESES_LARGOS[fecha.getMonth()]} de ${fecha.getFullYear()}`;
+}
+
 // Fecha ISO → "Hoy 7:16 AM", "Ayer 6:40 PM", "12 oct 6:40 PM"
 export function formatearDia(fechaISO: string) {
   const fecha = new Date(fechaISO);

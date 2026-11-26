@@ -265,6 +265,17 @@ export type Usuario = {
   avatar?: ImageSourcePropType;
 };
 
+// Cuenta del usuario (D1–D5). Fase 5: perfil de Supabase Auth
+export type Cuenta = {
+  nombre: string;
+  puntos: number;
+  // Celular y correo ya enmascarados para mostrar
+  telefono: string;
+  correo: string;
+  // Fecha ISO en que se borrará la cuenta; null si no se pidió eliminarla
+  eliminacionEl: string | null;
+};
+
 // Nivel de una zona del mapa de seguridad (F3_06)
 export type NivelZona = "alto" | "medio";
 

@@ -121,13 +121,14 @@ src/
 │   ├── reporte/         # _layout (Stack + ReporteProvider): index, linea, estado, ubicacion, paradero, transito, seguridad, gracias
 │   ├── ajustes.tsx      # F3_05 (interruptores en PreferenciasContext.ajustes; Apariencia Sistema/Claro/Oscuro)
 │   ├── accesibilidad.tsx # A1/A2 (texto, alto contraste, reducir movimiento, señales sin color)
+│   ├── cuenta/          # D1 index (Mi cuenta) · eliminar/: index (D2), alternativa (D3), confirmar (D4), programada (D5, sin gesto atrás)
 │   ├── seguridad.tsx    # F3_06 (param opcional paraderoId)
 │   ├── onboarding.tsx, buscar.tsx, rutas.tsx
 │   └── dev/             # catalogo, datos (solo __DEV__)
 ├── components/          # Base: Button, Chip, IconButton (tono="destacado" | "seguridad"), Toggle, Tile, ListItem, Header, BottomNav (badge), Mapa, Segmented, Toast (+ ToastProvider)
 │                        # Pantallas: BannerUbicacion, BarraProgreso, BotonMantener, CardParadero, CardRuta, GraficoAfluencia,
 │                        # ItemNotificacion, OpcionGrande, OpcionRadio, Paginador, PantallaCarga, PinUnidad, PlaceholderScreen,
-│                        # TarjetaDato, TarjetaEstadistica · F3: Avatar, FilaAjuste, MenuLateral (F3_07, Modal sobre Inicio) · 4.8: PildoraNivel
+│                        # TarjetaDato, TarjetaEstadistica · F3: Avatar, FilaAjuste, MenuLateral (F3_07, Modal sobre Inicio) · 4.8: PildoraNivel · 4.9: PantallaCuenta, TarjetaCuenta
 │                        # index.ts (barril)
 ├── context/             # ViajeContext, ReporteContext, NotificacionesContext, PreferenciasContext, TemaContext (useTema, useEstilos)
 ├── hooks/               # usePermisoUbicacion, useEnviarReporte, useCerrarSesion, useReducirMovimiento
@@ -156,6 +157,7 @@ src/
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
 - **4.6:** estilos por tema: `const crearEstilos = ({ colors, shadows, typography }: Tema) => StyleSheet.create({...})` + `useEstilos(crearEstilos)`; `@/theme` ya no exporta `colors`, `shadows` ni `typography` estáticos. Texto sobre amarillo: `colors.onYellow`. `Ajustes` suma `tema`, `altoContraste`, `escalaTexto` (1–2), `reducirMovimiento`, `senalesSinColor`; `cambiarAjuste` es genérico.
 - **4.8:** `/accesibilidad`; alturas fijas de controles pasan a `minHeight` (texto al 200 % sin cortes) y botones/títulos admiten 2 líneas; `useReducirMovimiento()` = preferencia de la app ∨ del sistema (splash, Toast, Gracias, MenuLateral).
+- **4.9:** tipo `Cuenta`; `getCuenta`, `desactivarCuenta`, `solicitarEliminacion` (devuelve la fecha ISO), `cancelarEliminacion` (eliminación pendiente en memoria); `src/config/cuenta.ts` (`DIAS_GRACIA_ELIMINACION = 30`, `PALABRA_ELIMINAR`, `PASOS_ELIMINACION`); `formatearFechaLarga` («26 de diciembre de 2026»). Correo del usuario de prueba `// supuesto`.
 - `src/utils/formato.ts`: `formatoDias` («L–V», «Fin de semana», «L, M, Mi, V»), `formatoHora`.
 
 **Contexts:** `ViajeContext` (linea, paraderoEspera, destino, sentido, estado, avisarParaBajar, finEn…), `ReporteContext` (tipo, lineaId, enUnidad, ocupacion, velocidad, posicion, compartirEnVivo…), `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`), `PreferenciasContext` (`onboardingVisto`…), y `ToastProvider` (en `components/Toast.tsx`).
@@ -295,9 +297,9 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | F3_06 | `/seguridad` | Stack ✅ |
 | F3_07 | `MenuLateral` (componente, ☰ de Inicio) | Modal ✅ |
 | A1/A2 | `/accesibilidad` | Stack ✅ |
-| D1–D5 | `/cuenta`, `/cuenta/eliminar/*` (propuesta) | 4.9 |
+| D1–D5 | `/cuenta`, `/cuenta/eliminar/*` | Stack ✅ (D5 sin gesto atrás) |
 
-**TODO pendientes en el código (verificado el 26/11/2026):** Mi cuenta desde la fila de perfil (4.9); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
+**TODO pendientes en el código (verificado el 26/11/2026):** edición de datos y «Descargar mis datos» en Mi cuenta (Fase 5); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
 
 ---
 

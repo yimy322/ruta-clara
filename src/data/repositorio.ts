@@ -1,5 +1,6 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
+import { DIAS_GRACIA_ELIMINACION } from "@/config/cuenta";
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
@@ -12,13 +13,14 @@ import { lugaresGuardados } from "@/mocks/lugares";
 import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
 import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
-import { ubicacionUsuario, usuario } from "@/mocks/usuario";
+import { correoUsuario, ubicacionUsuario, usuario } from "@/mocks/usuario";
 import { vias } from "@/mocks/vias";
 import type {
   ActividadParadero,
   AlertaDiaria,
   BorradorReporte,
   Coordenada,
+  Cuenta,
   DatosAlerta,
   Destino,
   Favoritos,
@@ -482,6 +484,49 @@ let usuarioActual: Usuario = { ...usuario };
 export async function getUsuario(): Promise<Usuario> {
   await esperar();
   return usuarioActual;
+}
+
+// Cuenta (D1–D5). Fecha de eliminación programada, en memoria.
+// Fase 5: Supabase Auth + tabla de usuarios; un proceso programado borra la
+// cuenta al vencer el periodo de gracia y envía el comprobante por correo.
+let eliminacionEl: string | null = null;
+
+export async function getCuenta(): Promise<Cuenta> {
+  await esperar();
+  if (getSimulacion().forzarError) {
+    throw new Error("No se pudo cargar la cuenta");
+  }
+  const { nombre, puntos, telefono } = usuarioActual;
+  return { nombre, puntos, telefono, correo: correoUsuario, eliminacionEl };
+}
+
+// Oculta el perfil y pausa las alertas hasta que el usuario vuelva a iniciar
+// sesión. Por ahora solo simula la llamada (la app cierra la sesión).
+export async function desactivarCuenta(): Promise<void> {
+  await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+}
+
+// Programa la eliminación y devuelve la fecha efectiva (ISO)
+export async function solicitarEliminacion(): Promise<string> {
+  await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() + DIAS_GRACIA_ELIMINACION);
+  eliminacionEl = fecha.toISOString();
+  return eliminacionEl;
+}
+
+export async function cancelarEliminacion(): Promise<void> {
+  await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+  eliminacionEl = null;
 }
 
 const esDeHoy = (fechaISO: string) => new Date(fechaISO).toDateString() === new Date().toDateString();

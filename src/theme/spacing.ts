@@ -182,6 +182,9 @@ export const sizes = {
   zonaMedia: 92,
   legendDot: 8,
   legendPadding: 10,
+  // Mi cuenta y eliminación (D1–D5): ícono del avatar y espacio sobre la señal de D5
+  avatarIcono: 28,
+  periodoGraciaTop: 64,
 } as const;
 
 // Feedback al presionar y estado deshabilitado

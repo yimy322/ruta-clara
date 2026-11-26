@@ -87,6 +87,12 @@ function RootNavigator() {
           <Stack.Screen name="alerta" options={{ presentation: "modal" }} />
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="accesibilidad" />
+          <Stack.Screen name="cuenta/index" />
+          <Stack.Screen name="cuenta/eliminar/index" />
+          <Stack.Screen name="cuenta/eliminar/alternativa" />
+          <Stack.Screen name="cuenta/eliminar/confirmar" />
+          {/* D5: sin gesto atrás; se sale con «Entendido» o «Cancelar eliminación» */}
+          <Stack.Screen name="cuenta/eliminar/programada" options={{ gestureEnabled: false }} />
           <Stack.Screen name="seguridad" />
           <Stack.Screen name="dev/catalogo" />
           <Stack.Screen name="dev/datos" />

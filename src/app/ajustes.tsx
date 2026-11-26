@@ -69,8 +69,7 @@ export default function Ajustes() {
       <ScrollView contentContainerStyle={styles.contenido}>
         {usuario ? (
           <Pressable
-            // TODO 4.9: abrir /cuenta (Mi cuenta, D1)
-            onPress={() => mostrar("Editar perfil estará disponible pronto")}
+            onPress={() => router.push("/cuenta")}
             accessibilityRole="button"
             accessibilityLabel={`${usuario.nombre}, editar perfil`}
             style={({ pressed }) => [styles.perfil, pressed && styles.pressed]}

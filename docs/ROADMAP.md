@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Siguiente: cuenta y eliminación de cuenta (**4.9**).
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Siguiente: Fase 5 (Supabase), que se planifica antes de empezar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -50,7 +50,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.7 | Estados E1–E10 en la app | ✅ (25/11) |
 | 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | ✅ (26/11) |
 | 4.8 | Módulo de accesibilidad (A1/A2) | ✅ (26/11) |
-| **4.9** | **Cuenta y eliminación de cuenta (D1–D5) con datos simulados** | 📝 **siguiente** |
+| 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | ✅ (26/11) |
 | 5 | Backend con Supabase (login, datos reales, tiempo real, correos) | 🗺️ |
 | 6 | Mapa real, ubicación real y notificaciones | 🗺️ |
 | 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
@@ -128,8 +128,8 @@ E1–E10 de la sección «Estados» de Figma, conectados a condiciones reales de
 ### 4.8 · Módulo de accesibilidad — ✅
 Pantalla `/accesibilidad` (A1/A2): texto hasta 200 %, alto contraste 7:1, reducir movimiento (`useReducirMovimiento`, también el del sistema) y señales sin depender del color (`PildoraNivel`, íconos en el mapa, segmentos, «siguiente», «Nuevo»). Preferencias persistentes. Pendiente menor: al 200 % las filas de próximas unidades de F3_02 no apilan la hora como en P2.
 
-### 4.9 · Cuenta y eliminación — 📝
-D1–D5 con funciones simuladas en el repositorio; se conectan a Supabase en la Fase 5.
+### 4.9 · Cuenta y eliminación — ✅
+D1–D5 (`/cuenta`, `/cuenta/eliminar/*`) con `getCuenta`, `desactivarCuenta`, `solicitarEliminacion` (fecha = hoy + 30 días) y `cancelarEliminacion` simuladas en el repositorio; se conectan a Supabase en la Fase 5. Supuestos: edición de datos y «Descargar mis datos» muestran «pronto»; desactivar y «Entendido» cierran sesión; Mi cuenta muestra un aviso para cancelar la eliminación pendiente.
 
 ## Fase 5 · Backend con Supabase — 🗺️
 Login, base de datos, reportes en tiempo real, cola sin conexión y correos. **Pendiente decidir:** método de login (OTP por correo, SMS o Google), esquema de datos y carga de 5–10 líneas reales.

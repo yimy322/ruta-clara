@@ -54,6 +54,11 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
 | F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (desde ⚙ en Mi perfil y en Alertas, y desde el menú lateral). Los interruptores van en `ajustes` de `usePreferencias()` |
 | A1/A2 · Accesibilidad | accesibilidad.tsx | /accesibilidad | Stack (desde la fila Accesibilidad de Ajustes). Tamaño del texto, alto contraste, reducir movimiento y señales sin depender del color (`ajustes` de `usePreferencias()`) |
+| D1 · Mi cuenta | cuenta/index.tsx | /cuenta | Stack (desde la fila de perfil de Ajustes). Recarga al recibir foco; aviso para cancelar una eliminación pendiente |
+| D2 · Eliminar cuenta: advertencia | cuenta/eliminar/index.tsx | /cuenta/eliminar | Stack. Paso 1 de 3 (estructura común: `PantallaCuenta`) |
+| D3 · Eliminar cuenta: alternativa | cuenta/eliminar/alternativa.tsx | /cuenta/eliminar/alternativa | Stack. Paso 2 de 3; «Desactivar» cierra la sesión |
+| D4 · Eliminar cuenta: confirmación | cuenta/eliminar/confirmar.tsx | /cuenta/eliminar/confirmar | Stack. Paso 3 de 3; escribir ELIMINAR; `router.replace` a D5 |
+| D5 · Eliminación programada | cuenta/eliminar/programada.tsx | /cuenta/eliminar/programada | Stack sin gesto atrás. «Entendido» cierra sesión; «Cancelar eliminación» vuelve a /cuenta |
 | F3_06 · Mapa de seguridad | seguridad.tsx | /seguridad | Stack (chip Seguridad de Inicio, menú lateral, aviso de seguridad). Param opcional `paraderoId` |
 | F3_07 · Menú lateral | components/MenuLateral.tsx | — | No es ruta: Modal sobre Inicio (☰) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
