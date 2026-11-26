@@ -92,7 +92,7 @@ Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualiza
 | Lint | ESLint con la configuración oficial de Expo |
 | Almacenamiento local | `@react-native-async-storage/async-storage` (`src/data/preferencias.ts`) |
 | Dependencias agregadas | `expo-location`, `expo-image-picker`, `expo-haptics`, `@react-native-community/datetimepicker` |
-| Backend (futuro) | **Supabase**: PostgreSQL + PostGIS, Auth, Realtime, Edge Functions |
+| Backend (Fase 5, en curso) | **Supabase**: PostgreSQL, Auth (OTP por correo), Realtime, Edge Functions. Cliente `@supabase/supabase-js` con sesión en AsyncStorage; claves en `.env.local` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). PostGIS disponible pero no se usa por ahora |
 | Mapa (futuro) | Sin decidir. `react-native-maps` funciona en Expo Go; MapLibre requiere *development build* |
 | Notificaciones (futuro) | Expo Notifications (push remoto requiere *development build*) |
 | IA (futuro) | Sin decidir; siempre detrás de una Edge Function (la clave nunca va en la app) |
@@ -328,6 +328,13 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 42 | Modo claro predeterminado; oscuro y alto contraste como opciones (Sistema / Claro / Oscuro) | [Claude chat → aprobado] |
 | 43 | Sin portada en Figma; proyecto individual | [Usuario] |
 | 44 | Desde noviembre, la **alta fidelidad es la referencia visual del código** | [Usuario] |
+| 45 | Login con **código de 6 dígitos por correo** (OTP de Supabase); SMTP propio antes de probar con otras personas | [Usuario, 26/11] |
+| 46 | Datos iniciales de Supabase = **los mocks actuales** (mismos ids); líneas reales después | [Usuario, 26/11] |
+| 47 | Sesión de Supabase en AsyncStorage (ya instalado), sin `expo-sqlite` ni url-polyfill | [Claude Code → aprobado] |
+| 48 | Sin PostGIS por ahora: distancias con Haversine en el cliente | [Claude Code → aprobado] |
+| 49 | SQL versionado en `supabase/migrations` + `seed.sql`, ejecutado en el SQL Editor (sin CLI) | [Claude Code → aprobado] |
+| 50 | Pantallas de login con componentes existentes (estilo D4), `// supuesto` (Figma no las tiene) | [Usuario, 26/11] |
+| 51 | Fase 5 priorizada para entrega en < 3 semanas: 5.0–5.5 para la demo; 5.6–5.7 si hay tiempo | [Usuario, 26/11] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.
@@ -336,9 +343,9 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 
 | Tema | Detalle |
 |---|---|
-| Proyecto Final | Fecha de entrega; forma de acceso al MVP (EAS Update/QR o web en Vercel); PPT; guion de la demo |
+| Proyecto Final | Fecha exacta de entrega (en menos de 3 semanas desde el 26/11); forma de acceso al MVP (EAS Update/QR o web en Vercel); PPT; guion de la demo |
 | IA | Elegir la función (reporte por voz/texto libre o agente de viaje) y el proveedor del modelo |
-| Fase 5 | Método de login; esquema de datos; líneas reales (5–10 a mano) |
+| Fase 5 | Decidida el 26/11 (decisiones 45–51; sub-pasos en ROADMAP). Pendiente: crear el proyecto (5.0) y **SMTP propio antes de la prueba con usuarios** |
 | Fase 6 | Proveedor de mapa (restricción de Expo Go) |
 | Prueba con usuario | Hacerla con la app real (guion en D9) |
 | README | Actualizar la sección «Avance» (SDK 58 ya está en `main` y subido: commit `353ee42`) |

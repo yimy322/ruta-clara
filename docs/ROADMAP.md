@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Siguiente: Fase 5 (Supabase), que se planifica antes de empezar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) planificada el 26/11: siguiente **5.0** (crear el proyecto y conectar la app).
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -51,7 +51,14 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | ✅ (26/11) |
 | 4.8 | Módulo de accesibilidad (A1/A2) | ✅ (26/11) |
 | 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | ✅ (26/11) |
-| 5 | Backend con Supabase (login, datos reales, tiempo real, correos) | 🗺️ |
+| 5.0 | Proyecto Supabase y cliente | 📝 **siguiente** |
+| 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | 📝 |
+| 5.2 | Inicio de sesión con código por correo | 📝 |
+| 5.3 | Perfil y cuenta reales | 📝 |
+| 5.4 | Reportes reales | 📝 |
+| 5.5 | Tiempo real | 📝 |
+| 5.6 | Favoritos, alertas y notificaciones en la base | 📝 si hay tiempo |
+| 5.7 | Correos (SMTP propio), fotos en Storage, borrado programado | 📝 si hay tiempo |
 | 6 | Mapa real, ubicación real y notificaciones | 🗺️ |
 | 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
 | 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
@@ -131,8 +138,27 @@ Pantalla `/accesibilidad` (A1/A2): texto hasta 200 %, alto contraste 7:1, reduci
 ### 4.9 · Cuenta y eliminación — ✅
 D1–D5 (`/cuenta`, `/cuenta/eliminar/*`) con `getCuenta`, `desactivarCuenta`, `solicitarEliminacion` (fecha = hoy + 30 días) y `cancelarEliminacion` simuladas en el repositorio; se conectan a Supabase en la Fase 5. Supuestos: edición de datos y «Descargar mis datos» muestran «pronto»; desactivar y «Entendido» cierran sesión; Mi cuenta muestra un aviso para cancelar la eliminación pendiente.
 
-## Fase 5 · Backend con Supabase — 🗺️
-Login, base de datos, reportes en tiempo real, cola sin conexión y correos. **Pendiente decidir:** método de login (OTP por correo, SMS o Google), esquema de datos y carga de 5–10 líneas reales.
+## Fase 5 · Backend con Supabase — 📝 (planificada el 26/11)
+Entrega en **menos de 3 semanas**: 5.0–5.5 son lo que se ve en la demo; 5.6–5.7 solo si hay tiempo. Prompts 9–16 en `PROMPTS_PENDIENTES.md`.
+
+**Decisiones:** login con **código de 6 dígitos por correo** (OTP); datos iniciales = **los mocks actuales** (las líneas reales quedan para después); sesión en AsyncStorage (ya instalado); sin PostGIS por ahora (Haversine en el cliente); SQL versionado en `supabase/` y ejecutado en el SQL Editor; pantallas de login con componentes existentes (Figma no las tiene).
+
+**Arquitectura:** `src/data/supabase.ts` es el único que importa supabase-js; el repositorio mantiene las firmas. El catálogo se carga una vez y queda en memoria (`src/data/catalogo.ts`); los datos del usuario van en tablas con RLS; `crear_reporte` (RPC) inserta y suma puntos; `refrescar_demo()` mantiene «en vivo» los reportes de ejemplo para la demo.
+
+**Límite importante:** el correo incluido en Supabase manda solo 2 correos por hora y **solo a correos del equipo del proyecto**. Para desarrollar alcanza con tu correo; **antes de la prueba con otras personas hay que configurar SMTP propio** (5.7).
+
+### 5.0 · Guía para crear el proyecto (lo haces tú)
+1. Entra a https://supabase.com y crea una cuenta (puede ser con GitHub).
+2. **New project** → nombre `rutaclara`, plan **Free**, región **South America (São Paulo)**. Genera la contraseña de la base de datos y **guárdala en tu gestor de contraseñas; no la pegues en el chat ni en el código**.
+3. Cuando termine de crearse: **Project Settings → API** (o «API Keys»). Copia la **Project URL** y la **publishable key** (la pública; nunca la `service_role` ni la secreta).
+4. En la raíz del proyecto crea `.env.local` con:
+   ```
+   EXPO_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+   ```
+   (`.gitignore` ya ignora `.env.*`, así que no se sube.)
+5. **Authentication → Email Templates → Magic Link**: agrega el código al cuerpo, por ejemplo `<p>Tu código de RutaClara es: <strong>{{ .Token }}</strong></p>`. Sin `{{ .Token }}` Supabase manda un enlace en vez del código.
+6. Avísame y ejecutamos el prompt 9.
 
 ## Fase 6 · Mapa real, ubicación y notificaciones — 🗺️
 **Pendiente decidir:** proveedor de mapa. Restricción de Expo Go: `react-native-maps` sí funciona en Expo Go; MapLibre necesita un *development build*. Las notificaciones push remotas también requieren *development build*.

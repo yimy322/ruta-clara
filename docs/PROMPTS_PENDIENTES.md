@@ -1,6 +1,6 @@
 # PROMPTS_PENDIENTES.md — RutaClara
 
-Actualizado: **22 de noviembre de 2026**. Prompts para Claude Code **que todavía no constan como ejecutados**. Todos usan la **alta fidelidad** como referencia visual (página `69:441`).
+Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todavía no constan como ejecutados**. Todos usan la **alta fidelidad** como referencia visual (página `69:441`).
 
 **Uso de cada prompt:**
 1. En la carpeta del proyecto: `claude`.
@@ -23,7 +23,21 @@ Actualizado: **22 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 6 | 4.6 + 4.8 · Tema dinámico y módulo de accesibilidad | ✅ (26/11) |
 | 7 | 4.9 · Cuenta y eliminación de cuenta | ✅ (26/11) |
 | 8 | Revisión de SDK 58 (si no se hizo) | ✅ (26/11) |
-| — | Fases 5, 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
+| 9 | 5.0 · Proyecto Supabase y cliente | 📝 **siguiente** |
+| 10 | 5.1 · Esquema, RLS y datos iniciales | 📝 |
+| 11 | 5.2 · Inicio de sesión con código por correo | 📝 |
+| 12 | 5.3 · Perfil y cuenta reales | 📝 |
+| 13 | 5.4 · Reportes reales | 📝 |
+| 14 | 5.5 · Tiempo real | 📝 |
+| 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | 📝 |
+| 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | 📝 |
+| — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
+
+**Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:
+- `src/data/supabase.ts` es el único archivo que importa `@supabase/supabase-js`; las pantallas siguen usando solo `@/data/repositorio` y **las firmas no cambian**.
+- SQL versionado en `supabase/migrations/NNN_nombre.sql` y `supabase/seed.sql`; el usuario lo ejecuta en el SQL Editor del dashboard (sin CLI de Supabase).
+- Claves en `.env.local` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Nunca la contraseña de la base ni la clave secreta en la app ni en el chat.
+- Errores de red → `SinConexionError` (la cola de reportes sigue funcionando); `simulacion.ts` sigue forzando error, vacío y sin red.
 
 ---
 
@@ -277,9 +291,135 @@ CLAUDE.md a SDK 58. Dime qué cambiaste y por qué.
 
 ---
 
+## 9. Paso 5.0 · Proyecto Supabase y cliente
+
+Antes, el usuario crea el proyecto (guía en `ROADMAP.md`, Fase 5) y pone la URL y la publishable key en `.env.local`.
+
+```
+Fase 5, paso 0: conectar la app a Supabase. El proyecto usa Expo SDK 58;
+instala con "npx expo install".
+- Instala @supabase/supabase-js (aprobado en el plan de la Fase 5).
+- src/data/supabase.ts: createClient con EXPO_PUBLIC_SUPABASE_URL y
+  EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY; auth con storage AsyncStorage,
+  autoRefreshToken, persistSession, detectSessionInUrl: false; listener de
+  AppState (startAutoRefresh / stopAutoRefresh). Si faltan las variables,
+  error claro en desarrollo.
+- .env.example con las dos variables vacías; verifica que .gitignore ignora
+  .env.local.
+- /dev/datos: fila "Conexión con Supabase" que hace una consulta mínima y
+  muestra OK o el error.
+Lee antes https://docs.expo.dev/guides/using-supabase/. Al final tsc, lint y
+expo-doctor. Primero el plan.
+```
+
+---
+
+## 10. Paso 5.1 · Esquema, RLS y datos iniciales
+
+```
+Fase 5, paso 1: base de datos. Escribe el SQL en supabase/migrations/
+(001_catalogo.sql, 002_usuario.sql, 003_funciones.sql) y supabase/seed.sql;
+yo lo ejecuto en el SQL Editor.
+- Catálogo (lectura pública): lineas (con recorrido_ida/vuelta y afluencia),
+  paraderos, destinos, vias, busquedas. Seed = los mocks actuales de
+  src/mocks, sin cambiar ids.
+- Usuario (RLS: cada uno ve y edita lo suyo): perfiles (nombre, telefono,
+  puntos, eliminacion_el, desactivada), lineas_favoritas,
+  paraderos_favoritos, lugares, alertas, notificaciones.
+- reportes: lectura para usuarios autenticados (sin usuario_id si es
+  anónimo), inserción solo por la RPC crear_reporte (suma puntos según
+  PUNTOS_POR_TIPO, replicado en SQL). Publicación supabase_realtime.
+- Trigger en auth.users que crea el perfil. Función refrescar_demo() que
+  vuelve a fechar los reportes de ejemplo como en src/mocks/reportes.ts.
+- src/data/catalogo.ts: carga el catálogo una vez y lo deja en memoria; el
+  repositorio deja de importar los mocks del catálogo (mismas firmas).
+- Botón "Refrescar datos de demo" en /dev/datos.
+Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 11. Paso 5.2 · Inicio de sesión con código por correo
+
+Figma no tiene pantallas de login: se arman con los componentes existentes (estilo de D4) y se marcan `// supuesto`.
+
+```
+Fase 5, paso 2: login con OTP por correo (signInWithOtp + verifyOtp
+type "email"; la plantilla Magic Link ya tiene {{ .Token }}).
+- /ingresar: correo (validación con ícono + texto, como E8) y "Enviar
+  código". /ingresar/codigo: 6 dígitos, "Reenviar código" a los 60 s,
+  errores (código incorrecto o vencido, sin conexión). Primera vez:
+  "¿Cómo te llamas?" guarda el nombre en perfiles.
+- Usa PantallaCuenta, TarjetaCuenta, Button y los tokens; textos en
+  español peruano.
+- Sesión en un contexto (useSesion); Stack.Protected: sin onboarding →
+  onboarding; sin sesión → ingresar; con sesión → app.
+- useCerrarSesion, "Desactivar" (D3) y "Entendido" (D5) llaman a
+  supabase.auth.signOut().
+Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 12. Paso 5.3 · Perfil y cuenta reales
+
+```
+Fase 5, paso 3: getUsuario, getCuenta, desactivarCuenta,
+solicitarEliminacion y cancelarEliminacion contra la tabla perfiles (correo
+de la sesión, enmascarado). Historial (F2_09) e insignias con los reportes
+propios. Mismas firmas. Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 13. Paso 5.4 · Reportes reales
+
+```
+Fase 5, paso 4: crearReporte llama a la RPC crear_reporte (devuelve puntos,
+total y usuario); las lecturas de reportes (Inicio, Detalle de paradero,
+Monitoreo, unidades en vivo, mapa de seguridad y zonas) salen de la tabla
+reportes. Error de red → SinConexionError para que la cola (E3) siga
+funcionando. Mismas firmas. Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 14. Paso 5.5 · Tiempo real
+
+```
+Fase 5, paso 5: hook useReportesEnVivo() con un canal postgres_changes
+(INSERT en reportes) que avisa a Inicio, Detalle de paradero, Monitoreo y
+Mapa de seguridad para recargar. Cerrar el canal al salir de la pantalla y
+al pasar a segundo plano. Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 15. Paso 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo)
+
+```
+Fase 5, paso 6: favoritos (líneas y paraderos), lugares guardados, alertas
+diarias y notificaciones pasan de memoria a sus tablas; simularAvisoAlerta
+inserta en notificaciones. Mismas firmas. Al final tsc y lint. Primero el
+plan.
+```
+
+---
+
+## 16. Paso 5.7 · Correos, fotos y borrado programado (si hay tiempo)
+
+```
+Fase 5, paso 7: guía para configurar SMTP propio (Gmail con contraseña de
+aplicación) antes de la prueba con usuarios; plantilla de verificación
+según el frame de Figma 111:2098; fotos de reportes en Supabase Storage;
+Edge Function programada que borra las cuentas al vencer los 30 días.
+Primero el plan.
+```
+
+---
+
 ## Fases sin prompt (planificar con Claude Code al llegar)
 
-- **Fase 5 · Supabase:** decidir login (OTP por correo recomendado por simplicidad), esquema (`usuarios`, `lineas`, `paraderos`, `reportes`, `alertas`, `notificaciones`), Realtime para reportes, RLS, `.env` fuera de Git, reemplazar el interior del repositorio sin cambiar firmas, cola sin conexión real, correos (bienvenida, verificación, eliminación).
 - **Fase 6 · Mapa real:** `react-native-maps` funciona en Expo Go; MapLibre y push remoto requieren *development build*.
 - **Fase 7 · IA (puntos adicionales):** propuesta: reporte por voz o texto libre que la IA convierte en borrador confirmable, y/o agente de viaje con herramientas (`buscarRutas`, `iniciarEspera`, `guardarAlerta`) que pide confirmación antes de actuar. El modelo se llama desde una Supabase Edge Function.
 - **Fase 8 · Entrega:** repositorio en GitHub con README; acceso (EAS Update + QR, o web en Vercel); prueba de usabilidad con la app real (guion: https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF); PPT; guion de la demo.
