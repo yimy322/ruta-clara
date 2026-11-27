@@ -29,8 +29,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 12 | 5.3 · Perfil y cuenta reales | ✅ ejecutado el 26/11 |
 | 13 | 5.4 · Reportes reales | ✅ ejecutado el 27/11 |
 | 14 | 5.5 · Tiempo real | ✅ ejecutado el 27/11 |
-| 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | 🔨 **en prueba** |
-| 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | 📝 |
+| 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | ✅ ejecutado el 27/11 |
+| 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | 🔨 **en prueba** |
 | — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:

@@ -92,7 +92,7 @@ Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualiza
 | Lint | ESLint con la configuración oficial de Expo |
 | Almacenamiento local | `@react-native-async-storage/async-storage` (`src/data/preferencias.ts`) |
 | Dependencias agregadas | `expo-location`, `expo-image-picker`, `expo-haptics`, `@react-native-community/datetimepicker` |
-| Backend (Fase 5, en curso) | **Supabase**: PostgreSQL, Auth (OTP por correo), Realtime, Edge Functions. Cliente `@supabase/supabase-js` con sesión en AsyncStorage; claves en `.env.local` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). PostGIS disponible pero no se usa por ahora |
+| Backend (Fase 5) | **Supabase**: PostgreSQL, Auth (OTP por correo), Realtime, Storage (fotos) y pg_cron (borrado programado). Cliente `@supabase/supabase-js` con sesión en AsyncStorage; claves en `.env.local` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). PostGIS disponible pero no se usa por ahora |
 | Mapa (futuro) | Sin decidir. `react-native-maps` funciona en Expo Go; MapLibre requiere *development build* |
 | Notificaciones (futuro) | Expo Notifications (push remoto requiere *development build*) |
 | IA (futuro) | Sin decidir; siempre detrás de una Edge Function (la clave nunca va en la app) |
@@ -346,6 +346,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 59 | Reportes: `crearReporte` usa la RPC `crear_reporte` (lee el perfil antes de insertar para no duplicar desde la cola). Lecturas desde la tabla: reportes de las últimas 24 h en memoria del repositorio, reutilizados 15 s (`invalidarReportes()`); sin red se usan los últimos leídos. La foto no se sube hasta 5.7 | [Claude Code, 26/11 → aprobado] |
 | 60 | Tiempo real: un solo canal `postgres_changes` (INSERT y UPDATE en `reportes`, `src/data/tiempoReal.ts`) compartido; solo escucha la pantalla visible (`useReportesEnVivo`, con `useFocusEffect`); avisos agrupados en 500 ms; se cierra en segundo plano y al volver avisa una vez. Inicio, Detalle de paradero, Monitoreo y Mapa de seguridad. «Lo están viendo N personas» (F2_08) sigue supuesto (necesitaría Presence) | [Claude Code, 27/11 → aprobado] |
 | 61 | Favoritos (líneas y paraderos), lugares y alertas: en memoria por usuario (se cargan una vez por sesión, sin red se usan los últimos), escrituras primero en la base; orden por `creado_en` (`005_orden.sql`). Avisos: siempre desde la tabla `notificaciones`; el conteo de no leídas se pide al entrar a la app. Sin mocks de usuario salvo `ubicacionUsuario` (Fase 6) | [Claude Code, 27/11 → aprobado] |
+| 62 | 5.7: borrado de cuentas vencidas con **pg_cron** (`borrar_cuentas_vencidas()`, diario 08:00 UTC) en vez de Edge Function, sin CLI. Fotos de reportes en el bucket público `fotos-reportes/{usuario}/…` (solo se sube a la carpeta propia); la foto es opcional: sin red el reporte va a la cola con ella, con otro error sale sin foto. Plantilla de correo según 111:2098 ya hecha en 5.2 | [Claude Code, 27/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.
@@ -356,7 +357,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 |---|---|
 | Proyecto Final | Fecha exacta de entrega (en menos de 3 semanas desde el 26/11); forma de acceso al MVP (EAS Update/QR o web en Vercel); PPT; guion de la demo |
 | IA | Elegir la función (reporte por voz/texto libre o agente de viaje) y el proveedor del modelo |
-| Fase 5 | Decidida el 26/11 (decisiones 45–51; sub-pasos en ROADMAP). Proyecto creado (5.0); **SMTP de Gmail al inicio del 5.2** (decisión 52) |
+| Fase 5 | Implementada 26–27/11 (decisiones 45–62). Pendiente conocido: el **comprobante por correo** de la eliminación (D5 dice «Te enviamos un comprobante…», Figma 113:2029) necesita Edge Function + proveedor de correo; trabajo futuro. «Lo están viendo N personas» (F2_08) sigue supuesto (Presence) |
 | Fase 6 | Proveedor de mapa (restricción de Expo Go) |
 | Prueba con usuario | Hacerla con la app real (guion en D9) |
 | README | Actualizar la sección «Avance» (SDK 58 ya está en `main` y subido: commit `353ee42`) |

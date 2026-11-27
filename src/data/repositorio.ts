@@ -54,7 +54,7 @@ import {
 } from "./catalogo";
 import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
-import { supabase } from "./supabase";
+import { subirFotoReporte, supabase } from "./supabase";
 
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
@@ -839,6 +839,19 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
   // haberse guardado, así no se duplica al reenviarlo
   const usuario = await getUsuario();
 
+  // Foto opcional (F2_06): sin red el reporte va a la cola con la foto; si
+  // falla por otra causa (p. ej. el archivo temporal ya no existe), sale sin ella
+  let fotoUrl: string | undefined;
+  if (borrador.fotoUri) {
+    try {
+      fotoUrl = await subirFotoReporte(usuario.id, borrador.fotoUri);
+    } catch (error) {
+      if (error instanceof SinConexionError) {
+        throw error;
+      }
+    }
+  }
+
   const datos = {
     tipo,
     linea_id: borrador.lineaId,
@@ -859,7 +872,7 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     urgente: borrador.urgente,
     anonimo: borrador.anonimo,
     nota: borrador.nota,
-    // La foto se sube a Supabase Storage en 5.7; la URI local no se guarda
+    foto_url: fotoUrl,
   };
   const { data } = await consultar(async () => await supabase.rpc("crear_reporte", { datos }));
   const { reporte: fila, puntos } = data as { reporte: FilaReporte; puntos: number };
