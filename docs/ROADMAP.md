@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente), 5.1 ✅ (esquema, RLS y catálogo remoto); 5.2 ✅ (login con código por correo); 5.3 ✅ (perfil y cuenta reales); 5.4 ✅ (reportes reales); 5.5 ✅ (tiempo real): **completa la parte de la Fase 5 para la demo (5.0–5.5)**. 5.6 ✅ (favoritos, lugares, alertas y avisos en la base). **5.7** (fotos en Storage y borrado programado; la plantilla de correo ya se hizo en 5.2) escrito, falta ejecutar `006_fotos_y_borrado.sql` y probar; con él la Fase 5 queda completa.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. Fase 6 (mapa y ubicación reales) planificada el 27/11: siguiente **6.0**.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -58,8 +58,11 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 5.4 | Reportes reales | ✅ (27/11) |
 | 5.5 | Tiempo real | ✅ (27/11) |
 | 5.6 | Favoritos, alertas y notificaciones en la base | ✅ (27/11) |
-| 5.7 | Plantilla de correo según Figma, fotos en Storage, borrado programado | 🔨 **en prueba** |
-| 6 | Mapa real, ubicación real y notificaciones | 🗺️ |
+| 5.7 | Plantilla de correo según Figma, fotos en Storage, borrado programado | ✅ (27/11) |
+| 6.0 | Mapa real (`react-native-maps`) con las mismas props de `Mapa` | 📝 **siguiente** |
+| 6.1 | Ubicación real del celular (con «Usar ubicación de prueba» para la demo) | 📝 |
+| 6.2 | Mapa interactivo: arrastrar en F2_04, centrar en mí, destino en F1_06 | 📝 |
+| 6.3 | Notificaciones locales (llegada, bajar, recordatorio de alertas) | 📝 si hay tiempo |
 | 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
 | 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
 
@@ -138,7 +141,7 @@ Pantalla `/accesibilidad` (A1/A2): texto hasta 200 %, alto contraste 7:1, reduci
 ### 4.9 · Cuenta y eliminación — ✅
 D1–D5 (`/cuenta`, `/cuenta/eliminar/*`) con `getCuenta`, `desactivarCuenta`, `solicitarEliminacion` (fecha = hoy + 30 días) y `cancelarEliminacion` simuladas en el repositorio; se conectan a Supabase en la Fase 5. Supuestos: edición de datos y «Descargar mis datos» muestran «pronto»; desactivar y «Entendido» cierran sesión; Mi cuenta muestra un aviso para cancelar la eliminación pendiente.
 
-## Fase 5 · Backend con Supabase — 📝 (planificada el 26/11)
+## Fase 5 · Backend con Supabase — ✅ (26–27/11)
 Entrega en **menos de 3 semanas**: 5.0–5.5 son lo que se ve en la demo; 5.6–5.7 solo si hay tiempo. Prompts 9–16 en `PROMPTS_PENDIENTES.md`.
 
 **Decisiones:** login con **código de 6 dígitos por correo** (OTP); datos iniciales = **los mocks actuales** (las líneas reales quedan para después); sesión en AsyncStorage (ya instalado); sin PostGIS por ahora (Haversine en el cliente); SQL versionado en `supabase/` y ejecutado en el SQL Editor; pantallas de login con componentes existentes (Figma no las tiene).
@@ -184,8 +187,14 @@ El catálogo se lee una vez (`src/data/catalogo.ts`) y queda guardado en el tel�
 
 Flujo: onboarding → `/ingresar` (correo) → `/ingresar/codigo` (6 dígitos) → la primera vez `/ingresar/nombre` → Inicio. La sesión queda guardada; «Cerrar sesión», «Desactivar» (D3) y «Entendido» (D5) cierran la sesión de Supabase.
 
-## Fase 6 · Mapa real, ubicación y notificaciones — 🗺️
-**Pendiente decidir:** proveedor de mapa. Restricción de Expo Go: `react-native-maps` sí funciona en Expo Go; MapLibre necesita un *development build*. Las notificaciones push remotas también requieren *development build*.
+## Fase 6 · Mapa y ubicación reales — 📝 (planificada el 27/11)
+**Hechos (docs de Expo SDK 58, 27/11):** `react-native-maps` funciona en Expo Go en iOS (Apple Maps) y Android **sin API key** (`npx expo install react-native-maps`); `expo-maps` necesita *development build* e iOS 17 (descartado). `expo-location` (ya instalado): ubicación en primer plano en Expo Go; segundo plano necesita *development build*. `expo-notifications`: notificaciones **locales** sí en Expo Go; push remoto no (Android).
+
+**Decisiones (CONTEXT 63–67):** mapa con `react-native-maps`; se acepta el fondo de Apple/Google Maps (Figma no se puede aplicar en Apple Maps) y los marcadores, chips y zonas mantienen el estilo RutaClara; «Usar ubicación de prueba» encendido por defecto para la demo; recorridos como líneas rectas entre paraderos; solo notificaciones locales.
+
+**Sub-pasos:** 6.0 mapa real (mismas props; las 9 pantallas no cambian) → 6.1 ubicación real → 6.2 mapa interactivo → 6.3 notificaciones locales (si hay tiempo). Prompts 17–20.
+
+**Fuera de la Fase 6:** trazo por calles reales (servicio de rutas), ubicación en segundo plano y push remoto (*development build*).
 
 ## Fase 7 · Inteligencia artificial — 🗺️ propuesta (sin aprobar)
 Puntos adicionales del Proyecto Final. Dos ideas con utilidad concreta:

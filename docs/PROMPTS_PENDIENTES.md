@@ -30,7 +30,11 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 13 | 5.4 · Reportes reales | ✅ ejecutado el 27/11 |
 | 14 | 5.5 · Tiempo real | ✅ ejecutado el 27/11 |
 | 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | ✅ ejecutado el 27/11 |
-| 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | 🔨 **en prueba** |
+| 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | ✅ ejecutado el 27/11 |
+| 17 | 6.0 · Mapa real | 📝 **siguiente** |
+| 18 | 6.1 · Ubicación real | 📝 |
+| 19 | 6.2 · Mapa interactivo | 📝 |
+| 20 | 6.3 · Notificaciones locales (si hay tiempo) | 📝 |
 | — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:
@@ -421,9 +425,81 @@ Primero el plan.
 
 ---
 
+## Fase 6 · Reglas comunes (prompts 17–20)
+- Expo Go en iPhone: nada que necesite *development build*. Instalar solo con `npx expo install` y lo aprobado (`react-native-maps` en 6.0, `expo-notifications` en 6.3).
+- Las pantallas siguen usando `Mapa` y `@/data/repositorio` con las mismas firmas.
+- Tokens y componentes existentes; modo oscuro, alto contraste, «reducir movimiento» y «señales sin color» siguen funcionando.
+- Lo que no está en Figma va `// supuesto`.
+
+---
+
+## 17. Paso 6.0 · Mapa real
+
+```
+Fase 6, paso 0: mapa real. El proyecto usa Expo SDK 58; instala con
+"npx expo install react-native-maps".
+- Reescribe src/components/Mapa.tsx con MapView de react-native-maps sin
+  cambiar sus props (lo usan 9 pantallas): usuario (punto azul con halo),
+  paraderos (marcador «P» o punto), unidades (burbuja amarilla / chip como
+  marcador personalizado), recorrido (Polyline recta), seguimiento
+  (Polyline punteada), zonas de seguridad (Circle rojo/ámbar), rótulos y
+  etiquetas (chips sobre el mapa). Encuadre automático de los puntos.
+- Modo oscuro con userInterfaceStyle; sin animación de cámara con
+  «reducir movimiento»; el mapa es decorativo para el lector de pantalla
+  (la información sigue en las listas).
+- Lee con el MCP los frames F1_04 (69:530), F1_08 (69:775), F3_02 (69:1185)
+  y F3_06 (69:1378) para los marcadores.
+Al final tsc, lint y expo-doctor. Primero el plan.
+```
+
+---
+
+## 18. Paso 6.1 · Ubicación real
+
+```
+Fase 6, paso 1: ubicación real con expo-location (ya instalado).
+- getUbicacionUsuario() usa la ubicación del celular en primer plano si hay
+  permiso; si no, o si está activo «Usar ubicación de prueba» (nuevo
+  interruptor en /dev/datos, encendido por defecto para la demo), usa
+  ubicacionUsuario de los mocks.
+- crearReporte (posición por defecto) y las líneas sugeridas usan la misma
+  ubicación. El banner de permiso de F1_04 ya existe.
+Al final tsc y lint. Primero el plan.
+```
+
+---
+
+## 19. Paso 6.2 · Mapa interactivo
+
+```
+Fase 6, paso 2: mapa interactivo.
+- F2_04 (69:959) «Confirmar ubicación»: arrastrar el mapa con un pin fijo al
+  centro; la posición elegida va al borrador (posicion).
+- Inicio (F1_04, 69:530): botón «centrar en mí».
+- Resultados (F1_06, 69:667): marcador del destino.
+Lee cada frame con el MCP antes de escribir código. Al final tsc y lint.
+Primero el plan.
+```
+
+---
+
+## 20. Paso 6.3 · Notificaciones locales (si hay tiempo)
+
+```
+Fase 6, paso 3: notificaciones locales con expo-notifications (instalar con
+npx expo install; push remoto fuera: necesita development build).
+- F1_08: «¡Tu carro está llegando!» y F1_09: aviso para bajar, como
+  notificación local si la app está en segundo plano.
+- Alertas diarias (F3_03): recordatorio local programado (días y hora menos
+  minutosAntes); se reprograma al guardar o eliminar una alerta.
+- Permiso pedido en contexto (al activar una alerta o iniciar el viaje).
+Al final tsc, lint y expo-doctor. Primero el plan.
+```
+
+---
+
 ## Fases sin prompt (planificar con Claude Code al llegar)
 
-- **Fase 6 · Mapa real:** `react-native-maps` funciona en Expo Go; MapLibre y push remoto requieren *development build*.
 - **Fase 7 · IA (puntos adicionales):** propuesta: reporte por voz o texto libre que la IA convierte en borrador confirmable, y/o agente de viaje con herramientas (`buscarRutas`, `iniciarEspera`, `guardarAlerta`) que pide confirmación antes de actuar. El modelo se llama desde una Supabase Edge Function.
 - **Fase 8 · Entrega:** repositorio en GitHub con README; acceso (EAS Update + QR, o web en Vercel); prueba de usabilidad con la app real (guion: https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF); PPT; guion de la demo.
 
