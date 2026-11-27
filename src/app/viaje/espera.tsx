@@ -9,6 +9,7 @@ import { Button, Chip, IconButton, Mapa, useToast } from "@/components";
 import { INTERVALO_ETA_MS } from "@/config/simulacion";
 import { useViaje } from "@/context/ViajeContext";
 import { getReportesCercanos, getUnidadEnCamino } from "@/data/repositorio";
+import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Reporte, UnidadEnCamino } from "@/types";
 import {
@@ -56,6 +57,9 @@ export default function Espera() {
   const lineaId = viaje?.linea.id;
   const paradero = viaje?.paraderoEspera;
 
+  // Tiempo real: sube con cada reporte nuevo y vuelve a pedir la unidad
+  const version = useReportesEnVivo();
+
   useEffect(() => {
     if (!lineaId || !paradero) {
       return;
@@ -64,6 +68,8 @@ export default function Espera() {
     getUnidadEnCamino(lineaId, paradero.id).then((data) => {
       if (activo) {
         setUnidad(data);
+        // La ETA vuelve a salir del reporte real
+        setAvance(0);
         setActualizadoEn(data ? new Date(data.actualizadoEn).getTime() : undefined);
       }
     });
@@ -71,7 +77,7 @@ export default function Espera() {
     return () => {
       activo = false;
     };
-  }, [lineaId, paradero]);
+  }, [lineaId, paradero, version]);
 
   const etaMin = unidad ? Math.max(unidad.etaMin - avance, ETA_MINIMA_MIN) : undefined;
   const enCamino = etaMin !== undefined && etaMin > ETA_MINIMA_MIN;

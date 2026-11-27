@@ -9,6 +9,7 @@ import { Button, Chip, IconButton, Mapa, PildoraNivel, Toggle } from "@/componen
 import { VENTANAS_SEGURIDAD_H } from "@/config/reportes";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { getUbicacionUsuario, getZonasSeguridad } from "@/data/repositorio";
+import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
 import { radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
 import type { Coordenada, NivelZona, TipoSeguridad, ZonaSeguridad } from "@/types";
 import { cantidadReportes, haceCuanto, seguridadEnFrase } from "@/utils/formato";
@@ -74,7 +75,9 @@ export default function Seguridad() {
     };
   }, [horas, tipo]);
 
-  useEffect(pedirZonas, [pedirZonas]);
+  // Tiempo real: recarga las zonas al llegar un reporte nuevo
+  const version = useReportesEnVivo();
+  useEffect(pedirZonas, [pedirZonas, version]);
 
   const cambiarFiltro = (valor: TipoSeguridad | null) => {
     setZonas(undefined);

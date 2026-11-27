@@ -14,6 +14,7 @@ import {
   getResumenParadero,
 } from "@/data/repositorio";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
+import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
 import type { AlertaDiaria, EstadoParadero, ResumenParadero } from "@/types";
 import {
   etiquetaOcupacion,
@@ -75,6 +76,8 @@ export default function DetalleParadero() {
   // Al volver de la alerta o del reporte se recarga sin mostrar de nuevo el
   // estado de carga, para reflejar lo que cambió
   useFocusEffect(cargar);
+  // Tiempo real: recarga al llegar un reporte nuevo
+  useReportesEnVivo(cargar);
 
   const reintentar = () => {
     setEstado({ tipo: "cargando" });

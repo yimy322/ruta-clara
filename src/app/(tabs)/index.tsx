@@ -23,6 +23,7 @@ import {
   getUbicacionUsuario,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
+import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { usePermisoUbicacion } from "@/hooks/usePermisoUbicacion";
 import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
@@ -50,6 +51,9 @@ export default function Inicio() {
   // Alto de los controles flotantes, para que el mapa no ponga puntos debajo
   const [altoArriba, setAltoArriba] = useState(0);
   const [altoAbajo, setAltoAbajo] = useState(0);
+
+  // Tiempo real: sube con cada reporte nuevo y vuelve a cargar el efecto
+  const version = useReportesEnVivo();
 
   useEffect(() => {
     let activo = true;
@@ -91,7 +95,7 @@ export default function Inicio() {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [version]);
 
   const alto = (setter: (valor: number) => void) => (e: LayoutChangeEvent) => setter(e.nativeEvent.layout.height);
 
