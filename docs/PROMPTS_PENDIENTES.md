@@ -26,8 +26,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 9 | 5.0 · Proyecto Supabase y cliente | ✅ ejecutado el 26/11 |
 | 10 | 5.1 · Esquema, RLS y datos iniciales | ✅ ejecutado el 26/11 |
 | 11 | 5.2 · Inicio de sesión con código por correo | ✅ ejecutado el 26/11 |
-| 12 | 5.3 · Perfil y cuenta reales | 🔨 **en prueba** |
-| 13 | 5.4 · Reportes reales | 📝 |
+| 12 | 5.3 · Perfil y cuenta reales | ✅ ejecutado el 26/11 |
+| 13 | 5.4 · Reportes reales | 🔨 **en prueba** |
 | 14 | 5.5 · Tiempo real | 📝 |
 | 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | 📝 |
 | 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | 📝 |

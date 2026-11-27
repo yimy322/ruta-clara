@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente), 5.1 ✅ (esquema, RLS y catálogo remoto); 5.2 ✅ (login con código por correo); **5.3** (perfil y cuenta reales) escrito, falta ejecutar `004_cuenta.sql` y probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente), 5.1 ✅ (esquema, RLS y catálogo remoto); 5.2 ✅ (login con código por correo); 5.3 ✅ (perfil y cuenta reales); **5.4** (reportes reales) escrito, falta probar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -54,8 +54,8 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 5.0 | Proyecto Supabase y cliente | ✅ (26/11) |
 | 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | ✅ (26/11) |
 | 5.2 | Inicio de sesión con código por correo | ✅ (26/11) |
-| 5.3 | Perfil y cuenta reales | 🔨 **en prueba** |
-| 5.4 | Reportes reales | 📝 |
+| 5.3 | Perfil y cuenta reales | ✅ (26/11) |
+| 5.4 | Reportes reales | 🔨 **en prueba** |
 | 5.5 | Tiempo real | 📝 |
 | 5.6 | Favoritos, alertas y notificaciones en la base | 📝 si hay tiempo |
 | 5.7 | Plantilla de correo según Figma, fotos en Storage, borrado programado | 📝 si hay tiempo |

@@ -7,7 +7,6 @@ import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
-import { reportes } from "@/mocks/reportes";
 import { ubicacionUsuario } from "@/mocks/usuario";
 import type {
   ActividadParadero,
@@ -83,6 +82,62 @@ const normalizar = (texto: string) =>
 const minutosEnRecorrer = (metros: number) => metros / ((VELOCIDAD_MEDIA_KMH * 1000) / 60);
 
 const minutosDesde = (fechaISO: string) => Math.floor((Date.now() - new Date(fechaISO).getTime()) / 60_000);
+
+// Reportes de las últimas VENTANA_REPORTES_H horas, leídos de Supabase y
+// guardados en memoria (como el catálogo). Las funciones de lectura llaman a
+// esperarConReportes() y después usan este arreglo.
+const reportes: Reporte[] = [];
+// Abarca la ventana más grande de la app (mapa de seguridad de 24 h y
+// «reportes de hoy»)
+const VENTANA_REPORTES_H = 24;
+// Una lectura más nueva que esto se reutiliza (una pantalla llama a varias funciones)
+const MEMORIA_REPORTES_MS = 15_000;
+const MAX_REPORTES = 500;
+
+let reportesLeidosEn = 0;
+let lecturaReportes: Promise<void> | null = null;
+
+async function leerReportesRecientes() {
+  const desde = new Date(Date.now() - VENTANA_REPORTES_H * 3_600_000).toISOString();
+  try {
+    const [sesion, { data }] = await Promise.all([
+      getSesionActual(),
+      consultar(
+        async () =>
+          await supabase
+            .from("reportes")
+            .select("*")
+            .gte("creado_en", desde)
+            .order("creado_en", { ascending: false })
+            .limit(MAX_REPORTES),
+      ),
+    ]);
+    const filas = (data as FilaReporte[]).map((fila) => filaAReporte(fila, sesion?.usuarioId));
+    reportes.splice(0, reportes.length, ...filas);
+    reportesLeidosEn = Date.now();
+  } catch {
+    // Sin red se siguen usando los últimos reportes leídos (o ninguno)
+  }
+}
+
+function reportesRecientes(): Promise<void> {
+  if (Date.now() - reportesLeidosEn < MEMORIA_REPORTES_MS) {
+    return Promise.resolve();
+  }
+  lecturaReportes ??= leerReportesRecientes().finally(() => {
+    lecturaReportes = null;
+  });
+  return lecturaReportes;
+}
+
+// Fuerza a leer de nuevo (después de crear un reporte; en 5.5, al llegar uno en tiempo real)
+export function invalidarReportes() {
+  reportesLeidosEn = 0;
+}
+
+const esperarConReportes = async () => {
+  await Promise.all([esperar(), reportesRecientes()]);
+};
 
 export async function getLineas(): Promise<Linea[]> {
   await esperar();
@@ -272,7 +327,7 @@ function resolverDestino(nombre: string): Destino | null {
 
 // `origen` todavía no se usa: por ahora siempre es "Mi ubicación".
 export async function buscarRutas(origen: string, destino: string): Promise<OpcionRuta[]> {
-  await esperar();
+  await esperarConReportes();
   if (getSimulacion().forzarError) {
     throw new Error("El servicio de rutas no responde");
   }
@@ -307,7 +362,7 @@ export async function buscarRutas(origen: string, destino: string): Promise<Opci
 }
 
 export async function getReportesCercanos(lat: number, lng: number): Promise<Reporte[]> {
-  await esperar();
+  await esperarConReportes();
   return reportes
     .filter((reporte) => distanciaMetros(lat, lng, reporte.lat, reporte.lng) <= RADIO_CERCANO_M)
     .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
@@ -335,7 +390,7 @@ export async function getParaderosCercanos(lat: number, lng: number): Promise<Pa
 
 // Última ubicación reportada de cada línea cerca del punto.
 export async function getUnidadesEnVivo(lat: number, lng: number): Promise<UnidadEnVivo[]> {
-  await esperar();
+  await esperarConReportes();
   const unidades: UnidadEnVivo[] = [];
   const vigentes = reportes
     .filter((reporte) => reporte.tipo === "ubicacion" && minutosDesde(reporte.creadoEn) <= VIGENCIA_REPORTE_MIN)
@@ -352,7 +407,7 @@ export async function getUnidadesEnVivo(lat: number, lng: number): Promise<Unida
 
 // Cada confirmación cuenta como un reporte más del mismo hecho.
 export async function getActividadParadero(paraderoId: string): Promise<ActividadParadero> {
-  await esperar();
+  await esperarConReportes();
   const vigentes = reportes
     .filter((reporte) => reporte.paraderoId === paraderoId && minutosDesde(reporte.creadoEn) <= VIGENCIA_REPORTE_MIN)
     .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
@@ -376,7 +431,7 @@ const etaHasta = (metros: number) => Math.max(Math.round(minutosEnRecorrer(metro
 // ubicación vigente; null si no hay. La ETA sale de la distancia en línea
 // recta a velocidad media.
 export async function getUnidadEnCamino(lineaId: string, paraderoId: string): Promise<UnidadEnCamino | null> {
-  await esperar();
+  await esperarConReportes();
   const linea = lineas.find((l) => l.id === lineaId);
   const paradero = paraderos.find((p) => p.id === paraderoId);
   const reporte = ultimaUbicacion(lineaId);
@@ -657,7 +712,7 @@ function sugerir(linea: Linea, lat: number, lng: number): LineaSugerida {
 // Primero las líneas que pasan cerca, de la más activa hoy a la menos; luego
 // el resto, de la más cercana a la más lejana.
 export async function getLineasSugeridas(lat: number, lng: number): Promise<LineaSugerida[]> {
-  await esperar();
+  await esperarConReportes();
   const cerca = (s: LineaSugerida) => s.distanciaM <= RADIO_CERCANO_M;
   return lineas
     .map((linea) => sugerir(linea, lat, lng))
@@ -674,7 +729,7 @@ export async function getLineasSugeridas(lat: number, lng: number): Promise<Line
 
 // Por código, nombre o empresa, sin importar tildes ni mayúsculas.
 export async function buscarLineas(texto: string): Promise<LineaSugerida[]> {
-  await esperar();
+  await esperarConReportes();
   const consulta = normalizar(texto);
   return lineas
     .filter((linea) => [linea.codigo, linea.nombre, linea.empresa].some((campo) => normalizar(campo).includes(consulta)))
@@ -684,7 +739,8 @@ export async function buscarLineas(texto: string): Promise<LineaSugerida[]> {
 // Tipos de reporte que se asocian al paradero más cercano
 const TIPOS_EN_PARADERO: Reporte["tipo"][] = ["paradero", "seguridad"];
 
-// Guarda el reporte en memoria y suma los puntos al usuario.
+// Guarda el reporte en Supabase con la RPC crear_reporte, que también suma
+// los puntos al perfil. Sin red lanza SinConexionError (va a la cola E3).
 export async function crearReporte(borrador: BorradorReporte): Promise<ResultadoReporte> {
   await esperar();
   if (getSimulacion().forzarSinRed) {
@@ -695,16 +751,14 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     throw new Error("El reporte no tiene tipo");
   }
   const { lat, lng } = borrador.posicion ?? ubicacionUsuario;
-  // Hasta 5.4 el reporte queda en memoria: los puntos se muestran sobre el
-  // perfil real pero todavía no se guardan
+  // Antes de insertar: si falla aquí (sin red) el reporte va a la cola sin
+  // haberse guardado, así no se duplica al reenviarlo
   const usuario = await getUsuario();
 
-  const reporte: Reporte = {
-    id: `r${Date.now()}`,
+  const datos = {
     tipo,
-    usuarioId: usuario.id,
-    lineaId: borrador.lineaId,
-    paraderoId: TIPOS_EN_PARADERO.includes(tipo)
+    linea_id: borrador.lineaId,
+    paradero_id: TIPOS_EN_PARADERO.includes(tipo)
       ? (borrador.paraderoId ?? paraderoMasCercano(lat, lng)?.id)
       : undefined,
     lat,
@@ -721,24 +775,17 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     urgente: borrador.urgente,
     anonimo: borrador.anonimo,
     nota: borrador.nota,
-    // Fase 5: se sube a Supabase Storage y se guarda la URL
-    fotoUri: borrador.fotoUri,
-    creadoEn: new Date().toISOString(),
-    confirmaciones: 1,
+    // La foto se sube a Supabase Storage en 5.7; la URI local no se guarda
   };
-  reportes.push(reporte);
-
-  const puntosGanados = PUNTOS_POR_TIPO[tipo];
-  const usuarioConPuntos: Usuario = {
-    ...usuario,
-    puntos: usuario.puntos + puntosGanados,
-    reportesMes: usuario.reportesMes + 1,
-  };
+  const { data } = await consultar(async () => await supabase.rpc("crear_reporte", { datos }));
+  const { reporte: fila, puntos } = data as { reporte: FilaReporte; puntos: number };
+  invalidarReportes();
 
   return {
-    reporte,
-    puntosGanados,
-    usuario: usuarioConPuntos,
+    reporte: filaAReporte(fila, usuario.id),
+    puntosGanados: puntos,
+    // La RPC ya sumó los puntos en perfiles
+    usuario: { ...usuario, puntos: usuario.puntos + puntos, reportesMes: usuario.reportesMes + 1 },
     // supuesto: hasta tener Realtime, un número creíble de pasajeros cerca
     personasQueLoVen: 20 + Math.floor(Math.random() * 41),
   };
@@ -747,7 +794,7 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
 // Reportes de seguridad de las últimas `horas`, del más reciente al más
 // antiguo (mapa de seguridad, F3_06). Los anónimos no dicen quién los envió.
 export async function getReportesSeguridad(horas: number): Promise<Reporte[]> {
-  await esperar();
+  await esperarConReportes();
   return reportes
     .filter((reporte) => reporte.tipo === "seguridad" && minutosDesde(reporte.creadoEn) <= horas * 60)
     .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
@@ -924,7 +971,7 @@ export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<Opcion
 // Favoritos (F3_01) en una sola llamada. Paraderos en el orden en que se
 // marcaron; rutas: primero las alertas y luego las líneas favoritas sin alerta.
 export async function getFavoritos(): Promise<Favoritos> {
-  await esperar();
+  await esperarConReportes();
   if (getSimulacion().forzarVacio) {
     return { lugares: [], paraderos: [], rutas: [] };
   }
