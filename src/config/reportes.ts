@@ -19,6 +19,11 @@ export const VENTANA_PARADERO_H = 2;
 // Mapa de seguridad (F3_06): ventanas de tiempo que alterna el chip «2 h ▾»
 export const VENTANAS_SEGURIDAD_H = [2, 6, 24] as const;
 
+// Radio en metros de las zonas del mapa de seguridad (F3_06) sobre el mapa
+// real. supuesto: Figma las dibuja en píxeles (144 y 92 px)
+export const RADIO_ZONA_ALTA_M = 350;
+export const RADIO_ZONA_MEDIA_M = 220;
+
 // Reportes de seguridad en un paradero, dentro de la ventana, para que su
 // zona sea alta; con menos (y al menos uno) es media
 export const UMBRAL_ZONA_ALTA = 3;

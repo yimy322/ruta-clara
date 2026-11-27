@@ -31,7 +31,7 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 14 | 5.5 · Tiempo real | ✅ ejecutado el 27/11 |
 | 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | ✅ ejecutado el 27/11 |
 | 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | ✅ ejecutado el 27/11 |
-| 17 | 6.0 · Mapa real | 📝 **siguiente** |
+| 17 | 6.0 · Mapa real | 🔨 **en prueba** |
 | 18 | 6.1 · Ubicación real | 📝 |
 | 19 | 6.2 · Mapa interactivo | 📝 |
 | 20 | 6.3 · Notificaciones locales (si hay tiempo) | 📝 |

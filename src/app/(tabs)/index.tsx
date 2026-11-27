@@ -103,6 +103,7 @@ export default function Inicio() {
     <View style={styles.screen}>
       <Mapa
         estilo={StyleSheet.absoluteFill}
+        interactivo
         usuario={usuario}
         paraderos={paraderos}
         unidades={unidades}

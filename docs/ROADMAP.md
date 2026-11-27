@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. Fase 6 (mapa y ubicación reales) planificada el 27/11: siguiente **6.0**.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. Fase 6 (mapa y ubicación reales) planificada el 27/11: **6.0** (mapa real) escrito, falta probar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -59,7 +59,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 5.5 | Tiempo real | ✅ (27/11) |
 | 5.6 | Favoritos, alertas y notificaciones en la base | ✅ (27/11) |
 | 5.7 | Plantilla de correo según Figma, fotos en Storage, borrado programado | ✅ (27/11) |
-| 6.0 | Mapa real (`react-native-maps`) con las mismas props de `Mapa` | 📝 **siguiente** |
+| 6.0 | Mapa real (`react-native-maps`) con las mismas props de `Mapa` | 🔨 **en prueba** |
 | 6.1 | Ubicación real del celular (con «Usar ubicación de prueba» para la demo) | 📝 |
 | 6.2 | Mapa interactivo: arrastrar en F2_04, centrar en mí, destino en F1_06 | 📝 |
 | 6.3 | Notificaciones locales (llegada, bajar, recordatorio de alertas) | 📝 si hay tiempo |

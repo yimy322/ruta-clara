@@ -139,7 +139,7 @@ src/
 
 **Principios:**
 1. **Repository:** en la Fase 5 el repositorio pasa a Supabase **sin cambiar firmas** (simula red con 300–600 ms).
-2. **Mapa provisional** con las mismas props que el mapa real. La capa de controles sobre el mapa usa `pointerEvents="box-none"`.
+2. **Mapa provisional** con las mismas props que el mapa real (reemplazado en 6.0 por `react-native-maps`). La capa de controles sobre el mapa usa `pointerEvents="box-none"`.
 3. **Modal de reporte con stack propio**: al cerrarlo se vuelve al origen (A bordo, Inicio o F3_02).
 4. Lógica con datos reales (Haversine, total de paraderos calculado).
 
@@ -151,7 +151,7 @@ src/
 - `getReportesSeguridad(horas)`, `getHistorialReportes()`.
 - **4.3A:** `getParaderosFavoritos`, `esParaderoFavorito`, `alternarParaderoFavorito`, `getResumenParadero(id)`, `getActividadParadero` (renombrado del antiguo `getResumenParadero`), `getAlertas`, `getAlerta`, `getAlertaDeParadero`, `guardarAlerta`, `eliminarAlerta`, `getOpcionesRutaAlerta`.
 - **4.3B:** `getFavoritos`, `getNotificaciones`, `marcarNotificacionLeida`, `contarNoLeidas`, `simularAvisoAlerta`.
-- **4.5B:** `Mapa` con decoración (manzanas, parque, avenida) y props opcionales `marcadorParadero="P"` y `estiloUnidad="burbuja"` (solo Inicio); `CardParadero` recibe `proximas` de `getResumenParadero`; `ListItem enTarjeta`.
+- **4.5B:** `Mapa` con decoración (manzanas, parque, avenida; desde 6.0 el fondo es Apple/Google Maps) y props opcionales `marcadorParadero="P"` y `estiloUnidad="burbuja"` (solo Inicio); `CardParadero` recibe `proximas` de `getResumenParadero`; `ListItem enTarjeta`.
 - **4.7:** `EstadoPantalla` y `EsqueletoRuta`; `sugerirDestino` (Levenshtein ≤ 3); `Linea.suspendida` (La 73, E9); cola `src/data/colaReportes.ts` + `ColaReportesProvider`; modo de prueba `src/data/simulacion.ts` (interruptores en /dev/datos); dependencia `@react-native-community/netinfo`.
 - **4.5C:** `OpcionGrande`/`OpcionRadio` como tarjetas con sombra (radio elegido en redSoft + borde red); `BotonMantener` con `shadows.danger`; `PinUnidad` con ícono Radio y prop `pista`; `ItemNotificacion` con caja canvas (seguridad: círculo redSoft con borde red); `ListItem amplio`; `typography.bodyBold`. Íconos de avisos: Bus, Split, TrafficCone, TriangleAlert, Star relleno.
 - **4.4:** `getZonasSeguridad(horas, tipo?)` (zona alta ≥ 3 reportes, en `src/config/reportes.ts`). `Usuario` tiene `telefono` y `avatar`. Ajustes en `src/data/preferencias.ts` (`getAjustes`/`setAjustes`); WhatsApp de soporte en `src/config/soporte.ts` (número de ejemplo).
@@ -300,7 +300,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | A1/A2 | `/accesibilidad` | Stack ✅ |
 | D1–D5 | `/cuenta`, `/cuenta/eliminar/*` | Stack ✅ (D5 sin gesto atrás) |
 
-**TODO pendientes en el código (verificado el 26/11/2026):** edición de datos y «Descargar mis datos» en Mi cuenta (Fase 5); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar el mapa real en Inicio, trazos de rutas y marcador del destino en F1_06.
+**TODO pendientes en el código (verificado el 26/11/2026):** edición de datos y «Descargar mis datos» en Mi cuenta (Fase 5); pantalla de Ayuda (sin frame); Modo offline del menú (Fase 5); desvío en F2_02 (toast); Fase 6: mapa arrastrable en F2_04, centrar en mí en Inicio y marcador del destino en F1_06 (6.2); trazos por calles reales fuera de la Fase 6.
 
 ---
 
@@ -352,6 +352,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 65 | «Usar ubicación de prueba» (en /dev/datos) encendido por defecto para la demo | [Claude Code, 27/11 → aprobado] |
 | 66 | Recorridos como líneas rectas entre paraderos (sin servicio de rutas por calles) | [Claude Code, 27/11 → aprobado] |
 | 67 | Fase 6 solo con notificaciones locales; push remoto y ubicación en segundo plano fuera (development build) | [Claude Code, 27/11 → aprobado] |
+| 68 | 6.0: `Mapa` con `MapView` y las mismas props + `interactivo` (por defecto fijo; Inicio, Monitoreo y Mapa de seguridad se mueven). Encuadre por usuario/paraderos/zonas (las unidades no reencuadran). Zonas como `Circle` de 350 m / 220 m (supuesto). Mapa decorativo para el lector de pantalla | [Claude Code, 27/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.

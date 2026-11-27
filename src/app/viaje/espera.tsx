@@ -131,6 +131,7 @@ export default function Espera() {
       {/* El usuario espera en el paradero, así que se ubica ahí */}
       <Mapa
         estilo={StyleSheet.absoluteFill}
+        interactivo
         usuario={paradero}
         etiquetaUsuario="Tú · paradero"
         unidades={

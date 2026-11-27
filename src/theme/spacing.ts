@@ -74,17 +74,15 @@ export const sizes = {
   miniMap: 120,
   cardPadding: 14,
   badgeDot: 10,
-  // Mapa provisional (F1_04)
+  // Marcadores del mapa (F1_04)
   mapStop: 20,
-  // Alta fidelidad: paradero «P», burbuja de unidad en vivo y avenida
+  // Alta fidelidad: paradero «P» y burbuja de unidad en vivo
   mapStopP: 28,
   mapBusCircle: 24,
   mapBusGlyph: 14,
   mapBusPadding: 5,
-  mapAvenue: 18,
   mapUser: 16,
   mapUserHalo: 36,
-  mapRoad: 10,
   // Detalle de ruta (F1_07)
   segmentedHeight: 40,
   routeMap: 140,
@@ -178,8 +176,6 @@ export const sizes = {
   esqueletoChip: 24,
   esqueletoLinea: 10,
   // Mapa de seguridad (F3_06): manchas de calor y leyenda
-  zonaAlta: 144,
-  zonaMedia: 92,
   legendDot: 8,
   legendPadding: 10,
   // Mi cuenta y eliminación (D1–D5): ícono del avatar y espacio sobre la señal de D5

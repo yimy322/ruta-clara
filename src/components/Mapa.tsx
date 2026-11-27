@@ -1,11 +1,13 @@
 import { Bus, Clock, TriangleAlert } from "lucide-react-native";
-import { useState, type ReactNode } from "react";
-import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
-import { StyleSheet, Text, View, type Insets, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { StyleSheet, Text, View, type Insets, type StyleProp, type ViewStyle } from "react-native";
+import MapView, { Circle, Marker, Polyline, type Region } from "react-native-maps";
 
+import { RADIO_ZONA_ALTA_M, RADIO_ZONA_MEDIA_M } from "@/config/reportes";
 import { usePreferencias } from "@/context/PreferenciasContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { borderWidths, opacity, radii, sizes, spacing, type Tema, type Paleta } from "@/theme";
+import { useReducirMovimiento } from "@/hooks/useReducirMovimiento";
+import { borderWidths, opacity, radii, sizes, spacing, type Paleta, type Tema } from "@/theme";
 import type { Coordenada, Linea, NivelZona, Paradero } from "@/types";
 
 import { Chip } from "./Chip";
@@ -19,7 +21,7 @@ type UnidadMapa = {
   icono?: ReactNode;
 };
 
-// Mancha de calor del mapa de seguridad (F3_06)
+// Zona de calor del mapa de seguridad (F3_06)
 type ZonaMapa = {
   id: string;
   lat: number;
@@ -27,11 +29,11 @@ type ZonaMapa = {
   nivel: NivelZona;
 };
 
-// Diámetro y color de cada nivel (manchas de F3_06)
-const estiloZonas = (colors: Paleta): Record<NivelZona, { diametro: number; color: string; texto: string }> => ({
-  alto: { diametro: sizes.zonaAlta, color: colors.red, texto: "Zona de riesgo alto" },
-  medio: { diametro: sizes.zonaMedia, color: colors.amber, texto: "Zona de riesgo medio" },
-  });
+// Radio (m) y color de cada nivel (zonas de F3_06)
+const estiloZonas = (colors: Paleta): Record<NivelZona, { radio: number; color: string }> => ({
+  alto: { radio: RADIO_ZONA_ALTA_M, color: colors.red },
+  medio: { radio: RADIO_ZONA_MEDIA_M, color: colors.amber },
+});
 
 type MapaProps = {
   usuario?: Coordenada;
@@ -50,48 +52,56 @@ type MapaProps = {
   // "burbuja": unidad en vivo como píldora amarilla con ícono de bus (F1_04).
   // Por defecto, Chip Live
   estiloUnidad?: "chip" | "burbuja";
-  // Manchas de calor de seguridad, debajo de los demás puntos (F3_06)
+  // Zonas de calor de seguridad, debajo de los demás puntos (F3_06)
   zonas?: ZonaMapa[];
-  // Espacio tapado por controles flotantes: los puntos se acomodan fuera de él
+  // Espacio tapado por controles flotantes: el encuadre lo deja libre
   margen?: Insets;
+  // Se puede mover y hacer zoom (pantallas de mapa completo). Por defecto
+  // fijo, para no competir con el scroll de la pantalla
+  interactivo?: boolean;
   estilo?: StyleProp<ViewStyle>;
 };
 
-// Separación mínima entre los puntos y el borde del área visible; a los
-// lados es mayor porque los chips de unidades son anchos
-const BORDE_X = spacing.xxl * 2;
-const BORDE_Y = spacing.xxl;
-// Lado mínimo de la caja en grados (~550 m), para que un solo punto no llene el mapa
+// Lado mínimo de la región en grados (~550 m), para que un solo punto no llene el mapa
 const SPAN_MINIMO = 0.005;
+// Aire alrededor del punto más lejano
+const AIRE = 1.3;
+const DURACION_ENCUADRE_MS = 400;
+// Los marcadores se redibujan un momento tras cada cambio y luego se fijan (batería)
+const SEGUIR_CAMBIOS_MS = 1000;
 
-// Calles decorativas, en fracción del ancho/alto (posiciones de F1_04)
-const CALLES_HORIZONTALES = [0.3, 0.64];
-const CALLES_VERTICALES = [0.33, 0.72];
+// Región centrada en el usuario si lo hay (como un mapa real); si no, en el
+// centro de los puntos. Abarca el punto más lejano con algo de aire.
+function calcularRegion(puntos: Coordenada[], centro?: Coordenada): Region | undefined {
+  if (puntos.length === 0) {
+    return undefined;
+  }
+  const lats = puntos.map((p) => p.lat);
+  const lngs = puntos.map((p) => p.lng);
+  const latitude = centro?.lat ?? (Math.min(...lats) + Math.max(...lats)) / 2;
+  const longitude = centro?.lng ?? (Math.min(...lngs) + Math.max(...lngs)) / 2;
+  const lejosLat = Math.max(...lats.map((lat) => Math.abs(lat - latitude)));
+  const lejosLng = Math.max(...lngs.map((lng) => Math.abs(lng - longitude)));
+  return {
+    latitude,
+    longitude,
+    latitudeDelta: Math.max(2 * lejosLat * AIRE, SPAN_MINIMO),
+    longitudeDelta: Math.max(2 * lejosLng * AIRE, SPAN_MINIMO),
+  };
+}
 
-// Manzanas y parque decorativos (alta fidelidad, F1_04), en fracción del
-// ancho/alto del frame de 360 × 740: [left, top, width, height]
-const MANZANAS: [number, number, number, number][] = [
-  [0.39, 0.054, 0.278, 0.216],
-  [0.044, 0.338, 0.256, 0.149],
-  [0.778, 0.338, 0.178, 0.176],
-  [0.044, 0.676, 0.256, 0.203],
-];
-const PARQUE: [number, number, number, number] = [0.394, 0.405, 0.294, 0.162];
-// Avenida diagonal: centro en fracción y giro (F1_04)
-const AVENIDA = { top: 0.65, angulo: "-22deg" } as const;
-// Bajo este alto el mapa es una miniatura: sin avenida, para no tapar el recorrido
-const ALTO_MINIMO_AVENIDA = 300;
+// "#C93B29" + 0.55 → "rgba(201, 59, 41, 0.55)"
+function conAlfa(hex: string, alfa: number) {
+  const n = parseInt(hex.slice(1, 7), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alfa})`;
+}
 
-const fraccion = ([left, top, width, height]: [number, number, number, number]): ViewStyle => ({
-  left: `${left * 100}%`,
-  top: `${top * 100}%`,
-  width: `${width * 100}%`,
-  height: `${height * 100}%`,
-  });
+const coordenada = ({ lat, lng }: Coordenada) => ({ latitude: lat, longitude: lng });
 
-// Mapa PROVISIONAL que imita los wireframes: fondo plano, calles fijas y los
-// puntos ubicados con una proyección simple que encuadra todo lo recibido.
-// Fase 6: se reemplaza por un mapa real con las mismas props.
+// Mapa real (Fase 6, react-native-maps: Apple Maps en iOS). Los marcadores,
+// chips y zonas mantienen el estilo de RutaClara; el fondo es el del
+// proveedor (decisión 64). Es decorativo para el lector de pantalla: la
+// información está en las listas de cada pantalla.
 export function Mapa({
   usuario,
   paraderos = [],
@@ -104,119 +114,147 @@ export function Mapa({
   estiloUnidad = "chip",
   zonas = [],
   margen,
+  interactivo = false,
   estilo,
 }: MapaProps) {
-  const { colors, typography } = useTema();
+  const { colors, esquema, typography } = useTema();
   const styles = useEstilos(crearEstilos);
   // Señales sin depender del color (Accesibilidad)
   const senales = usePreferencias().ajustes.senalesSinColor;
+  const reducirMovimiento = useReducirMovimiento();
+  const mapa = useRef<MapView>(null);
 
-  const [tamano, setTamano] = useState({ ancho: 0, alto: 0 });
+  // Las unidades no cuentan para el encuadre: se mueven en tiempo real y el
+  // mapa no debe saltar cada vez
+  const fijos: Coordenada[] = [...(usuario ? [usuario] : []), ...paraderos, ...zonas];
+  const region = calcularRegion(fijos.length > 0 ? fijos : unidades, usuario);
+  const claveEncuadre = region
+    ? [region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta].map((n) => n.toFixed(5)).join()
+    : "";
 
-  const handleLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    setTamano({ ancho: width, alto: height });
-  };
+  // Reencuadra si cambian los puntos fijos (la región inicial cubre el primer render)
+  const primerEncuadre = useRef(claveEncuadre);
+  useEffect(() => {
+    if (!region || claveEncuadre === primerEncuadre.current) {
+      return;
+    }
+    primerEncuadre.current = claveEncuadre;
+    mapa.current?.animateToRegion(region, reducirMovimiento ? 0 : DURACION_ENCUADRE_MS);
+    // region se recalcula en cada render; claveEncuadre resume sus valores
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [claveEncuadre, reducirMovimiento]);
 
-  const puntos: Coordenada[] = [...(usuario ? [usuario] : []), ...paraderos, ...unidades, ...zonas];
-  const proyectar = crearProyeccion(puntos, usuario, tamano.ancho, tamano.alto, margen);
+  // Redibuja los marcadores un momento cuando cambia su contenido o el tema
+  const claveMarcadores = [esquema, senales, ...unidades.map((u) => `${u.linea.id}:${u.etiqueta ?? ""}`)].join();
+  const [seguir, setSeguir] = useState({ clave: claveMarcadores, activo: true });
+  if (seguir.clave !== claveMarcadores) {
+    setSeguir({ clave: claveMarcadores, activo: true });
+  }
+  useEffect(() => {
+    if (!seguir.activo) {
+      return;
+    }
+    const id = setTimeout(() => setSeguir((actual) => ({ ...actual, activo: false })), SEGUIR_CAMBIOS_MS);
+    return () => clearTimeout(id);
+  }, [seguir]);
+  const tracksViewChanges = seguir.activo;
 
   return (
-    <View style={[styles.base, estilo]} onLayout={handleLayout} accessibilityLabel="Mapa">
-      {MANZANAS.map((m) => (
-        <View key={`m${m.join()}`} style={[styles.manzana, fraccion(m)]} />
-      ))}
-      <View style={[styles.parque, fraccion(PARQUE)]} />
-      {tamano.alto >= ALTO_MINIMO_AVENIDA && <View style={styles.avenida} />}
-      {CALLES_HORIZONTALES.map((y) => (
-        <View key={`h${y}`} style={[styles.calle, styles.calleHorizontal, { top: `${y * 100}%` }]} />
-      ))}
-      {CALLES_VERTICALES.map((x) => (
-        <View key={`v${x}`} style={[styles.calle, styles.calleVertical, { left: `${x * 100}%` }]} />
-      ))}
-
-      {proyectar &&
-        zonas.map((zona) => {
-          const { diametro, color, texto } = estiloZonas(colors)[zona.nivel];
-          const radio = diametro / 2;
+    <View
+      style={[styles.base, estilo]}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
+      <MapView
+        ref={mapa}
+        style={StyleSheet.absoluteFill}
+        initialRegion={region}
+        mapPadding={{ top: margen?.top ?? 0, right: margen?.right ?? 0, bottom: margen?.bottom ?? 0, left: margen?.left ?? 0 }}
+        userInterfaceStyle={esquema === "oscuro" ? "dark" : "light"}
+        scrollEnabled={interactivo}
+        zoomEnabled={interactivo}
+        rotateEnabled={false}
+        pitchEnabled={false}
+        showsPointsOfInterests={false}
+        showsCompass={false}
+        toolbarEnabled={false}
+      >
+        {zonas.map((zona) => {
+          const { radio, color } = estiloZonas(colors)[zona.nivel];
           return (
-            <View
+            <Circle
               key={`z${zona.id}`}
-              style={[styles.marcador, { width: diametro, height: diametro }, proyectar(zona)]}
-              accessibilityLabel={texto}
-              pointerEvents="none"
-            >
-              <Svg width={diametro} height={diametro}>
-                <Defs>
-                  <RadialGradient id={`g${zona.id}`} cx="50%" cy="50%" r="50%">
-                    <Stop offset="0" stopColor={color} stopOpacity={opacity.zonaCentro} />
-                    <Stop offset="1" stopColor={color} stopOpacity={0} />
-                  </RadialGradient>
-                </Defs>
-                <Circle cx={radio} cy={radio} r={radio} fill={`url(#g${zona.id})`} />
-              </Svg>
-              {senales && (
-                <View style={styles.zonaIcono}>
-                  {zona.nivel === "alto" ? (
-                    <TriangleAlert color={colors.redStrong} size={sizes.iconGlyph} />
-                  ) : (
-                    <Clock color={colors.ink} size={sizes.iconGlyph} />
-                  )}
-                </View>
-              )}
-            </View>
+              center={coordenada(zona)}
+              radius={radio}
+              fillColor={conAlfa(color, opacity.zonaCentro)}
+              strokeColor={color}
+              strokeWidth={borderWidths.thin}
+            />
           );
         })}
 
-      {proyectar &&
-        recorrido &&
-        paraderos.slice(1).map((paradero, i) => (
-          <View key={`r${paraderos[i].id}`} style={[styles.tramo, estiloTramo(proyectar(paraderos[i]), proyectar(paradero))]} />
-        ))}
+        {senales &&
+          zonas.map((zona) => (
+            <Marker key={`zi${zona.id}`} coordinate={coordenada(zona)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
+              {zona.nivel === "alto" ? (
+                <TriangleAlert color={colors.redStrong} size={sizes.iconGlyph} />
+              ) : (
+                <Clock color={colors.ink} size={sizes.iconGlyph} />
+              )}
+            </Marker>
+          ))}
 
-      {proyectar &&
-        usuario &&
-        seguimiento &&
-        unidades.flatMap((unidad) =>
-          trazosPunteados(proyectar(unidad), proyectar(usuario)).map(([a, b], i) => (
-            <View key={`s${unidad.linea.id}-${i}`} style={[styles.tramo, estiloTramo(a, b)]} />
-          )),
+        {recorrido && paraderos.length > 1 && (
+          <Polyline coordinates={paraderos.map(coordenada)} strokeColor={colors.ink} strokeWidth={sizes.mapRoute} />
         )}
 
-      {proyectar &&
-        paraderos.map((paradero) => (
-          <View
-            key={paradero.id}
-            style={[styles.marcador, marcadorParadero === "P" ? styles.paraderoP : styles.paradero, proyectar(paradero)]}
-            accessibilityLabel={paradero.nombre}
-          >
-            {marcadorParadero === "P" ? (
-              <Text style={[typography.captionStrong, styles.paraderoLetra]}>P</Text>
-            ) : (
-              <View style={styles.paraderoCentro} />
-            )}
-          </View>
+        {usuario &&
+          seguimiento &&
+          unidades.map((unidad) => (
+            <Polyline
+              key={`s${unidad.linea.id}`}
+              coordinates={[coordenada(unidad), coordenada(usuario)]}
+              strokeColor={colors.ink}
+              strokeWidth={sizes.mapRoute}
+              lineDashPattern={[sizes.mapDash, sizes.mapDash]}
+            />
+          ))}
+
+        {paraderos.map((paradero) => (
+          <Marker key={paradero.id} coordinate={coordenada(paradero)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
+            <View style={marcadorParadero === "P" ? styles.paraderoP : styles.paradero}>
+              {marcadorParadero === "P" ? (
+                <Text style={[typography.captionStrong, styles.paraderoLetra]}>P</Text>
+              ) : (
+                <View style={styles.paraderoCentro} />
+              )}
+            </View>
+          </Marker>
         ))}
 
-      {proyectar && usuario && (
-        <View style={[styles.marcador, styles.halo, proyectar(usuario)]} accessibilityLabel="Tu ubicación">
-          <View style={styles.usuario} />
-        </View>
-      )}
+        {usuario && (
+          <Marker coordinate={coordenada(usuario)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
+            <View style={styles.halo}>
+              <View style={styles.usuario} />
+            </View>
+          </Marker>
+        )}
 
-      {proyectar && usuario && etiquetaUsuario != null && (
-        <View style={[styles.marcador, styles.etiquetaUsuario, proyectar(usuario)]}>
-          <Text style={[typography.caption, styles.etiquetaTexto]} numberOfLines={1}>
-            {etiquetaUsuario}
-          </Text>
-        </View>
-      )}
+        {usuario && etiquetaUsuario != null && (
+          // Anclado por arriba en el usuario y bajado medio halo: queda debajo del punto
+          <Marker coordinate={coordenada(usuario)} anchor={{ x: 0.5, y: 0 }} tracksViewChanges={tracksViewChanges}>
+            <View style={styles.etiquetaUsuario}>
+              <Text style={[typography.caption, styles.etiquetaTexto]} numberOfLines={1}>
+                {etiquetaUsuario}
+              </Text>
+            </View>
+          </Marker>
+        )}
 
-      {proyectar &&
-        unidades.map((unidad) => (
-          <View key={unidad.linea.id} style={[styles.marcador, styles.unidad, proyectar(unidad)]}>
+        {unidades.map((unidad) => (
+          <Marker key={unidad.linea.id} coordinate={coordenada(unidad)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
             {estiloUnidad === "burbuja" ? (
-              <View style={styles.burbuja} accessibilityLabel={`Unidad en vivo: ${unidad.etiqueta ?? unidad.linea.nombre}`}>
+              <View style={styles.burbuja}>
                 <View style={styles.burbujaIcono}>
                   {/* supuesto: Figma no deja ver el color del ícono; amarillo sobre el círculo negro */}
                   <Bus color={colors.yellow} size={sizes.mapBusGlyph} />
@@ -228,11 +266,12 @@ export function Mapa({
             ) : (
               <Chip label={unidad.etiqueta ?? unidad.linea.nombre} icon={unidad.icono} state="live" />
             )}
-          </View>
+          </Marker>
         ))}
+      </MapView>
 
       {etiqueta != null && (
-        <View style={styles.etiqueta}>
+        <View style={styles.etiqueta} pointerEvents="none">
           <Text style={[typography.overline, styles.etiquetaTexto]} numberOfLines={1}>
             {etiqueta}
           </Text>
@@ -242,118 +281,11 @@ export function Mapa({
   );
 }
 
-type Punto = { left: number; top: number };
-
-// Segmento recto entre dos puntos: una barra centrada en el punto medio,
-// del largo de la distancia y girada según el ángulo entre ambos
-function estiloTramo(a: Punto, b: Punto): ViewStyle {
-  const dx = b.left - a.left;
-  const dy = b.top - a.top;
-  return {
-    left: (a.left + b.left) / 2,
-    top: (a.top + b.top) / 2,
-    width: Math.hypot(dx, dy),
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }, { rotate: `${Math.atan2(dy, dx)}rad` }],
-  };
-}
-
-// Divide el segmento a→b en trazos de `sizes.mapDash` separados por huecos
-// del mismo largo (línea punteada)
-function trazosPunteados(a: Punto, b: Punto): [Punto, Punto][] {
-  const largo = Math.hypot(b.left - a.left, b.top - a.top);
-  const cantidad = Math.floor(largo / (sizes.mapDash * 2));
-  const enPunto = (distancia: number): Punto => ({
-    left: a.left + ((b.left - a.left) * distancia) / largo,
-    top: a.top + ((b.top - a.top) * distancia) / largo,
-  });
-  return Array.from({ length: cantidad }, (_, i) => [
-    enPunto(i * sizes.mapDash * 2),
-    enPunto(i * sizes.mapDash * 2 + sizes.mapDash),
-  ]);
-}
-
-// Devuelve una función lat/lng → posición (left/top) dentro del recuadro, o
-// null si todavía no se conoce el tamaño o no hay puntos. Usa la misma escala
-// en ambos ejes (la longitud se corrige por cos(lat)). Centra en el usuario si
-// lo hay (como un mapa real); si no, en el centro de los puntos.
-function crearProyeccion(
-  puntos: Coordenada[],
-  centro: Coordenada | undefined,
-  ancho: number,
-  alto: number,
-  margen: Insets = {},
-) {
-  if (puntos.length === 0 || ancho === 0 || alto === 0) {
-    return null;
-  }
-
-  const latMedia = puntos.reduce((suma, p) => suma + p.lat, 0) / puntos.length;
-  const cosLat = Math.cos((latMedia * Math.PI) / 180);
-  const xs = puntos.map((p) => p.lng * cosLat);
-  const ys = puntos.map((p) => -p.lat);
-
-  const centroX = centro ? centro.lng * cosLat : (Math.min(...xs) + Math.max(...xs)) / 2;
-  const centroY = centro ? -centro.lat : (Math.min(...ys) + Math.max(...ys)) / 2;
-  // Doble de la distancia al punto más lejano, para que todos entren alrededor del centro
-  const spanX = Math.max(2 * Math.max(...xs.map((x) => Math.abs(x - centroX))), SPAN_MINIMO);
-  const spanY = Math.max(2 * Math.max(...ys.map((y) => Math.abs(y - centroY))), SPAN_MINIMO);
-
-  const izquierda = (margen.left ?? 0) + BORDE_X;
-  const arriba = (margen.top ?? 0) + BORDE_Y;
-  const anchoUtil = Math.max(ancho - izquierda - (margen.right ?? 0) - BORDE_X, 1);
-  const altoUtil = Math.max(alto - arriba - (margen.bottom ?? 0) - BORDE_Y, 1);
-  const escala = Math.min(anchoUtil / spanX, altoUtil / spanY);
-
-  return (punto: Coordenada) => ({
-    left: izquierda + anchoUtil / 2 + (punto.lng * cosLat - centroX) * escala,
-    top: arriba + altoUtil / 2 + (-punto.lat - centroY) * escala,
-  });
-}
-
 const crearEstilos = ({ colors, shadows }: Tema) =>
   StyleSheet.create({
     base: {
       backgroundColor: colors.map,
       overflow: "hidden",
-    },
-    calle: {
-      position: "absolute",
-      backgroundColor: colors.surface,
-    },
-    manzana: {
-      position: "absolute",
-      borderRadius: radii.md,
-      backgroundColor: colors.block,
-    },
-    parque: {
-      position: "absolute",
-      borderRadius: radii.control,
-      backgroundColor: colors.park,
-    },
-    // Más ancha que el mapa para que el giro no deje puntas visibles
-    avenida: {
-      position: "absolute",
-      left: "-25%",
-      right: "-25%",
-      top: `${AVENIDA.top * 100}%`,
-      height: sizes.mapAvenue,
-      backgroundColor: colors.avenue,
-      transform: [{ rotate: AVENIDA.angulo }],
-    },
-    calleHorizontal: {
-      left: 0,
-      right: 0,
-      height: sizes.mapRoad,
-    },
-    calleVertical: {
-      top: 0,
-      bottom: 0,
-      width: sizes.mapRoad,
-    },
-    // Cada marcador se centra sobre su coordenada
-    marcador: {
-      position: "absolute",
-      transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     },
     paradero: {
       width: sizes.mapStop,
@@ -397,11 +329,6 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       justifyContent: "center",
     },
     // Ícono centrado sobre la mancha (señales sin depender del color)
-    zonaIcono: {
-      ...StyleSheet.absoluteFill,
-      alignItems: "center",
-      justifyContent: "center",
-    },
     sobreAmarillo: {
       color: colors.onYellow,
     },
@@ -433,12 +360,6 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
     unidad: {
       alignItems: "center",
     },
-    tramo: {
-      position: "absolute",
-      height: sizes.mapRoute,
-      borderRadius: radii.pill,
-      backgroundColor: colors.ink,
-    },
     etiqueta: {
       position: "absolute",
       top: spacing.sm,
@@ -456,7 +377,6 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
     // Debajo del halo del usuario: se baja medio halo más un margen
     etiquetaUsuario: {
       marginTop: sizes.mapUserHalo / 2 + spacing.xs,
-      transform: [{ translateX: "-50%" }],
       paddingHorizontal: sizes.mapLabelPaddingX,
       paddingVertical: sizes.mapLabelPaddingY,
       borderRadius: radii.xs,

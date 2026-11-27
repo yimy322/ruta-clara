@@ -103,6 +103,7 @@ export default function Seguridad() {
     <View style={styles.screen}>
       <Mapa
         estilo={StyleSheet.absoluteFill}
+        interactivo
         usuario={usuario}
         paraderos={destacada ? [destacada.paradero] : []}
         zonas={(zonas ?? []).map((z) => ({ id: z.paradero.id, lat: z.paradero.lat, lng: z.paradero.lng, nivel: z.nivel }))}
