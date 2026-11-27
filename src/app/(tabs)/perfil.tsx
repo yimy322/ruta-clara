@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { Eye, Lock, Settings, ShieldCheck, Star, Sunrise, type LucideIcon } from "lucide-react-native";
+import { CloudOff, Eye, Lock, Settings, ShieldCheck, Star, Sunrise, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -38,21 +38,32 @@ export default function Perfil() {
   const { actualizarNoLeidas } = useNotificaciones();
   const { mostrar } = useToast();
   const [datos, setDatos] = useState<Datos>();
+  // Sin red o sin respuesta y sin datos que mostrar
+  const [error, setError] = useState(false);
 
   // Al volver a la tab, por si ganó puntos reportando
-  useFocusEffect(
-    useCallback(() => {
-      let activo = true;
-      Promise.all([getUsuario(), getHistorialReportes(), getInsignias()]).then(([usuario, historial, insignias]) => {
+  const cargar = useCallback(() => {
+    let activo = true;
+    Promise.all([getUsuario(), getHistorialReportes(), getInsignias()])
+      .then(([usuario, historial, insignias]) => {
         if (activo) {
+          setError(false);
           setDatos({ usuario, historial, insignias });
         }
-      });
-      return () => {
-        activo = false;
-      };
-    }, []),
-  );
+      })
+      // Si ya había datos se siguen mostrando
+      .catch(() => activo && setError(true));
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  useFocusEffect(cargar);
+
+  const reintentar = () => {
+    setError(false);
+    cargar();
+  };
 
   // Desarrollo: crea el aviso de llegada de la primera alerta activa
   const simularAviso = async () => {
@@ -81,7 +92,18 @@ export default function Perfil() {
         <IconButton icon={<Settings />} accessibilityLabel="Ajustes" onPress={() => router.push("/ajustes")} />
       </View>
 
-      {!datos ? (
+      {!datos && error ? (
+        // supuesto: mismo patrón que los demás errores de carga (E7)
+        <View style={[styles.contenido, styles.centroVertical]}>
+          <EstadoPantalla
+            Icono={CloudOff}
+            tono="error"
+            titulo="No pudimos cargar tu perfil"
+            texto="Revisa tu conexión e inténtalo de nuevo."
+            acciones={<Button label="Reintentar" onPress={reintentar} fullWidth />}
+          />
+        </View>
+      ) : !datos ? (
         <ActivityIndicator style={styles.cargando} color={colors.ink} />
       ) : (
         <ScrollView contentContainerStyle={[styles.contenido, sinHistorial && styles.centroVertical]}>

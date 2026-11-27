@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { cerrarSesionRemota, escucharSesion, getNombrePerfil, type DatosSesion } from "@/data/sesion";
+import { cerrarSesionRemota, escucharSesion, prepararPerfil, type DatosSesion } from "@/data/sesion";
 
 // cargando = leyendo la sesión guardada o el nombre del perfil;
 // sin-nombre = primera vez, falta «¿Cómo te llamas?» (/ingresar/nombre)
@@ -32,7 +32,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!usuarioId) return;
     let activo = true;
-    getNombrePerfil(usuarioId)
+    prepararPerfil(usuarioId)
       .then((nombre) => activo && setPerfil({ usuarioId, conNombre: nombre.trim().length > 0 }))
       // Sin red no se bloquea a quien ya había entrado
       .catch(() => activo && setPerfil({ usuarioId, conNombre: true }));

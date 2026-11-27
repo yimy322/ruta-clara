@@ -1,15 +1,14 @@
 // Capa de acceso a datos. Las pantallas solo leen datos desde aquí.
 // Fase 5: se reemplaza por consultas a Supabase sin cambiar las firmas.
-import { DIAS_GRACIA_ELIMINACION } from "@/config/cuenta";
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
+import { INSIGNIAS } from "@/config/insignias";
 import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
 import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
-import { insignias } from "@/mocks/insignias";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
 import { reportes } from "@/mocks/reportes";
-import { correoUsuario, ubicacionUsuario, usuario } from "@/mocks/usuario";
+import { ubicacionUsuario } from "@/mocks/usuario";
 import type {
   ActividadParadero,
   AlertaDiaria,
@@ -44,6 +43,7 @@ import type {
   ViajeAlerta,
   ZonaSeguridad,
 } from "@/types";
+import { enmascararCorreo, enmascararTelefono } from "@/utils/formato";
 import { distanciaMetros } from "@/utils/geo";
 
 import {
@@ -56,7 +56,9 @@ import {
   rutasPorDestino,
   vias,
 } from "./catalogo";
+import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
+import { supabase } from "./supabase";
 
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
@@ -486,56 +488,156 @@ export async function getTramoViaje(
   });
 }
 
-// Usuario en memoria: los puntos ganados duran mientras la app está abierta.
-// Fase 5: sale del perfil del usuario autenticado en Supabase.
-let usuarioActual: Usuario = { ...usuario };
+// Fila de la tabla reportes (snake_case) → Reporte. Los anónimos de otros
+// no dicen quién los envió (decisión 55)
+type FilaReporte = {
+  id: string;
+  tipo: Reporte["tipo"];
+  usuario_id: string | null;
+  linea_id: string | null;
+  paradero_id: string | null;
+  lat: number;
+  lng: number;
+  ocupacion: Reporte["ocupacion"] | null;
+  velocidad: Reporte["velocidad"] | null;
+  nota: string | null;
+  valoracion: number | null;
+  etiquetas: string[] | null;
+  espera: Reporte["espera"] | null;
+  congestion: Reporte["congestion"] | null;
+  causas: Reporte["causas"] | null;
+  via: string | null;
+  seguridad: Reporte["seguridad"] | null;
+  urgente: boolean;
+  anonimo: boolean;
+  foto_url: string | null;
+  creado_en: string;
+  confirmaciones: number;
+};
 
-export async function getUsuario(): Promise<Usuario> {
-  await esperar();
-  return usuarioActual;
+function filaAReporte(fila: FilaReporte, usuarioId?: string): Reporte {
+  const propio = fila.usuario_id != null && fila.usuario_id === usuarioId;
+  return {
+    id: fila.id,
+    tipo: fila.tipo,
+    usuarioId: fila.usuario_id && (propio || !fila.anonimo) ? fila.usuario_id : undefined,
+    lineaId: fila.linea_id ?? undefined,
+    paraderoId: fila.paradero_id ?? undefined,
+    lat: fila.lat,
+    lng: fila.lng,
+    ocupacion: fila.ocupacion ?? undefined,
+    velocidad: fila.velocidad ?? undefined,
+    nota: fila.nota ?? undefined,
+    valoracion: fila.valoracion ?? undefined,
+    etiquetas: fila.etiquetas ?? undefined,
+    espera: fila.espera ?? undefined,
+    congestion: fila.congestion ?? undefined,
+    causas: fila.causas ?? undefined,
+    via: fila.via ?? undefined,
+    seguridad: fila.seguridad ?? undefined,
+    urgente: fila.urgente || undefined,
+    anonimo: fila.anonimo || undefined,
+    fotoUri: fila.foto_url ?? undefined,
+    creadoEn: fila.creado_en,
+    confirmaciones: fila.confirmaciones,
+  };
 }
 
-// Cuenta (D1–D5). Fecha de eliminación programada, en memoria.
-// Fase 5: Supabase Auth + tabla de usuarios; un proceso programado borra la
-// cuenta al vencer el periodo de gracia y envía el comprobante por correo.
-let eliminacionEl: string | null = null;
+// Usuario de la sesión; sin sesión las pantallas de la app no se muestran
+async function sesionActual() {
+  const sesion = await getSesionActual();
+  if (!sesion) {
+    throw new Error("No hay sesión");
+  }
+  return sesion;
+}
 
+type FilaPerfil = { nombre: string; puntos: number; telefono: string | null; eliminacion_el: string | null };
+
+async function leerPerfil(usuarioId: string): Promise<FilaPerfil> {
+  const { data } = await consultar(
+    async () =>
+      await supabase.from("perfiles").select("nombre, puntos, telefono, eliminacion_el").eq("id", usuarioId).single(),
+  );
+  return data as FilaPerfil;
+}
+
+// Reportes propios, del más reciente al más antiguo (historial, insignias, estadísticas)
+async function leerReportesPropios(usuarioId: string): Promise<Reporte[]> {
+  const { data } = await consultar(
+    async () =>
+      await supabase.from("reportes").select("*").eq("usuario_id", usuarioId).order("creado_en", { ascending: false }),
+  );
+  return (data as FilaReporte[]).map((fila) => filaAReporte(fila, usuarioId));
+}
+
+const esDelMes = (fechaISO: string) => {
+  const fecha = new Date(fechaISO);
+  const hoy = new Date();
+  return fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear();
+};
+
+// Perfil de Supabase + estadísticas del mes con los reportes propios (F2_09)
+export async function getUsuario(): Promise<Usuario> {
+  await esperar();
+  const { usuarioId } = await sesionActual();
+  const [perfil, propios] = await Promise.all([leerPerfil(usuarioId), leerReportesPropios(usuarioId)]);
+  const delMes = propios.filter((reporte) => esDelMes(reporte.creadoEn));
+  const confirmados = delMes.filter((reporte) => reporte.confirmaciones > 1).length;
+  return {
+    id: usuarioId,
+    nombre: perfil.nombre,
+    puntos: perfil.puntos,
+    reportesMes: delMes.length,
+    porcentajeConfirmados: delMes.length ? Math.round((confirmados / delMes.length) * 100) : 0,
+    telefono: enmascararTelefono(perfil.telefono),
+  };
+}
+
+// Cuenta (D1–D5): perfil de Supabase y correo de la sesión, enmascarados.
+// Pendiente (5.7): un proceso programado borra la cuenta al vencer el
+// periodo de gracia y envía el comprobante por correo.
 export async function getCuenta(): Promise<Cuenta> {
   await esperar();
   if (getSimulacion().forzarError) {
     throw new Error("No se pudo cargar la cuenta");
   }
-  const { nombre, puntos, telefono } = usuarioActual;
-  return { nombre, puntos, telefono, correo: correoUsuario, eliminacionEl };
+  const { usuarioId, correo } = await sesionActual();
+  const perfil = await leerPerfil(usuarioId);
+  return {
+    nombre: perfil.nombre,
+    puntos: perfil.puntos,
+    telefono: enmascararTelefono(perfil.telefono),
+    correo: enmascararCorreo(correo),
+    eliminacionEl: perfil.eliminacion_el,
+  };
+}
+
+// Llama a una función de cuenta de 004_cuenta.sql
+async function rpcCuenta<T = null>(funcion: string): Promise<T> {
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+  const { data } = await consultar(async () => await supabase.rpc(funcion));
+  return data as T;
 }
 
 // Oculta el perfil y pausa las alertas hasta que el usuario vuelva a iniciar
-// sesión. Por ahora solo simula la llamada (la app cierra la sesión).
+// sesión (la app cierra la sesión; al entrar se reactiva)
 export async function desactivarCuenta(): Promise<void> {
   await esperar();
-  if (getSimulacion().forzarSinRed) {
-    throw new SinConexionError();
-  }
+  await rpcCuenta("desactivar_cuenta");
 }
 
-// Programa la eliminación y devuelve la fecha efectiva (ISO)
+// Programa la eliminación (30 días) y devuelve la fecha efectiva (ISO)
 export async function solicitarEliminacion(): Promise<string> {
   await esperar();
-  if (getSimulacion().forzarSinRed) {
-    throw new SinConexionError();
-  }
-  const fecha = new Date();
-  fecha.setDate(fecha.getDate() + DIAS_GRACIA_ELIMINACION);
-  eliminacionEl = fecha.toISOString();
-  return eliminacionEl;
+  return rpcCuenta<string>("solicitar_eliminacion");
 }
 
 export async function cancelarEliminacion(): Promise<void> {
   await esperar();
-  if (getSimulacion().forzarSinRed) {
-    throw new SinConexionError();
-  }
-  eliminacionEl = null;
+  await rpcCuenta("cancelar_eliminacion");
 }
 
 const esDeHoy = (fechaISO: string) => new Date(fechaISO).toDateString() === new Date().toDateString();
@@ -593,11 +695,14 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
     throw new Error("El reporte no tiene tipo");
   }
   const { lat, lng } = borrador.posicion ?? ubicacionUsuario;
+  // Hasta 5.4 el reporte queda en memoria: los puntos se muestran sobre el
+  // perfil real pero todavía no se guardan
+  const usuario = await getUsuario();
 
   const reporte: Reporte = {
     id: `r${Date.now()}`,
     tipo,
-    usuarioId: usuarioActual.id,
+    usuarioId: usuario.id,
     lineaId: borrador.lineaId,
     paraderoId: TIPOS_EN_PARADERO.includes(tipo)
       ? (borrador.paraderoId ?? paraderoMasCercano(lat, lng)?.id)
@@ -624,16 +729,16 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
   reportes.push(reporte);
 
   const puntosGanados = PUNTOS_POR_TIPO[tipo];
-  usuarioActual = {
-    ...usuarioActual,
-    puntos: usuarioActual.puntos + puntosGanados,
-    reportesMes: usuarioActual.reportesMes + 1,
+  const usuarioConPuntos: Usuario = {
+    ...usuario,
+    puntos: usuario.puntos + puntosGanados,
+    reportesMes: usuario.reportesMes + 1,
   };
 
   return {
     reporte,
     puntosGanados,
-    usuario: usuarioActual,
+    usuario: usuarioConPuntos,
     // supuesto: hasta tener Realtime, un número creíble de pasajeros cerca
     personasQueLoVen: 20 + Math.floor(Math.random() * 41),
   };
@@ -691,20 +796,22 @@ export async function getHistorialReportes(): Promise<ReporteHistorial[]> {
   if (getSimulacion().forzarVacio) {
     return [];
   }
-  return reportes
-    .filter((reporte) => reporte.usuarioId === usuarioActual.id)
-    .sort((a, b) => b.creadoEn.localeCompare(a.creadoEn))
-    .map((reporte) => ({
-      reporte,
-      linea: lineas.find((l) => l.id === reporte.lineaId),
-      puntos: PUNTOS_POR_TIPO[reporte.tipo],
-      vencido: minutosDesde(reporte.creadoEn) > VIGENCIA_REPORTE_MIN,
-    }));
+  const { usuarioId } = await sesionActual();
+  const propios = await leerReportesPropios(usuarioId);
+  return propios.map((reporte) => ({
+    reporte,
+    linea: lineas.find((l) => l.id === reporte.lineaId),
+    puntos: PUNTOS_POR_TIPO[reporte.tipo],
+    vencido: minutosDesde(reporte.creadoEn) > VIGENCIA_REPORTE_MIN,
+  }));
 }
 
+// Insignias de F2_09 según los reportes propios (reglas en config/insignias)
 export async function getInsignias(): Promise<Insignia[]> {
   await esperar();
-  return insignias;
+  const { usuarioId } = await sesionActual();
+  const propios = await leerReportesPropios(usuarioId);
+  return INSIGNIAS.map(({ cumple, ...insignia }) => ({ ...insignia, obtenida: cumple(propios) }));
 }
 
 // Alertas en memoria: duran mientras la app está abierta y empiezan vacías.

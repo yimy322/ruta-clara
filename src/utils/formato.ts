@@ -335,3 +335,21 @@ const sinPrefijoParadero = (nombre: string) => nombre.replace(/^Paradero\s+/i, "
 // "La 50 · Puente Nuevo → Jockey Plaza" (rutas guardadas, F3_01)
 export const textoRutaAlerta = (linea: Linea, paradero: Paradero, destino: Destino) =>
   `${linea.nombre} · ${sinPrefijoParadero(paradero.nombre)} → ${destino.nombre}`;
+
+// "rosa@correo.com" → "r•••@correo.com" (D1, D5)
+export function enmascararCorreo(correo: string) {
+  const [usuario, dominio] = correo.split("@");
+  if (!usuario || !dominio) {
+    return correo;
+  }
+  return `${usuario[0]}•••@${dominio}`;
+}
+
+// "987654321" o "+51 987 654 321" → "+51 987 •••• 21" (F3_05); null → "Sin celular"
+export function enmascararTelefono(telefono: string | null) {
+  const digitos = (telefono ?? "").replace(/\D/g, "").replace(/^51(?=\d{9}$)/, "");
+  if (digitos.length < 9) {
+    return "Sin celular"; // supuesto: Figma siempre muestra un número
+  }
+  return `+51 ${digitos.slice(0, 3)} •••• ${digitos.slice(-2)}`;
+}

@@ -90,11 +90,23 @@ export function escucharSesion(alCambiar: (sesion: DatosSesion | null) => void):
   return () => data.subscription.unsubscribe();
 }
 
-// Nombre del perfil ("" si todavía no lo eligió)
-export async function getNombrePerfil(usuarioId: string): Promise<string> {
+// Al entrar: reactiva la cuenta si estaba desactivada (D3: «vuelves cuando
+// quieras iniciando sesión») y devuelve el nombre ("" si aún no lo eligió)
+export async function prepararPerfil(usuarioId: string): Promise<string> {
+  await llamar(async () => await supabase.rpc("reactivar_cuenta"));
   const { data } = await llamar(async () => await supabase.from("perfiles").select("nombre").eq("id", usuarioId).single());
   return (data as { nombre: string } | null)?.nombre ?? "";
 }
+
+// Sesión guardada en el teléfono (no va a la red), para el repositorio
+export async function getSesionActual(): Promise<DatosSesion | null> {
+  const { data } = await supabase.auth.getSession();
+  const usuario = data.session?.user;
+  return usuario ? { usuarioId: usuario.id, correo: usuario.email ?? "" } : null;
+}
+
+// Para el repositorio: misma traducción de errores (sin red → SinConexionError)
+export const consultar = llamar;
 
 export async function guardarNombre(usuarioId: string, nombre: string): Promise<void> {
   await llamar(async () => await supabase.from("perfiles").update({ nombre }).eq("id", usuarioId));

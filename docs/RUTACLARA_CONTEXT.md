@@ -162,7 +162,7 @@ src/
 
 **Contexts:** `ViajeContext` (linea, paraderoEspera, destino, sentido, estado, avisarParaBajar, finEn…), `ReporteContext` (tipo, lineaId, enUnidad, ocupacion, velocidad, posicion, compartirEnVivo…), `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`), `PreferenciasContext` (`onboardingVisto`…), y `ToastProvider` (en `components/Toast.tsx`).
 
-**Datos de prueba:** líneas La 50 (`la-50`, custer, Ate – Surco, S/ 2.50), El Chosicano, Anconero (sin reportes → estimado), La 73, Santa Cruz. Paraderos Puente Nuevo, Los Ángeles, Av. La Molina, Puente Primavera, Jockey Plaza, Angamos, Plaza Norte. Paraderos favoritos iniciales: Puente Nuevo y Angamos. Sin alertas al iniciar. Favoritos y alertas **en memoria** (se pierden al recargar). Desde 5.1 el **catálogo** sale de Supabase (`supabase/seed.sql`, generado de los mocks); reportes, usuario, favoritos, alertas y avisos siguen en memoria hasta 5.3–5.6.
+**Datos de prueba:** líneas La 50 (`la-50`, custer, Ate – Surco, S/ 2.50), El Chosicano, Anconero (sin reportes → estimado), La 73, Santa Cruz. Paraderos Puente Nuevo, Los Ángeles, Av. La Molina, Puente Primavera, Jockey Plaza, Angamos, Plaza Norte. Paraderos favoritos iniciales: Puente Nuevo y Angamos. Sin alertas al iniciar. Favoritos y alertas **en memoria** (se pierden al recargar). Desde 5.1 el **catálogo** sale de Supabase (`supabase/seed.sql`, generado de los mocks); perfil y cuenta salen de `perfiles` desde 5.3; reportes, favoritos, alertas y avisos siguen en memoria hasta 5.4–5.6.
 
 ---
 
@@ -342,6 +342,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 55 | Riesgo aceptado: los reportes anónimos guardan `usuario_id` (uuid sin nombre, visible en la tabla y en Realtime); el repositorio lo oculta. Al borrar la cuenta queda en null | [Claude Code, 26/11 → aprobado] |
 | 56 | Login: código de 6 dígitos que vence en 10 min (como el correo 111:2098), SMTP de Gmail, plantilla en `supabase/plantillas/codigo.html` sin «Verificar con un toque», pegada en «Magic link or OTP» y en «Confirm sign up» (primer correo de una cuenta nueva). Cerrar sesión = `signOut` + borrar preferencias (vuelve a la bienvenida) | [Claude Code, 26/11 → aprobado] |
 | 57 | La primera vez se pregunta «¿Cómo te llamas?» (`/ingresar/nombre`) y se guarda en `perfiles.nombre`. Pantallas de login `// supuesto` con `PantallaCuenta` + `CampoCuenta` (campo de D4, ahora compartido) | [Claude Code, 26/11 → aprobado] |
+| 58 | Cuenta nueva en **0 puntos** («Pasajero Junior»). Perfil, Ajustes, menú y Mi cuenta leen `perfiles` + sesión; estadísticas del mes e insignias (`src/config/insignias.ts`) se calculan con los reportes propios. Desactivar/eliminar/cancelar solo por RPC (`004_cuenta.sql`); al entrar se reactiva la cuenta. Sin foto de perfil (ícono) y «Sin celular» hasta que se pueda editar | [Usuario + Claude Code, 26/11] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.
