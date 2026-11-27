@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { useSesion } from "@/context/SesionContext";
 import { contarNoLeidas } from "@/data/repositorio";
 
 type NotificacionesContextValue = {
@@ -11,23 +12,37 @@ type NotificacionesContextValue = {
 const NotificacionesContext = createContext<NotificacionesContextValue | null>(null);
 
 // Cantidad de avisos sin leer, para el punto de la tab Alertas (F3_04).
-// Fase 5: se actualiza también al llegar avisos por Realtime / push.
+// Se cuenta al entrar a la app (con sesión) y vuelve a 0 al cerrar sesión.
+// Pendiente: actualizar también al llegar avisos por Realtime / push.
 export function NotificacionesProvider({ children }: { children: ReactNode }) {
   const [noLeidas, setNoLeidas] = useState(0);
+  const { estado } = useSesion();
+  const enLaApp = estado === "lista";
 
   const actualizarNoLeidas = useCallback(async () => {
-    setNoLeidas(await contarNoLeidas());
+    try {
+      setNoLeidas(await contarNoLeidas());
+    } catch {
+      // Sin red se mantiene el último conteo
+    }
   }, []);
 
   useEffect(() => {
+    if (!enLaApp) {
+      return;
+    }
     let activo = true;
-    contarNoLeidas().then((cantidad) => activo && setNoLeidas(cantidad));
+    contarNoLeidas()
+      .then((cantidad) => activo && setNoLeidas(cantidad))
+      .catch(() => {});
     return () => {
       activo = false;
     };
-  }, []);
+  }, [enLaApp]);
 
-  const value = useMemo(() => ({ noLeidas, actualizarNoLeidas }), [noLeidas, actualizarNoLeidas]);
+  // Sin sesión no hay avisos que mostrar
+  const visibles = enLaApp ? noLeidas : 0;
+  const value = useMemo(() => ({ noLeidas: visibles, actualizarNoLeidas }), [visibles, actualizarNoLeidas]);
 
   return <NotificacionesContext.Provider value={value}>{children}</NotificacionesContext.Provider>;
 }

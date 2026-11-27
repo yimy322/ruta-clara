@@ -4,9 +4,6 @@ import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { INSIGNIAS } from "@/config/insignias";
 import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
-import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
-import { lugaresGuardados } from "@/mocks/lugares";
-import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
 import { ubicacionUsuario } from "@/mocks/usuario";
 import type {
   ActividadParadero,
@@ -67,8 +64,99 @@ const RADIO_LUGAR_M = 5000;
 // (300–600 ms) de lo que aún sale de los mocks
 const esperar = async () => {
   await cargarCatalogo();
-  await new Promise<void>((resolve) => setTimeout(resolve, 300 + Math.random() * 300));
+  await Promise.all([
+    cargarDatosUsuario(),
+    new Promise<void>((resolve) => setTimeout(resolve, 300 + Math.random() * 300)),
+  ]);
 };
+
+// Datos del usuario (5.6): favoritos, lugares y alertas de sus tablas, en
+// memoria por usuario. Las escrituras van primero a la base y después aquí.
+const favoritas = new Set<string>();
+// En el orden en que se marcaron
+const paraderosMarcados = new Set<string>();
+const lugaresGuardados: LugarGuardado[] = [];
+const alertas: AlertaDiaria[] = [];
+
+let datosDe: string | null = null;
+let cargaDatos: Promise<void> | null = null;
+
+type FilaAlerta = {
+  id: string;
+  linea_id: string;
+  paradero_id: string;
+  destino_id: string;
+  hora: number;
+  minuto: number;
+  dias: number[];
+  minutos_antes: AlertaDiaria["minutosAntes"];
+  transito: boolean;
+  seguridad: boolean;
+  activa: boolean;
+};
+
+const filaAAlerta = (fila: FilaAlerta): AlertaDiaria => ({
+  id: fila.id,
+  lineaId: fila.linea_id,
+  paraderoId: fila.paradero_id,
+  destinoId: fila.destino_id,
+  hora: fila.hora,
+  minuto: fila.minuto,
+  dias: fila.dias,
+  minutosAntes: fila.minutos_antes,
+  transito: fila.transito,
+  seguridad: fila.seguridad,
+  activa: fila.activa,
+});
+
+const alertaAFila = (alerta: DatosAlerta) => ({
+  linea_id: alerta.lineaId,
+  paradero_id: alerta.paraderoId,
+  destino_id: alerta.destinoId,
+  hora: alerta.hora,
+  minuto: alerta.minuto,
+  dias: alerta.dias,
+  minutos_antes: alerta.minutosAntes,
+  transito: alerta.transito,
+  seguridad: alerta.seguridad,
+  activa: alerta.activa,
+});
+
+async function leerDatosUsuario(usuarioId: string) {
+  const [rLineas, rParaderos, rLugares, rAlertas] = await Promise.all([
+    consultar(async () => await supabase.from("lineas_favoritas").select("linea_id").order("creado_en")),
+    consultar(async () => await supabase.from("paraderos_favoritos").select("paradero_id").order("creado_en")),
+    consultar(async () => await supabase.from("lugares").select("id, nombre, direccion, lat, lng")),
+    consultar(async () => await supabase.from("alertas").select("*").order("creado_en")),
+  ]);
+  favoritas.clear();
+  (rLineas.data as { linea_id: string }[]).forEach((fila) => favoritas.add(fila.linea_id));
+  paraderosMarcados.clear();
+  (rParaderos.data as { paradero_id: string }[]).forEach((fila) => paraderosMarcados.add(fila.paradero_id));
+  // Casa, Trabajo, U (orden de F3_01)
+  const orden: LugarGuardado["nombre"][] = ["Casa", "Trabajo", "U"];
+  lugaresGuardados.splice(
+    0,
+    lugaresGuardados.length,
+    ...(rLugares.data as LugarGuardado[]).sort((a, b) => orden.indexOf(a.nombre) - orden.indexOf(b.nombre)),
+  );
+  alertas.splice(0, alertas.length, ...(rAlertas.data as FilaAlerta[]).map(filaAAlerta));
+  datosDe = usuarioId;
+}
+
+// Una vez por usuario. Sin red no falla: se usan los últimos datos leídos
+async function cargarDatosUsuario() {
+  const sesion = await getSesionActual();
+  if (!sesion || sesion.usuarioId === datosDe) {
+    return;
+  }
+  cargaDatos ??= leerDatosUsuario(sesion.usuarioId)
+    .catch(() => {})
+    .finally(() => {
+      cargaDatos = null;
+    });
+  await cargaDatos;
+}
 
 // Minúsculas y sin tildes, para comparar textos de búsqueda
 const normalizar = (texto: string) =>
@@ -165,10 +253,6 @@ export async function getRecorrido(lineaId: string, sentido: Sentido): Promise<P
   return ids.flatMap((id) => paraderos.find((paradero) => paradero.id === id) ?? []);
 }
 
-// Favoritas en memoria: duran mientras la app está abierta.
-// Fase 5: se guardan por usuario en Supabase.
-const favoritas = new Set(lineasFavoritas);
-
 export async function esFavorita(lineaId: string): Promise<boolean> {
   await esperar();
   return favoritas.has(lineaId);
@@ -178,9 +262,11 @@ export async function esFavorita(lineaId: string): Promise<boolean> {
 export async function alternarFavorita(lineaId: string): Promise<boolean> {
   await esperar();
   if (favoritas.has(lineaId)) {
+    await consultar(async () => await supabase.from("lineas_favoritas").delete().eq("linea_id", lineaId));
     favoritas.delete(lineaId);
     return false;
   }
+  await consultar(async () => await supabase.from("lineas_favoritas").insert({ linea_id: lineaId }));
   favoritas.add(lineaId);
   return true;
 }
@@ -214,10 +300,6 @@ export async function getLineasPorParadero(paraderoId: string): Promise<Linea[]>
   return lineasDelParadero(paraderoId);
 }
 
-// Favoritos en memoria, igual que las líneas favoritas.
-// Fase 5: se guardan por usuario en Supabase.
-const paraderosMarcados = new Set(paraderosFavoritos);
-
 // En el orden en que se marcaron
 export async function getParaderosFavoritos(): Promise<Paradero[]> {
   await esperar();
@@ -233,9 +315,11 @@ export async function esParaderoFavorito(paraderoId: string): Promise<boolean> {
 export async function alternarParaderoFavorito(paraderoId: string): Promise<boolean> {
   await esperar();
   if (paraderosMarcados.has(paraderoId)) {
+    await consultar(async () => await supabase.from("paraderos_favoritos").delete().eq("paradero_id", paraderoId));
     paraderosMarcados.delete(paraderoId);
     return false;
   }
+  await consultar(async () => await supabase.from("paraderos_favoritos").insert({ paradero_id: paraderoId }));
   paraderosMarcados.add(paraderoId);
   return true;
 }
@@ -370,7 +454,7 @@ export async function getReportesCercanos(lat: number, lng: number): Promise<Rep
 
 export async function getLugaresGuardados(): Promise<LugarGuardado[]> {
   await esperar();
-  return lugaresGuardados;
+  return [...lugaresGuardados];
 }
 
 // Fase 6: se reemplaza por la ubicación real del celular.
@@ -861,10 +945,7 @@ export async function getInsignias(): Promise<Insignia[]> {
   return INSIGNIAS.map(({ cumple, ...insignia }) => ({ ...insignia, obtenida: cumple(propios) }));
 }
 
-// Alertas en memoria: duran mientras la app está abierta y empiezan vacías.
-// Fase 5: se guardan por usuario en Supabase y las dispara el servidor.
-const alertas: AlertaDiaria[] = [];
-
+// Alertas diarias (tabla alertas). Pendiente: las dispara el servidor.
 export async function getAlertas(): Promise<AlertaDiaria[]> {
   await esperar();
   return [...alertas];
@@ -884,7 +965,12 @@ export async function getAlertaDeParadero(paraderoId: string): Promise<AlertaDia
 // Crea la alerta si no trae id; si no, la reemplaza.
 export async function guardarAlerta(datos: DatosAlerta): Promise<AlertaDiaria> {
   await esperar();
-  const alerta: AlertaDiaria = { ...datos, id: datos.id ?? `a${Date.now()}` };
+  const { data } = datos.id
+    ? await consultar(
+        async () => await supabase.from("alertas").update(alertaAFila(datos)).eq("id", datos.id!).select().single(),
+      )
+    : await consultar(async () => await supabase.from("alertas").insert(alertaAFila(datos)).select().single());
+  const alerta = filaAAlerta(data as FilaAlerta);
   const i = alertas.findIndex((a) => a.id === alerta.id);
   if (i === -1) {
     alertas.push(alerta);
@@ -896,6 +982,7 @@ export async function guardarAlerta(datos: DatosAlerta): Promise<AlertaDiaria> {
 
 export async function eliminarAlerta(id: string): Promise<void> {
   await esperar();
+  await consultar(async () => await supabase.from("alertas").delete().eq("id", id));
   const i = alertas.findIndex((alerta) => alerta.id === id);
   if (i !== -1) {
     alertas.splice(i, 1);
@@ -1001,7 +1088,7 @@ export async function getFavoritos(): Promise<Favoritos> {
     }
   }
 
-  return { lugares: lugaresGuardados, paraderos: favoritos, rutas };
+  return { lugares: [...lugaresGuardados], paraderos: favoritos, rutas };
 }
 
 // Línea, paradero, destino y sentido de la alerta, para iniciar la espera
@@ -1018,9 +1105,31 @@ export async function getViajeDeAlerta(alertaId: string): Promise<ViajeAlerta | 
   return { linea, paradero, destino, sentido: sentidoHacia(linea, paradero.id, destino) ?? "ida" };
 }
 
-// Notificaciones en memoria: duran mientras la app está abierta.
-// Fase 5: se guardan por usuario en Supabase y llegan por Realtime / push.
-const notificaciones: Notificacion[] = notificacionesIniciales.map((n) => ({ ...n }));
+// Avisos (tabla notificaciones). Se leen siempre de la base: más adelante
+// los creará el servidor. Pendiente: Realtime / push.
+type FilaNotificacion = {
+  id: string;
+  tipo: Notificacion["tipo"];
+  titulo: string;
+  detalle: string;
+  fecha: string;
+  leida: boolean;
+  linea_id: string | null;
+  paradero_id: string | null;
+  alerta_id: string | null;
+};
+
+const filaANotificacion = (fila: FilaNotificacion): Notificacion => ({
+  id: fila.id,
+  tipo: fila.tipo,
+  titulo: fila.titulo,
+  detalle: fila.detalle,
+  fecha: fila.fecha,
+  leida: fila.leida,
+  lineaId: fila.linea_id ?? undefined,
+  paraderoId: fila.paradero_id ?? undefined,
+  alertaId: fila.alerta_id ?? undefined,
+});
 
 // De la más reciente a la más antigua
 export async function getNotificaciones(): Promise<Notificacion[]> {
@@ -1028,20 +1137,24 @@ export async function getNotificaciones(): Promise<Notificacion[]> {
   if (getSimulacion().forzarVacio) {
     return [];
   }
-  return [...notificaciones].sort((a, b) => b.fecha.localeCompare(a.fecha));
+  const { data } = await consultar(
+    async () => await supabase.from("notificaciones").select("*").order("fecha", { ascending: false }),
+  );
+  return (data as FilaNotificacion[]).map(filaANotificacion);
 }
 
 export async function marcarNotificacionLeida(id: string): Promise<void> {
   await esperar();
-  const notificacion = notificaciones.find((n) => n.id === id);
-  if (notificacion) {
-    notificacion.leida = true;
-  }
+  await consultar(async () => await supabase.from("notificaciones").update({ leida: true }).eq("id", id));
 }
 
 export async function contarNoLeidas(): Promise<number> {
   await esperar();
-  return notificaciones.filter((n) => !n.leida).length;
+  const { count } = await consultar(
+    async () =>
+      await supabase.from("notificaciones").select("id", { count: "exact", head: true }).eq("leida", false),
+  );
+  return count ?? 0;
 }
 
 // Desarrollo: simula el aviso que dispara la primera alerta activa cuando su
@@ -1054,17 +1167,20 @@ export async function simularAvisoAlerta(): Promise<Notificacion> {
   if (!alerta || !linea || !paradero) {
     throw new Error("No hay alertas activas");
   }
-  const notificacion: Notificacion = {
-    id: `n${Date.now()}`,
-    tipo: "llegada",
-    titulo: `¡Tu combi habitual está a ${alerta.minutosAntes} min del paradero!`,
-    detalle: `${linea.nombre} · ${paradero.nombre}`,
-    fecha: new Date().toISOString(),
-    leida: false,
-    lineaId: linea.id,
-    paraderoId: paradero.id,
-    alertaId: alerta.id,
-  };
-  notificaciones.push(notificacion);
-  return notificacion;
+  const { data } = await consultar(
+    async () =>
+      await supabase
+        .from("notificaciones")
+        .insert({
+          tipo: "llegada",
+          titulo: `¡Tu combi habitual está a ${alerta.minutosAntes} min del paradero!`,
+          detalle: `${linea.nombre} · ${paradero.nombre}`,
+          linea_id: linea.id,
+          paradero_id: paradero.id,
+          alerta_id: alerta.id,
+        })
+        .select()
+        .single(),
+  );
+  return filaANotificacion(data as FilaNotificacion);
 }
