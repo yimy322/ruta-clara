@@ -7,7 +7,7 @@ import { Button, Chip, FilaAjuste, Header, ListItem } from "@/components";
 import { useColaReportes } from "@/context/ColaReportesContext";
 import { buscarRutas } from "@/data/repositorio";
 import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
-import { probarConexion, type EstadoConexion } from "@/data/supabase";
+import { probarConexion, refrescarDemo, type EstadoConexion } from "@/data/supabase";
 import { radii, spacing, type Tema } from "@/theme";
 import type { OpcionRuta, TipoUnidad } from "@/types";
 import { formatearEta, formatearPasaje } from "@/utils/formato";
@@ -47,6 +47,18 @@ export default function Datos() {
   const { reintentar } = useColaReportes();
   // undefined = sin probar; null = probando
   const [conexion, setConexion] = useState<EstadoConexion | null>();
+
+  // undefined = sin tocar; null = refrescando
+  const [demo, setDemo] = useState<string | null>();
+
+  const refrescar = async () => {
+    setDemo(null);
+    try {
+      setDemo(`${await refrescarDemo()} reportes de ejemplo con fecha de ahora`);
+    } catch {
+      setDemo("No se pudo refrescar: revisa la conexión y que 003_funciones.sql esté ejecutado");
+    }
+  };
 
   const probar = async () => {
     setConexion(null);
@@ -102,6 +114,12 @@ export default function Datos() {
                 : TEXTO_CONEXION[conexion]}
           </Text>
           <Button label="Probar" variant="secondary" disabled={conexion === null} onPress={() => void probar()} />
+        </View>
+        <View style={[styles.card, styles.conexion]}>
+          <Text style={[styles.muted, styles.flex]} accessibilityLiveRegion="polite">
+            {demo === undefined ? "Reportes de ejemplo de la demo" : demo === null ? "Refrescando…" : demo}
+          </Text>
+          <Button label="Refrescar" variant="secondary" disabled={demo === null} onPress={() => void refrescar()} />
         </View>
         <Text style={styles.seccion}>Rutas a {DESTINO}</Text>
         {error ? (
@@ -162,6 +180,9 @@ const crearEstilos = ({ colors, typography }: Tema) =>
       justifyContent: "space-between",
       gap: spacing.md,
       padding: spacing.lg,
+    },
+    flex: {
+      flex: 1,
     },
     chips: {
       flexDirection: "row",

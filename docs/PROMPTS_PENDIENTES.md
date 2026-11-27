@@ -23,8 +23,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 6 | 4.6 + 4.8 · Tema dinámico y módulo de accesibilidad | ✅ (26/11) |
 | 7 | 4.9 · Cuenta y eliminación de cuenta | ✅ (26/11) |
 | 8 | Revisión de SDK 58 (si no se hizo) | ✅ (26/11) |
-| 9 | 5.0 · Proyecto Supabase y cliente | 📝 **siguiente** |
-| 10 | 5.1 · Esquema, RLS y datos iniciales | 📝 |
+| 9 | 5.0 · Proyecto Supabase y cliente | ✅ ejecutado el 26/11 |
+| 10 | 5.1 · Esquema, RLS y datos iniciales | 🔨 **en prueba** |
 | 11 | 5.2 · Inicio de sesión con código por correo | 📝 |
 | 12 | 5.3 · Perfil y cuenta reales | 📝 |
 | 13 | 5.4 · Reportes reales | 📝 |

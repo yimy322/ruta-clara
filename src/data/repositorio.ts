@@ -4,17 +4,12 @@ import { DIAS_GRACIA_ELIMINACION } from "@/config/cuenta";
 import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
-import { destinosComunes, destinosRecientes } from "@/mocks/busquedas";
-import { destinos } from "@/mocks/destinos";
 import { lineasFavoritas, paraderosFavoritos } from "@/mocks/favoritos";
 import { insignias } from "@/mocks/insignias";
-import { lineas, rutasPorDestino } from "@/mocks/lineas";
 import { lugaresGuardados } from "@/mocks/lugares";
 import { notificaciones as notificacionesIniciales } from "@/mocks/notificaciones";
-import { paraderos } from "@/mocks/paraderos";
 import { reportes } from "@/mocks/reportes";
 import { correoUsuario, ubicacionUsuario, usuario } from "@/mocks/usuario";
-import { vias } from "@/mocks/vias";
 import type {
   ActividadParadero,
   AlertaDiaria,
@@ -51,14 +46,28 @@ import type {
 } from "@/types";
 import { distanciaMetros } from "@/utils/geo";
 
+import {
+  cargarCatalogo,
+  destinos,
+  destinosComunes,
+  destinosRecientes,
+  lineas,
+  paraderos,
+  rutasPorDestino,
+  vias,
+} from "./catalogo";
 import { getSimulacion, SinConexionError } from "./simulacion";
 
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
 const RADIO_LUGAR_M = 5000;
 
-// Simula la latencia de red (300–600 ms)
-const esperar = () => new Promise<void>((resolve) => setTimeout(resolve, 300 + Math.random() * 300));
+// Asegura el catálogo de Supabase (una vez) y simula la latencia de red
+// (300–600 ms) de lo que aún sale de los mocks
+const esperar = async () => {
+  await cargarCatalogo();
+  await new Promise<void>((resolve) => setTimeout(resolve, 300 + Math.random() * 300));
+};
 
 // Minúsculas y sin tildes, para comparar textos de búsqueda
 const normalizar = (texto: string) =>

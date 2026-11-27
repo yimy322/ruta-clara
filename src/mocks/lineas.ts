@@ -1,4 +1,4 @@
-import type { Linea, NivelTrafico, Ocupacion } from "@/types";
+import type { Linea, RutaDestino } from "@/types";
 
 // Líneas de prueba sacadas de F1_06 / F1_07. Los valores marcados como
 // "supuesto" no aparecen en Figma.
@@ -76,17 +76,8 @@ export const lineas: Linea[] = [
   },
 ];
 
-// Líneas que sirven cada destino, con el estado de tráfico y conteo de
-// reportes activos. En Supabase saldrá de una vista agregada.
-export type RutaMock = {
-  lineaId: string;
-  etaMin: number;
-  trafico: NivelTrafico;
-  reportesActivos: number;
-  ocupacion?: Ocupacion;
-};
-
-export const rutasPorDestino: Record<string, RutaMock[]> = {
+// Líneas que sirven cada destino (tabla rutas_destino en Supabase).
+export const rutasPorDestino: Record<string, RutaDestino[]> = {
   // F1_06: La 50 · 8 min · 12 reportes; El Chosicano · 14 min · 7 reportes; Anconero · ~20 min
   "jockey-plaza": [
     { lineaId: "anconero", etaMin: 20, trafico: "bajo", reportesActivos: 0 },

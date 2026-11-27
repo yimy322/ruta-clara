@@ -45,3 +45,14 @@ export async function probarConexion(): Promise<EstadoConexion> {
     return "sin-red";
   }
 }
+
+// Vuelve a fechar los reportes de ejemplo para que la demo siga «en vivo»
+// (función refrescar_demo de supabase/migrations/003). Devuelve cuántos
+// reportes actualizó.
+export async function refrescarDemo(): Promise<number> {
+  const { data, error } = await supabase.rpc("refrescar_demo");
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data as number;
+}

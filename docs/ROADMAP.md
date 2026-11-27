@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) planificada el 26/11: siguiente **5.0** (crear el proyecto y conectar la app).
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente); **5.1** (esquema, RLS y datos iniciales) escrito, falta ejecutar el SQL y probar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -51,8 +51,8 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.6 | Tema dinámico (claro, oscuro, alto contraste, escala de texto) | ✅ (26/11) |
 | 4.8 | Módulo de accesibilidad (A1/A2) | ✅ (26/11) |
 | 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | ✅ (26/11) |
-| 5.0 | Proyecto Supabase y cliente | 📝 **siguiente** |
-| 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | 📝 |
+| 5.0 | Proyecto Supabase y cliente | ✅ (26/11) |
+| 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | 🔨 **en prueba** |
 | 5.2 | Inicio de sesión con código por correo | 📝 |
 | 5.3 | Perfil y cuenta reales | 📝 |
 | 5.4 | Reportes reales | 📝 |
@@ -159,6 +159,15 @@ Entrega en **menos de 3 semanas**: 5.0–5.5 son lo que se ve en la demo; 5.6–
    (`.gitignore` ya ignora `.env.*`, así que no se sube.)
 5. ~~Plantilla Magic Link con `{{ .Token }}`~~: no se puede editar sin SMTP propio; pasa al inicio del 5.2 (SMTP de Gmail + plantilla con el código).
 6. Avísame y ejecutamos el prompt 9.
+
+### 5.1 · Ejecutar el SQL (lo haces tú)
+En el dashboard: **SQL Editor → New query**. Pega y ejecuta (**Run**) cada archivo, en este orden; todos se pueden volver a correr:
+1. `supabase/migrations/001_catalogo.sql` — catálogo con lectura pública.
+2. `supabase/migrations/002_usuario.sql` — perfiles, favoritos, lugares, alertas, notificaciones y reportes con RLS; `reportes` en tiempo real.
+3. `supabase/migrations/003_funciones.sql` — perfil + datos de demo al registrarse, `crear_reporte` y `refrescar_demo`.
+4. `supabase/seed.sql` — los mocks (generado desde `src/mocks`; si cambian los mocks, se regenera).
+
+El catálogo se lee una vez (`src/data/catalogo.ts`) y queda guardado en el teléfono para usarlo sin red. «Refrescar» en `/dev/datos` vuelve a fechar los reportes de ejemplo.
 
 ## Fase 6 · Mapa real, ubicación y notificaciones — 🗺️
 **Pendiente decidir:** proveedor de mapa. Restricción de Expo Go: `react-native-maps` sí funciona en Expo Go; MapLibre necesita un *development build*. Las notificaciones push remotas también requieren *development build*.

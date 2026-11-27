@@ -93,6 +93,16 @@ export type Reporte = {
   confirmaciones: number;
 };
 
+// Línea que sirve un destino, con su tráfico y reportes activos (F1_06).
+// Tabla rutas_destino de Supabase; más adelante, una vista agregada
+export type RutaDestino = {
+  lineaId: string;
+  etaMin: number;
+  trafico: NivelTrafico;
+  reportesActivos: number;
+  ocupacion?: Ocupacion;
+};
+
 // Resultado de búsqueda (F1_06)
 export type OpcionRuta = {
   linea: Linea;

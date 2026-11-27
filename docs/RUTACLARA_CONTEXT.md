@@ -162,7 +162,7 @@ src/
 
 **Contexts:** `ViajeContext` (linea, paraderoEspera, destino, sentido, estado, avisarParaBajar, finEn…), `ReporteContext` (tipo, lineaId, enUnidad, ocupacion, velocidad, posicion, compartirEnVivo…), `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`), `PreferenciasContext` (`onboardingVisto`…), y `ToastProvider` (en `components/Toast.tsx`).
 
-**Datos de prueba:** líneas La 50 (`la-50`, custer, Ate – Surco, S/ 2.50), El Chosicano, Anconero (sin reportes → estimado), La 73, Santa Cruz. Paraderos Puente Nuevo, Los Ángeles, Av. La Molina, Puente Primavera, Jockey Plaza, Angamos, Plaza Norte. Paraderos favoritos iniciales: Puente Nuevo y Angamos. Sin alertas al iniciar. Favoritos y alertas **en memoria** (se pierden al recargar).
+**Datos de prueba:** líneas La 50 (`la-50`, custer, Ate – Surco, S/ 2.50), El Chosicano, Anconero (sin reportes → estimado), La 73, Santa Cruz. Paraderos Puente Nuevo, Los Ángeles, Av. La Molina, Puente Primavera, Jockey Plaza, Angamos, Plaza Norte. Paraderos favoritos iniciales: Puente Nuevo y Angamos. Sin alertas al iniciar. Favoritos y alertas **en memoria** (se pierden al recargar). Desde 5.1 el **catálogo** sale de Supabase (`supabase/seed.sql`, generado de los mocks); reportes, usuario, favoritos, alertas y avisos siguen en memoria hasta 5.3–5.6.
 
 ---
 
@@ -336,6 +336,9 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 50 | Pantallas de login con componentes existentes (estilo D4), `// supuesto` (Figma no las tiene) | [Usuario, 26/11] |
 | 51 | Fase 5 priorizada para entrega en < 3 semanas: 5.0–5.5 para la demo; 5.6–5.7 si hay tiempo | [Usuario, 26/11] |
 | 52 | Supabase no deja editar plantillas de correo sin SMTP propio y la de fábrica no trae el código: el SMTP de Gmail se adelanta al inicio del 5.2 | [Claude Code, 26/11 → aprobado] |
+| 53 | Catálogo leído una vez de Supabase a arreglos en memoria (`src/data/catalogo.ts`, mismos nombres que los mocks) con copia en AsyncStorage para usarlo sin red; columna `orden` para conservar el orden de los mocks | [Claude Code, 26/11 → aprobado] |
+| 54 | El trigger `crear_perfil` copia datos de demo a cada cuenta nueva (paraderos favoritos, lugares y los 4 avisos de Figma) | [Claude Code, 26/11 → aprobado] |
+| 55 | Riesgo aceptado: los reportes anónimos guardan `usuario_id` (uuid sin nombre, visible en la tabla y en Realtime); el repositorio lo oculta. Al borrar la cuenta queda en null | [Claude Code, 26/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.
