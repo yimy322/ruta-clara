@@ -345,7 +345,11 @@ Figma no tiene pantallas de login: se arman con los componentes existentes (esti
 
 ```
 Fase 5, paso 2: login con OTP por correo (signInWithOtp + verifyOtp
-type "email"; la plantilla Magic Link ya tiene {{ .Token }}).
+type "email").
+- Antes del código: guía para el SMTP de Gmail (verificación en dos pasos,
+  contraseña de aplicación, Authentication → Emails → SMTP Settings) y
+  plantilla "Magic link or OTP" con {{ .Token }}. Sin SMTP propio Supabase
+  no deja editar plantillas y la de fábrica solo trae un enlace.
 - /ingresar: correo (validación con ícono + texto, como E8) y "Enviar
   código". /ingresar/codigo: 6 dígitos, "Reenviar código" a los 60 s,
   errores (código incorrecto o vencido, sin conexión). Primera vez:
@@ -409,8 +413,7 @@ plan.
 ## 16. Paso 5.7 · Correos, fotos y borrado programado (si hay tiempo)
 
 ```
-Fase 5, paso 7: guía para configurar SMTP propio (Gmail con contraseña de
-aplicación) antes de la prueba con usuarios; plantilla de verificación
+Fase 5, paso 7 (el SMTP de Gmail ya se configuró en el 5.2): plantilla de verificación
 según el frame de Figma 111:2098; fotos de reportes en Supabase Storage;
 Edge Function programada que borra las cuentas al vencer los 30 días.
 Primero el plan.

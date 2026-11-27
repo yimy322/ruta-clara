@@ -3,10 +3,11 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-nat
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { Chip, FilaAjuste, Header, ListItem } from "@/components";
+import { Button, Chip, FilaAjuste, Header, ListItem } from "@/components";
 import { useColaReportes } from "@/context/ColaReportesContext";
 import { buscarRutas } from "@/data/repositorio";
 import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
+import { probarConexion, type EstadoConexion } from "@/data/supabase";
 import { radii, spacing, type Tema } from "@/theme";
 import type { OpcionRuta, TipoUnidad } from "@/types";
 import { formatearEta, formatearPasaje } from "@/utils/formato";
@@ -24,6 +25,12 @@ const nombreTipo: Record<TipoUnidad, string> = {
 };
 
 // Interruptores del modo de prueba (src/data/simulacion.ts)
+const TEXTO_CONEXION: Record<EstadoConexion, string> = {
+  conectado: "Conectado",
+  "sin-red": "Sin conexión: no se llegó al servidor",
+  error: "Error: revisa la URL y la clave de .env.local",
+};
+
 const INTERRUPTORES: { clave: keyof Simulacion; titulo: string; subtitulo: string }[] = [
   { clave: "forzarError", titulo: "Forzar error del sistema", subtitulo: "Resultados de rutas falla (E7)" },
   { clave: "forzarVacio", titulo: "Forzar listas vacías", subtitulo: "Favoritos, Perfil y Alertas vacíos (E4–E6)" },
@@ -38,6 +45,13 @@ export default function Datos() {
   const [error, setError] = useState(false);
   const [simulacion, setEstadoSimulacion] = useState<Simulacion>(getSimulacion);
   const { reintentar } = useColaReportes();
+  // undefined = sin probar; null = probando
+  const [conexion, setConexion] = useState<EstadoConexion | null>();
+
+  const probar = async () => {
+    setConexion(null);
+    setConexion(await probarConexion());
+  };
 
   const cambiar = (clave: keyof Simulacion, valor: boolean) => {
     setSimulacion({ [clave]: valor });
@@ -77,6 +91,17 @@ export default function Datos() {
               onValueChange={(valor) => cambiar(clave, valor)}
             />
           ))}
+        </View>
+        <Text style={styles.seccion}>Supabase</Text>
+        <View style={[styles.card, styles.conexion]}>
+          <Text style={styles.muted} accessibilityLiveRegion="polite">
+            {conexion === undefined
+              ? "Conexión con Supabase sin probar"
+              : conexion === null
+                ? "Probando…"
+                : TEXTO_CONEXION[conexion]}
+          </Text>
+          <Button label="Probar" variant="secondary" disabled={conexion === null} onPress={() => void probar()} />
         </View>
         <Text style={styles.seccion}>Rutas a {DESTINO}</Text>
         {error ? (
@@ -130,6 +155,13 @@ const crearEstilos = ({ colors, typography }: Tema) =>
       backgroundColor: colors.surface,
       borderRadius: radii.lg,
       overflow: "hidden",
+    },
+    conexion: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+      padding: spacing.lg,
     },
     chips: {
       flexDirection: "row",

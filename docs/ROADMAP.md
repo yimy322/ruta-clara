@@ -58,7 +58,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 5.4 | Reportes reales | 📝 |
 | 5.5 | Tiempo real | 📝 |
 | 5.6 | Favoritos, alertas y notificaciones en la base | 📝 si hay tiempo |
-| 5.7 | Correos (SMTP propio), fotos en Storage, borrado programado | 📝 si hay tiempo |
+| 5.7 | Plantilla de correo según Figma, fotos en Storage, borrado programado | 📝 si hay tiempo |
 | 6 | Mapa real, ubicación real y notificaciones | 🗺️ |
 | 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
 | 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
@@ -145,7 +145,7 @@ Entrega en **menos de 3 semanas**: 5.0–5.5 son lo que se ve en la demo; 5.6–
 
 **Arquitectura:** `src/data/supabase.ts` es el único que importa supabase-js; el repositorio mantiene las firmas. El catálogo se carga una vez y queda en memoria (`src/data/catalogo.ts`); los datos del usuario van en tablas con RLS; `crear_reporte` (RPC) inserta y suma puntos; `refrescar_demo()` mantiene «en vivo» los reportes de ejemplo para la demo.
 
-**Límite importante:** el correo incluido en Supabase manda solo 2 correos por hora y **solo a correos del equipo del proyecto**. Para desarrollar alcanza con tu correo; **antes de la prueba con otras personas hay que configurar SMTP propio** (5.7).
+**Límite importante:** el correo incluido en Supabase manda solo 2 correos por hora y **solo a correos del equipo del proyecto**. Para desarrollar alcanza con tu correo; **antes de la prueba con otras personas hay que configurar SMTP propio**. Además, desde 26/11 Supabase **no deja editar las plantillas sin SMTP propio** y la plantilla por defecto solo trae un enlace (sin el código), así que el SMTP de Gmail se configura **al inicio del 5.2**.
 
 ### 5.0 · Guía para crear el proyecto (lo haces tú)
 1. Entra a https://supabase.com y crea una cuenta (puede ser con GitHub).
@@ -157,7 +157,7 @@ Entrega en **menos de 3 semanas**: 5.0–5.5 son lo que se ve en la demo; 5.6–
    EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
    ```
    (`.gitignore` ya ignora `.env.*`, así que no se sube.)
-5. **Authentication → Email Templates → Magic Link**: agrega el código al cuerpo, por ejemplo `<p>Tu código de RutaClara es: <strong>{{ .Token }}</strong></p>`. Sin `{{ .Token }}` Supabase manda un enlace en vez del código.
+5. ~~Plantilla Magic Link con `{{ .Token }}`~~: no se puede editar sin SMTP propio; pasa al inicio del 5.2 (SMTP de Gmail + plantilla con el código).
 6. Avísame y ejecutamos el prompt 9.
 
 ## Fase 6 · Mapa real, ubicación y notificaciones — 🗺️

@@ -335,6 +335,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 49 | SQL versionado en `supabase/migrations` + `seed.sql`, ejecutado en el SQL Editor (sin CLI) | [Claude Code → aprobado] |
 | 50 | Pantallas de login con componentes existentes (estilo D4), `// supuesto` (Figma no las tiene) | [Usuario, 26/11] |
 | 51 | Fase 5 priorizada para entrega en < 3 semanas: 5.0–5.5 para la demo; 5.6–5.7 si hay tiempo | [Usuario, 26/11] |
+| 52 | Supabase no deja editar plantillas de correo sin SMTP propio y la de fábrica no trae el código: el SMTP de Gmail se adelanta al inicio del 5.2 | [Claude Code, 26/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.
@@ -345,7 +346,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 |---|---|
 | Proyecto Final | Fecha exacta de entrega (en menos de 3 semanas desde el 26/11); forma de acceso al MVP (EAS Update/QR o web en Vercel); PPT; guion de la demo |
 | IA | Elegir la función (reporte por voz/texto libre o agente de viaje) y el proveedor del modelo |
-| Fase 5 | Decidida el 26/11 (decisiones 45–51; sub-pasos en ROADMAP). Pendiente: crear el proyecto (5.0) y **SMTP propio antes de la prueba con usuarios** |
+| Fase 5 | Decidida el 26/11 (decisiones 45–51; sub-pasos en ROADMAP). Proyecto creado (5.0); **SMTP de Gmail al inicio del 5.2** (decisión 52) |
 | Fase 6 | Proveedor de mapa (restricción de Expo Go) |
 | Prueba con usuario | Hacerla con la app real (guion en D9) |
 | README | Actualizar la sección «Avance» (SDK 58 ya está en `main` y subido: commit `353ee42`) |
