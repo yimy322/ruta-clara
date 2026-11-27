@@ -6,6 +6,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { Button, PantallaCuenta, TarjetaCuenta, useToast } from "@/components";
 import { DIAS_GRACIA_ELIMINACION } from "@/config/cuenta";
 import { usePreferencias } from "@/context/PreferenciasContext";
+import { useSesion } from "@/context/SesionContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { desactivarCuenta } from "@/data/repositorio";
 import { sizes, spacing, type Tema } from "@/theme";
@@ -18,6 +19,7 @@ export default function EliminarAlternativa() {
   const styles = useEstilos(crearEstilos);
   const { mostrar } = useToast();
   const { reiniciarOnboarding } = usePreferencias();
+  const { cerrarSesion } = useSesion();
 
   const [desactivando, setDesactivando] = useState(false);
 
@@ -26,6 +28,7 @@ export default function EliminarAlternativa() {
     try {
       await desactivarCuenta();
       // Desactivar cierra la sesión, como «Cerrar sesión» (vuelve a la bienvenida)
+      await cerrarSesion();
       await reiniciarOnboarding();
     } catch {
       setDesactivando(false);

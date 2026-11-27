@@ -18,11 +18,13 @@ type PantallaCuentaProps = {
   children: ReactNode;
   // Botones al pie (se desplazan con el contenido si el texto es grande)
   acciones?: ReactNode;
+  // Sin flecha atrás (primera pantalla de un flujo, p. ej. /ingresar)
+  sinAtras?: boolean;
 };
 
 // Estructura común de Mi cuenta y del flujo de eliminación (D1–D4): atrás +
 // título H1, contenido con separación de 14 y acciones al pie.
-export function PantallaCuenta({ titulo, paso, pregunta, children, acciones }: PantallaCuentaProps) {
+export function PantallaCuenta({ titulo, paso, pregunta, children, acciones, sinAtras }: PantallaCuentaProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { typography } = useTema();
@@ -31,7 +33,7 @@ export function PantallaCuenta({ titulo, paso, pregunta, children, acciones }: P
   return (
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
       <View style={[styles.barra, { paddingTop: insets.top + spacing.sm }]}>
-        <IconButton icon={<ArrowLeft />} accessibilityLabel="Volver" onPress={() => router.back()} />
+        {!sinAtras && <IconButton icon={<ArrowLeft />} accessibilityLabel="Volver" onPress={() => router.back()} />}
         <Text style={[typography.h1, styles.ink, styles.flex]} accessibilityRole="header" numberOfLines={2}>
           {titulo}
         </Text>

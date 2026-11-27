@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, TarjetaCuenta, useToast } from "@/components";
 import { usePreferencias } from "@/context/PreferenciasContext";
+import { useSesion } from "@/context/SesionContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { cancelarEliminacion, getCuenta } from "@/data/repositorio";
 import { radii, sizes, spacing, type Tema } from "@/theme";
@@ -24,6 +25,7 @@ export default function EliminacionProgramada() {
   const styles = useEstilos(crearEstilos);
   const { mostrar } = useToast();
   const { reiniciarOnboarding } = usePreferencias();
+  const { cerrarSesion } = useSesion();
 
   const [cuenta, setCuenta] = useState<Estado>();
   const [cancelando, setCancelando] = useState(false);
@@ -54,7 +56,10 @@ export default function EliminacionProgramada() {
   };
 
   // «Cerramos tu sesión»: igual que Cerrar sesión, vuelve a la bienvenida
-  const entendido = () => void reiniciarOnboarding();
+  const entendido = async () => {
+    await cerrarSesion();
+    await reiniciarOnboarding();
+  };
 
   return (
     <SafeAreaView style={styles.screen}>

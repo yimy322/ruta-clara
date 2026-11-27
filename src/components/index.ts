@@ -23,6 +23,7 @@ export { Paginador } from "./Paginador";
 export { PildoraNivel, type NivelPildora } from "./PildoraNivel";
 export { PinUnidad } from "./PinUnidad";
 export { PantallaCarga } from "./PantallaCarga";
+export { CampoCuenta } from "./CampoCuenta";
 export { PantallaCuenta } from "./PantallaCuenta";
 export { PlaceholderScreen, type PlaceholderAction } from "./PlaceholderScreen";
 export { Segmented } from "./Segmented";

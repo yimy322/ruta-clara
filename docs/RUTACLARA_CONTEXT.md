@@ -213,6 +213,7 @@ src/
 | D1–D5 | Mi cuenta → advertencia → alternativa → confirmación → periodo de gracia | 109:1928, 109:1992, 109:2047, 109:2088, 109:2118 |
 | Oscuro | Inicio / Detalle de paradero / Alertas | 93:1350 / 93:1429 / 93:1463 |
 | Correos | Bienvenida, Verificación, Eliminación, Resumen del mes | 111:2039, 111:2098, 113:2029, 113:2100 |
+| Inicio de sesión (sin frame, `// supuesto`) | `/ingresar`, `/ingresar/codigo`, `/ingresar/nombre` | — (estructura de D4) |
 
 Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69:1155`, Logo `69:1476`, Modo oscuro `93:1349`, Estados `95:1503`, Accesibilidad y cuenta `106:1836`, Mailings `111:1999`, Comparación `114:2047`.
 
@@ -339,6 +340,8 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 53 | Catálogo leído una vez de Supabase a arreglos en memoria (`src/data/catalogo.ts`, mismos nombres que los mocks) con copia en AsyncStorage para usarlo sin red; columna `orden` para conservar el orden de los mocks | [Claude Code, 26/11 → aprobado] |
 | 54 | El trigger `crear_perfil` copia datos de demo a cada cuenta nueva (paraderos favoritos, lugares y los 4 avisos de Figma) | [Claude Code, 26/11 → aprobado] |
 | 55 | Riesgo aceptado: los reportes anónimos guardan `usuario_id` (uuid sin nombre, visible en la tabla y en Realtime); el repositorio lo oculta. Al borrar la cuenta queda en null | [Claude Code, 26/11 → aprobado] |
+| 56 | Login: código de 6 dígitos que vence en 10 min (como el correo 111:2098), SMTP de Gmail, plantilla en `supabase/plantillas/codigo.html` sin «Verificar con un toque», pegada en «Magic link or OTP» y en «Confirm sign up» (primer correo de una cuenta nueva). Cerrar sesión = `signOut` + borrar preferencias (vuelve a la bienvenida) | [Claude Code, 26/11 → aprobado] |
+| 57 | La primera vez se pregunta «¿Cómo te llamas?» (`/ingresar/nombre`) y se guarda en `perfiles.nombre`. Pantallas de login `// supuesto` con `PantallaCuenta` + `CampoCuenta` (campo de D4, ahora compartido) | [Claude Code, 26/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.

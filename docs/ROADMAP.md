@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente); **5.1** (esquema, RLS y datos iniciales) escrito, falta ejecutar el SQL y probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** Fase 5 (Supabase) en curso: 5.0 ✅ (proyecto y cliente), 5.1 ✅ (esquema, RLS y catálogo remoto); **5.2** (login con código por correo) escrito, falta configurar el SMTP y probar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -52,8 +52,8 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 4.8 | Módulo de accesibilidad (A1/A2) | ✅ (26/11) |
 | 4.9 | Cuenta y eliminación de cuenta (D1–D5) con datos simulados | ✅ (26/11) |
 | 5.0 | Proyecto Supabase y cliente | ✅ (26/11) |
-| 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | 🔨 **en prueba** |
-| 5.2 | Inicio de sesión con código por correo | 📝 |
+| 5.1 | Esquema, RLS y datos iniciales (seed con los mocks) | ✅ (26/11) |
+| 5.2 | Inicio de sesión con código por correo | 🔨 **en prueba** |
 | 5.3 | Perfil y cuenta reales | 📝 |
 | 5.4 | Reportes reales | 📝 |
 | 5.5 | Tiempo real | 📝 |
@@ -168,6 +168,15 @@ En el dashboard: **SQL Editor → New query**. Pega y ejecuta (**Run**) cada arc
 4. `supabase/seed.sql` — los mocks (generado desde `src/mocks`; si cambian los mocks, se regenera).
 
 El catálogo se lee una vez (`src/data/catalogo.ts`) y queda guardado en el teléfono para usarlo sin red. «Refrescar» en `/dev/datos` vuelve a fechar los reportes de ejemplo.
+
+### 5.2 · Correo con código (lo haces tú, una vez)
+1. **Contraseña de aplicación de Gmail:** en tu cuenta de Google activa la verificación en dos pasos; luego en https://myaccount.google.com/apppasswords crea «RutaClara». Copia las 16 letras **solo en Supabase** (nunca en el chat ni en el código).
+2. **Authentication → Emails → SMTP Settings** → Enable custom SMTP: host `smtp.gmail.com`, puerto `465`, usuario y sender email = tu Gmail, contraseña = la de aplicación, sender name `RutaClara`.
+3. **Authentication → Sign In / Providers → Email:** Email OTP Expiration `600` y Email OTP Length `6`.
+4. **Authentication → Emails → Magic link or OTP** y también **Confirm sign up** (el primer correo de una cuenta nueva usa esa plantilla): asunto `Tu código de RutaClara: {{ .Token }}`; cuerpo = `supabase/plantillas/codigo.html` (Source).
+5. **Authentication → Rate Limits:** emails por hora en 30 o más.
+
+Flujo: onboarding → `/ingresar` (correo) → `/ingresar/codigo` (6 dígitos) → la primera vez `/ingresar/nombre` → Inicio. La sesión queda guardada; «Cerrar sesión», «Desactivar» (D3) y «Entendido» (D5) cierran la sesión de Supabase.
 
 ## Fase 6 · Mapa real, ubicación y notificaciones — 🗺️
 **Pendiente decidir:** proveedor de mapa. Restricción de Expo Go: `react-native-maps` sí funciona en Expo Go; MapLibre necesita un *development build*. Las notificaciones push remotas también requieren *development build*.

@@ -59,6 +59,9 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | D3 · Eliminar cuenta: alternativa | cuenta/eliminar/alternativa.tsx | /cuenta/eliminar/alternativa | Stack. Paso 2 de 3; «Desactivar» cierra la sesión |
 | D4 · Eliminar cuenta: confirmación | cuenta/eliminar/confirmar.tsx | /cuenta/eliminar/confirmar | Stack. Paso 3 de 3; escribir ELIMINAR; `router.replace` a D5 |
 | D5 · Eliminación programada | cuenta/eliminar/programada.tsx | /cuenta/eliminar/programada | Stack sin gesto atrás. «Entendido» cierra sesión; «Cancelar eliminación» vuelve a /cuenta |
+| — · Ingresar (correo) | ingresar/index.tsx | /ingresar | Stack sin flecha atrás. Solo sin sesión (`useSesion()`); supuesto, sin frame |
+| — · Código de 6 dígitos | ingresar/codigo.tsx | /ingresar/codigo | Stack. Param `correo`; verifica al completar, reenviar a los 60 s |
+| — · ¿Cómo te llamas? | ingresar/nombre.tsx | /ingresar/nombre | Stack sin flecha atrás. Solo la primera vez (perfil sin nombre) |
 | F3_06 · Mapa de seguridad | seguridad.tsx | /seguridad | Stack (chip Seguridad de Inicio, menú lateral, aviso de seguridad). Param opcional `paraderoId` |
 | F3_07 · Menú lateral | components/MenuLateral.tsx | — | No es ruta: Modal sobre Inicio (☰) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
@@ -70,8 +73,8 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | — Catálogo de componentes (dev) | dev/catalogo.tsx | /dev/catalogo | Stack |
 | — Datos de prueba (dev) | dev/datos.tsx | /dev/datos | Stack |
 
-Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext). Toda ruta nueva debe declararse dentro del grupo protegido.
-Cerrar sesión: `useCerrarSesion()` (/src/hooks) pide confirmación y vuelve al onboarding.
+Primer uso: `_layout.tsx` usa `Stack.Protected` con `onboardingVisto` (PreferenciasContext) y `estado` de `useSesion()` (SesionContext: cargando / sin-sesion → /ingresar / sin-nombre → /ingresar/nombre / lista → app). Toda ruta nueva debe declararse dentro del grupo protegido.
+Cerrar sesión: `useCerrarSesion()` (/src/hooks) pide confirmación, llama a `cerrarSesion()` de `useSesion()` (Supabase) y vuelve al onboarding. Funciones de Auth en /src/data/sesion.ts.
 Confirmar antes de salir: `usePreventRemove(condición, ({ repeat }) => …)`; para dejar salir, poner la condición en false y llamar a `repeat()` (SDK 58; no usar `navigation.dispatch(data.action)`).
 Cerrar el modal de reporte desde cualquier paso: `cerrar()` de `useReporte()` (`router.dismissAll()` solo vuelve al primer paso del stack anidado).
 Camino feliz: Inicio → buscar → rutas → ruta/la-50 → viaje/espera → viaje/a-bordo → viaje/fin → Inicio.

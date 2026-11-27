@@ -185,6 +185,8 @@ export const sizes = {
   // Mi cuenta y eliminación (D1–D5): ícono del avatar y espacio sobre la señal de D5
   avatarIcono: 28,
   periodoGraciaTop: 64,
+  // Inicio de sesión (supuesto, sin frame): separación entre los dígitos del código, como en el correo 111:2098
+  codigoEspaciado: 8,
 } as const;
 
 // Feedback al presionar y estado deshabilitado
