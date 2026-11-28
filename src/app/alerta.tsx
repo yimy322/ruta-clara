@@ -80,14 +80,40 @@ function fechaConHora(hora: number, minuto: number) {
   return fecha;
 }
 
+// Datos sugeridos por el asistente de viaje (7.2) para una alerta nueva; se
+// ignora lo que no sea válido
+type Sugerencia = { destinoId?: string; hora?: string; minuto?: string; dias?: string; minutosAntes?: string };
+
+function aplicarSugerencia(base: Omit<Formulario, "ruta">, s: Sugerencia): Omit<Formulario, "ruta"> {
+  const entero = (texto: string | undefined, min: number, max: number) => {
+    const n = Number(texto);
+    // "" daría 0 (domingo o medianoche): se descarta
+    return texto !== undefined && texto.trim() !== "" && Number.isInteger(n) && n >= min && n <= max ? n : undefined;
+  };
+  const hora = entero(s.hora, 0, 23);
+  const dias = [...new Set((s.dias ?? "").split(",").flatMap((d) => entero(d, 0, 6) ?? []))];
+  const minutosAntes = MINUTOS_ANTES.find((m) => String(m) === s.minutosAntes);
+  return {
+    ...base,
+    hora: hora ?? base.hora,
+    minuto: hora !== undefined ? (entero(s.minuto, 0, 59) ?? 0) : base.minuto,
+    dias: dias.length > 0 ? dias : base.dias,
+    minutosAntes: minutosAntes ?? base.minutosAntes,
+  };
+}
+
 // F3_03 · Configurar alerta diaria. Con `paraderoId` crea una alerta que sube
-// en ese paradero; con `id` edita una existente.
+// en ese paradero; con `id` edita una existente. Una alerta nueva acepta los
+// datos del asistente de viaje (`destinoId`, `hora`, `minuto`, `dias`,
+// `minutosAntes`): son el estado inicial y no se guardan sin «Guardar».
 export default function Alerta() {
   const { colors, typography } = useTema();
   const styles = useEstilos(crearEstilos);
 
   const router = useRouter();
-  const { id, paraderoId } = useLocalSearchParams<{ id?: string; paraderoId?: string }>();
+  const { id, paraderoId, ...sugerencia } = useLocalSearchParams<{ id?: string; paraderoId?: string } & Sugerencia>();
+  const { destinoId, hora: horaSugerida, minuto: minutoSugerido, dias: diasSugeridos, minutosAntes: antesSugerido } =
+    sugerencia;
   const { mostrar } = useToast();
 
   const [carga, setCarga] = useState<Carga>({ tipo: "cargando" });
@@ -115,7 +141,9 @@ export default function Alerta() {
         if (!activo) {
           return;
         }
-        const ruta = alerta ? claveAlerta(alerta) : opciones[0] && claveRuta(opciones[0]);
+        // Con destino sugerido, la primera ruta favorita que llega ahí; si ninguna llega, hay que elegir
+        const sugerida = destinoId ? opciones.find((opcion) => opcion.destino.id === destinoId) : opciones[0];
+        const ruta = alerta ? claveAlerta(alerta) : sugerida && claveRuta(sugerida);
         const base = alerta
           ? {
               hora: alerta.hora,
@@ -125,7 +153,12 @@ export default function Alerta() {
               transito: alerta.transito,
               seguridad: alerta.seguridad,
             }
-          : NUEVA;
+          : aplicarSugerencia(NUEVA, {
+              hora: horaSugerida,
+              minuto: minutoSugerido,
+              dias: diasSugeridos,
+              minutosAntes: antesSugerido,
+            });
         const inicial: Formulario = {
           ...base,
           // Si la ruta guardada ya no está entre las opciones, hay que elegir otra
@@ -142,7 +175,7 @@ export default function Alerta() {
     return () => {
       activo = false;
     };
-  }, [id, paraderoId]);
+  }, [id, paraderoId, destinoId, horaSugerida, minutoSugerido, diasSugeridos, antesSugerido]);
 
   useEffect(cargar, [cargar]);
 

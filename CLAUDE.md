@@ -52,7 +52,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab. Recarga al recibir foco; el punto rojo de la tab sale de `useNotificaciones()` |
 | F2_09 · Historial y logros | (tabs)/perfil.tsx | /perfil | Tab |
 | F3_02 · Detalle de paradero | paradero/[id].tsx | /paradero/puente-nuevo | Stack (desde la card de Inicio). Recarga al recibir foco |
-| F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); pide confirmación si hay cambios sin guardar |
+| F3_03 · Configurar alerta diaria | alerta.tsx | /alerta | Modal. Params opcionales `paraderoId` (nueva, desde F3_02) o `id` (editar); el asistente (7.2) puede sugerir `destinoId`, `hora`, `minuto`, `dias`, `minutosAntes`; pide confirmación si hay cambios sin guardar |
 | F3_05 · Ajustes | ajustes.tsx | /ajustes | Stack (desde ⚙ en Mi perfil y en Alertas, y desde el menú lateral). Los interruptores van en `ajustes` de `usePreferencias()` |
 | A1/A2 · Accesibilidad | accesibilidad.tsx | /accesibilidad | Stack (desde la fila Accesibilidad de Ajustes). Tamaño del texto, alto contraste, reducir movimiento y señales sin depender del color (`ajustes` de `usePreferencias()`) |
 | D1 · Mi cuenta | cuenta/index.tsx | /cuenta | Stack (desde la fila de perfil de Ajustes). Recarga al recibir foco; aviso para cancelar una eliminación pendiente |
@@ -66,6 +66,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F3_06 · Mapa de seguridad | seguridad.tsx | /seguridad | Stack (chip Seguridad de Inicio, menú lateral, aviso de seguridad). Param opcional `paraderoId` |
 | F3_07 · Menú lateral | components/MenuLateral.tsx | — | No es ruta: Modal sobre Inicio (☰) |
 | F1_05 · Búsqueda de destino | buscar.tsx | /buscar | Stack |
+| — · Asistente de viaje (IA) | asistente.tsx | /asistente | Stack (chip «Con tus palabras» de F1_05; supuesto, sin frame) |
 | F1_06 · Resultados de rutas | rutas.tsx | /rutas | Stack |
 | F1_07 · Detalle de ruta | ruta/[id].tsx | /ruta/la-50 | Stack |
 | F1_08 · Monitoreo en vivo | viaje/espera.tsx | /viaje/espera | Stack |
@@ -93,7 +94,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
 - Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano). Ubicación (6.1): `getUbicacionUsuario()` usa /src/data/ubicacion.ts (GPS o la de prueba de los mocks; interruptor «Usar ubicación de prueba» en /dev/datos, encendido por defecto).
 - Notificaciones locales (6.3): /src/data/notificacionesLocales.ts (único que importa expo-notifications); recordatorios de alertas vía `sincronizarRecordatorios()` del repositorio; avisos de viaje con `useAvisoProgramado()` (/src/hooks). Permiso solo en contexto (`pedirPermisoNotificaciones()`).
-- IA (Fase 7): `interpretarReporte(texto)` del repositorio llama a la Edge Function `supabase/functions/interpretar-reporte` (Gemini gratuito; código Deno, excluido de tsc y ESLint). Solo propone un borrador; errores `SinConexionError` o `ErrorIA` (`limite`, `ocupada`, `texto`).
+- IA (Fase 7): `interpretarReporte(texto)` (7.1) e `interpretarViaje(texto)` (7.2) del repositorio llaman a la Edge Function `supabase/functions/interpretar-reporte` (Gemini gratuito; código Deno, excluido de tsc y ESLint). Solo proponen (borrador o acción); campo compartido `CampoIA`; errores `SinConexionError` o `ErrorIA` (`limite`, `ocupada`, `texto`).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 - Estados vacíos y de error (E1–E10): componente `EstadoPantalla`. Sin conexión, los reportes van a la cola de /src/data/colaReportes.ts (AsyncStorage) y `ColaReportesProvider` los reenvía al volver la red (NetInfo).
 - Tema dinámico (4.6): colores, sombras y tipografía salen de `useTema()` (/src/context/TemaContext.tsx); los estilos se escriben como `const crearEstilos = ({ colors }: Tema) => StyleSheet.create({...})` y se usan con `useEstilos(crearEstilos)`. Texto sobre amarillo: `colors.onYellow`. `spacing`, `radii`, `sizes`, `opacity` y `fonts` se importan directo de `@/theme`.

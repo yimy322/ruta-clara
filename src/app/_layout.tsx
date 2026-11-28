@@ -92,6 +92,7 @@ function RootNavigator() {
         <Stack.Protected guard={onboardingVisto && estado === "lista"}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="buscar" />
+          <Stack.Screen name="asistente" />
           <Stack.Screen name="rutas" />
           <Stack.Screen name="ruta/[id]" />
           <Stack.Screen name="paradero/[id]" />

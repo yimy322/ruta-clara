@@ -4,6 +4,7 @@ export { BannerUbicacion } from "./BannerUbicacion";
 export { BarraProgreso } from "./BarraProgreso";
 export { BotonMantener } from "./BotonMantener";
 export { Button, type ButtonVariant } from "./Button";
+export { CampoIA, MAX_TEXTO_IA, MENSAJES_ERROR_IA } from "./CampoIA";
 export { CardParadero, type DatosCardParadero } from "./CardParadero";
 export { CardRuta } from "./CardRuta";
 export { Chip, type ChipState } from "./Chip";

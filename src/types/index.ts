@@ -337,6 +337,23 @@ export type InterpretacionReporte = {
   seguridad?: TipoSeguridad;
 };
 
+// Acción de viaje que propone la IA (7.2): buscar rutas (F1_06) o crear una
+// alerta diaria (F3_03). El usuario confirma en esas pantallas.
+export type InterpretacionViaje = {
+  entendido: boolean;
+  falta?: string;
+  accion?: "buscar_rutas" | "crear_alerta";
+  // Destino del catálogo (con su nombre) o lugar guardado
+  destinoId?: string;
+  destinoNombre?: string;
+  lugar?: LugarGuardado["nombre"];
+  hora?: number;
+  minuto?: number;
+  // Como Date.getDay(): 0 = domingo
+  dias?: number[];
+  minutosAntes?: MinutosAntes;
+};
+
 // Reporte en armado a lo largo de los pasos del Flujo 2 (F2_01–F2_08)
 export type BorradorReporte = {
   tipo?: TipoReporte;

@@ -8,6 +8,7 @@ import {
   History,
   LocateFixed,
   MapPin,
+  MessageSquareText,
   Search,
   X,
   type LucideIcon,
@@ -226,6 +227,8 @@ export default function Buscar() {
         style={styles.lugaresScroll}
         contentContainerStyle={styles.lugares}
       >
+        {/* 7.2 (supuesto, sin frame): asistente de viaje con IA */}
+        <Chip label="Con tus palabras" icon={<MessageSquareText />} onPress={() => router.push("/asistente")} />
         {lugares.map((lugar) => {
           const Icono = ICONO_LUGAR[lugar.nombre];
           return <Chip key={lugar.id} label={lugar.nombre} icon={<Icono />} onPress={() => irARutas(lugar.nombre)} />;

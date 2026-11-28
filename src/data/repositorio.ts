@@ -15,6 +15,7 @@ import type {
   Favoritos,
   Insignia,
   InterpretacionReporte,
+  InterpretacionViaje,
   Linea,
   LineaSugerida,
   LugarGuardado,
@@ -57,7 +58,12 @@ import { getAjustes } from "./preferencias";
 import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
 import { obtenerUbicacion } from "./ubicacion";
-import { interpretarReporte as interpretarConIA, subirFotoReporte, supabase } from "./supabase";
+import {
+  interpretarReporte as interpretarReporteIA,
+  interpretarViaje as interpretarViajeIA,
+  subirFotoReporte,
+  supabase,
+} from "./supabase";
 
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
@@ -475,7 +481,17 @@ export async function interpretarReporte(texto: string): Promise<InterpretacionR
   if (getSimulacion().forzarSinRed) {
     throw new SinConexionError();
   }
-  return interpretarConIA(texto);
+  return interpretarReporteIA(texto);
+}
+
+// Asistente de viaje (7.2): la IA propone buscar rutas o crear una alerta; el
+// usuario confirma en F1_06 o F3_03. Errores: SinConexionError o ErrorIA.
+export async function interpretarViaje(texto: string): Promise<InterpretacionViaje> {
+  await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+  return interpretarViajeIA(texto);
 }
 
 export { ErrorIA, type MotivoErrorIA } from "./supabase";

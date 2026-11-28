@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
 import { AppState } from "react-native";
 
-import type { InterpretacionReporte } from "@/types";
+import type { InterpretacionReporte, InterpretacionViaje } from "@/types";
 
 import { SinConexionError } from "./simulacion";
 
@@ -103,13 +103,13 @@ export class ErrorIA extends Error {
   }
 }
 
-// Texto o dictado → borrador propuesto, con la Edge Function interpretar-reporte
-// (supabase/functions; Gemini gratuito). Sin red lanza SinConexionError; si la
-// función responde con error, ErrorIA.
-export async function interpretarReporte(texto: string): Promise<InterpretacionReporte> {
-  let resultado: Awaited<ReturnType<typeof supabase.functions.invoke<InterpretacionReporte>>>;
+// Llama a la Edge Function interpretar-reporte (supabase/functions; Gemini
+// gratuito). Sin red lanza SinConexionError; si la función responde con error,
+// ErrorIA.
+async function invocarIA<T>(cuerpo: { texto: string; modo?: "viaje" }): Promise<T> {
+  let resultado: Awaited<ReturnType<typeof supabase.functions.invoke<T>>>;
   try {
-    resultado = await supabase.functions.invoke<InterpretacionReporte>("interpretar-reporte", { body: { texto } });
+    resultado = await supabase.functions.invoke<T>("interpretar-reporte", { body: cuerpo });
   } catch {
     throw new SinConexionError();
   }
@@ -134,3 +134,9 @@ export async function interpretarReporte(texto: string): Promise<InterpretacionR
   }
   return data;
 }
+
+// Texto o dictado → borrador de reporte propuesto (7.1)
+export const interpretarReporte = (texto: string) => invocarIA<InterpretacionReporte>({ texto });
+
+// Frase de viaje → acción propuesta (7.2)
+export const interpretarViaje = (texto: string) => invocarIA<InterpretacionViaje>({ texto, modo: "viaje" });

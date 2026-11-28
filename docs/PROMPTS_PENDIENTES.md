@@ -35,9 +35,9 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 18 | 6.1 · Ubicación real | ✅ ejecutado el 27/11 |
 | 19 | 6.2 · Mapa interactivo | ✅ ejecutado el 27/11 |
 | 20 | 6.3 · Notificaciones locales (si hay tiempo) | ✅ ejecutado el 27/11 |
-| — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | 📝 guía abajo |
-| 21 | 7.1 · Reporte con tus palabras | 🔨 **en prueba** |
-| 22 | 7.2 · Asistente de viaje (si hay tiempo) | 📝 |
+| — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | ✅ (28/11) |
+| 21 | 7.1 · Reporte con tus palabras | ✅ ejecutado el 28/11 |
+| 22 | 7.2 · Asistente de viaje (si hay tiempo) | 🔨 **en prueba** |
 | — | Fase 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:

@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** **7.1** (reporte con tus palabras) escrito; falta el 7.0 (clave y Edge Function, lo haces tú) y probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** 7.0 y 7.1 ✅ (reporte con tus palabras); **7.2** (asistente de viaje) escrito, falta probar.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -63,9 +63,9 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 6.1 | Ubicación real del celular (con «Usar ubicación de prueba» para la demo) | ✅ (27/11) |
 | 6.2 | Mapa interactivo: arrastrar en F2_04, centrar en mí, destino en F1_06 | ✅ (27/11) |
 | 6.3 | Notificaciones locales (llegada, bajar, recordatorio de alertas) | ✅ (27/11) |
-| 7.0 | Clave gratuita de Gemini y Edge Function `interpretar-reporte` (lo haces tú, guiado) | 📝 |
-| 7.1 | Reporte con tus palabras (texto o dictado → borrador que el usuario confirma) | 🔨 **en prueba** (código listo; falta el 7.0) |
-| 7.2 | Asistente de viaje: frase → acción propuesta (buscar rutas o crear alerta) | 📝 si hay tiempo |
+| 7.0 | Clave gratuita de Gemini y Edge Function `interpretar-reporte` (lo haces tú, guiado) | ✅ (28/11) |
+| 7.1 | Reporte con tus palabras (texto o dictado → borrador que el usuario confirma) | ✅ (28/11) |
+| 7.2 | Asistente de viaje: frase → acción propuesta (buscar rutas o crear alerta) | 🔨 **en prueba** |
 | 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
 
 ## Orden recomendado para el Proyecto Final

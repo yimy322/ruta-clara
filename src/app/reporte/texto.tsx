@@ -1,16 +1,15 @@
 import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
-import { AccessibilityInfo, ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { AccessibilityInfo, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, Header } from "@/components";
+import { Button, CampoIA, Header, MENSAJES_ERROR_IA } from "@/components";
 import { useReporte } from "@/context/ReporteContext";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { ErrorIA, interpretarReporte } from "@/data/repositorio";
-import { borderWidths, sizes, spacing, type Tema } from "@/theme";
+import { spacing, type Tema } from "@/theme";
 import type { BorradorReporte, InterpretacionReporte } from "@/types";
 
-const MAX_TEXTO = 280;
 // La nota del reporte de tránsito tiene su propio límite (F2_06)
 const MAX_NOTA_TRANSITO = 120;
 
@@ -41,18 +40,12 @@ function destino(texto: string, ia: InterpretacionReporte): { cambios: Partial<B
   }
 }
 
-const MENSAJES_ERROR: Record<ErrorIA["motivo"] | "sin-red", string> = {
-  limite: "Llegaste al límite de reportes con IA por hoy.",
-  ocupada: "La IA está ocupada en este momento.",
-  texto: "Escribe tu reporte en menos de 280 letras.",
-  "sin-red": "Sin conexión. Revisa tu internet e inténtalo otra vez.",
-};
 
 // Reporte con tus palabras (7.1, supuesto: sin frame en Figma). La IA arma un
 // borrador y abre el paso de siempre con las opciones marcadas; el usuario
 // revisa y confirma (decisión 72).
 export default function ReporteConTexto() {
-  const { colors, typography } = useTema();
+  const { typography } = useTema();
   const styles = useEstilos(crearEstilos);
 
   const router = useRouter();
@@ -87,7 +80,7 @@ export default function ReporteConTexto() {
       actualizar(Object.fromEntries(Object.entries(cambios).filter(([, valor]) => valor !== undefined)));
       router.push(paso);
     } catch (error) {
-      mostrarAviso(MENSAJES_ERROR[error instanceof ErrorIA ? error.motivo : "sin-red"]);
+      mostrarAviso(MENSAJES_ERROR_IA[error instanceof ErrorIA ? error.motivo : "sin-red"]);
     } finally {
       setEnviando(false);
     }
@@ -102,46 +95,20 @@ export default function ReporteConTexto() {
           Escribe o dicta qué pasa y armamos el reporte por ti. Tú lo revisas antes de enviarlo.
         </Text>
 
-        <View style={styles.campo}>
-          <TextInput
-            value={texto}
-            onChangeText={(valor) => {
-              setTexto(valor);
-              setAviso(null);
-            }}
-            multiline
-            autoFocus
-            maxLength={MAX_TEXTO}
-            editable={!enviando}
-            placeholder="Ej.: La 50 viene llena por Javier Prado"
-            placeholderTextColor={colors.inkMuted}
-            accessibilityLabel="Tu reporte"
-            accessibilityHint="Puedes usar el micrófono del teclado para dictar"
-            style={[typography.body, styles.ink, styles.campoTexto]}
-          />
-          <Text style={[typography.caption, styles.muted, styles.contador]}>
-            {texto.length}/{MAX_TEXTO}
-          </Text>
-        </View>
-
-        <View style={styles.pistas}>
-          <Text style={[typography.caption, styles.muted]}>Usa el micrófono del teclado para dictar.</Text>
-          <Text style={[typography.caption, styles.muted]}>No escribas datos personales.</Text>
-        </View>
-
-        {enviando && (
-          <View style={styles.cargando} accessibilityLiveRegion="polite">
-            <ActivityIndicator color={colors.ink} />
-            <Text style={[typography.body, styles.ink]}>Entendiendo tu reporte…</Text>
-          </View>
-        )}
-
-        {aviso && (
-          <View style={styles.aviso} accessibilityLiveRegion="polite">
-            <Text style={[typography.body, styles.ink]}>{aviso}</Text>
-            <Button label="Reportar paso a paso" variant="secondary" onPress={() => router.back()} fullWidth />
-          </View>
-        )}
+        <CampoIA
+          valor={texto}
+          onCambiar={(valor) => {
+            setTexto(valor);
+            setAviso(null);
+          }}
+          placeholder="Ej.: La 50 viene llena por Javier Prado"
+          accessibilityLabel="Tu reporte"
+          enviando={enviando}
+          textoEnviando="Entendiendo tu reporte…"
+          aviso={aviso}
+          etiquetaAlternativa="Reportar paso a paso"
+          onAlternativa={() => router.back()}
+        />
       </ScrollView>
 
       <View style={styles.pie}>
@@ -160,38 +127,6 @@ const crearEstilos = ({ colors }: Tema) =>
     contenido: {
       gap: spacing.md,
       padding: spacing.lg,
-    },
-    campo: {
-      minHeight: sizes.noteHeight,
-      padding: spacing.md,
-      borderRadius: sizes.optionRadius,
-      borderWidth: borderWidths.regular,
-      borderColor: colors.line,
-      backgroundColor: colors.surface,
-    },
-    campoTexto: {
-      flex: 1,
-      padding: 0,
-      textAlignVertical: "top",
-    },
-    contador: {
-      textAlign: "right",
-    },
-    pistas: {
-      gap: spacing.xxs,
-    },
-    cargando: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.sm,
-    },
-    aviso: {
-      gap: spacing.md,
-      padding: spacing.md,
-      borderRadius: sizes.optionRadius,
-      borderWidth: borderWidths.regular,
-      borderColor: colors.line,
-      backgroundColor: colors.canvas,
     },
     pie: {
       paddingHorizontal: spacing.lg,
