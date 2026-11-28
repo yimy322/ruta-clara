@@ -38,8 +38,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | ✅ (28/11) |
 | 21 | 7.1 · Reporte con tus palabras | ✅ ejecutado el 28/11 |
 | 22 | 7.2 · Asistente de viaje (si hay tiempo) | ✅ ejecutado el 28/11 |
-| 23 | 8.0 · Lista para la demo | 🔨 **en prueba** |
-| 24 | 8.1 · README y repositorio | 📝 |
+| 23 | 8.0 · Lista para la demo | ✅ ejecutado el 28/11 |
+| 24 | 8.1 · README y repositorio | 🔨 **en prueba** |
 | 25 | 8.2 · Evidencia de pruebas | 📝 |
 | 26 | 8.3 · PPT | 📝 |
 | 27 | 8.4 · Guion de la demo | 📝 |

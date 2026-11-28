@@ -58,7 +58,7 @@ Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualiza
 
 ## 4. Contexto académico
 
-- Curso **Interacción Hombre-Máquina**, UTP. Proyecto individual.
+- Curso **Interacción Hombre-Máquina**, UTP. Proyecto individual. Autor: **Yimy Jhon Flores Hilares** (GitHub @yimy322).
 - **AP2 (entregado):** 26 wireframes conectados y 3 tareas. Evaluación heurística: **la llenó el propio usuario** (no hubo profesional externo). **No hubo pruebas con usuarios.**
 - **AP3 (entregado):** alta fidelidad, 11 estados, módulo de accesibilidad, eliminación de cuenta, 4 correos y análisis. Informe: https://claude.ai/artifact/HvT7UWB2B5pn1rg9EGGZ6q
 - Guion de prueba con usuario: https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF (no consta que se haya hecho).
@@ -365,6 +365,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 78 | Fase 8: la PPT se hace como presentación Slides de claude.ai, descargable como .pptx o PDF (el usuario usa Fedora, sin PowerPoint; se edita en LibreOffice Impress o Google Slides) | [Claude Code, 28/11 → aprobado] |
 | 79 | Fase 8: cron `refrescar-demo` cada 30 min (pg_cron) para que los reportes de ejemplo se vean siempre en vivo; el botón de /dev/datos queda de respaldo | [Claude Code, 28/11 → aprobado] |
 | 80 | 8.0: sin botones «pronto» en el camino de la demo. Desvío de ruta → línea → F2_04 («Confirma dónde se desvió») → se envía como reporte `desvio`. Modo offline del menú explica la cola E3. Ayuda de Ajustes abre WhatsApp. Mi cuenta → Nombre se edita con `Alert.prompt` (iOS) y `cambiarNombre()`. Quedan fuera del MVP (siguen «pronto»): elegir destino en el mapa (E1), «Avísame cuando vuelva», cambiar celular o correo y descargar datos | [Usuario, 28/11] |
+| 81 | 8.1: README de entrega en español (problema, modalidades, funciones, arquitectura en Mermaid, cómo correrlo). Capturas reales del iPhone en `docs/capturas/` (las toma el usuario). LICENSE MIT a nombre del autor (antes era la de la plantilla de Expo). `.env.example` solo con claves públicas | [Usuario, 28/11] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.

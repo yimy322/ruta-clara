@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** **Fase 7 (IA) completa** (28/11): reporte con tus palabras y asistente de viaje con Gemini gratuito. **Fase 8 (entrega) planificada el 28/11:** **8.0** (lista para la demo) escrito, falta probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** **Fase 7 (IA) completa** (28/11): reporte con tus palabras y asistente de viaje con Gemini gratuito. **Fase 8 (entrega) planificada el 28/11:** 8.0 ✅; **8.1** (README) escrito, faltan las capturas.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -66,8 +66,8 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 7.0 | Clave gratuita de Gemini y Edge Function `interpretar-reporte` (lo haces tú, guiado) | ✅ (28/11) |
 | 7.1 | Reporte con tus palabras (texto o dictado → borrador que el usuario confirma) | ✅ (28/11) |
 | 7.2 | Asistente de viaje: frase → acción propuesta (buscar rutas o crear alerta) | ✅ (28/11) |
-| 8.0 | Lista para la demo: cron `refrescar-demo`, TODO visibles, validaciones | 🔨 **en prueba** |
-| 8.1 | README y repositorio (cómo correrlo, arquitectura, sin secretos) | 📝 |
+| 8.0 | Lista para la demo: cron `refrescar-demo`, TODO visibles, validaciones | ✅ (28/11) |
+| 8.1 | README y repositorio (cómo correrlo, arquitectura, sin secretos) | 🔨 **en prueba** (faltan tus capturas) |
 | 8.2 | Evidencia de pruebas: `docs/PRUEBAS.md` y `docs/USABILIDAD.md` (tú haces las pruebas) | 📝 |
 | 8.3 | PPT (presentación Slides, descargable como .pptx o PDF) | 📝 |
 | 8.4 | Guion de la demo (`docs/DEMO.md`) | 📝 |
