@@ -4,7 +4,6 @@ import { PUNTOS_POR_TIPO } from "@/config/gamificacion";
 import { INSIGNIAS } from "@/config/insignias";
 import { UMBRAL_EN_VIVO_MIN, UMBRAL_ZONA_ALTA, VENTANA_PARADERO_H, VIGENCIA_REPORTE_MIN } from "@/config/reportes";
 import { VELOCIDAD_MEDIA_KMH } from "@/config/simulacion";
-import { ubicacionUsuario } from "@/mocks/usuario";
 import type {
   ActividadParadero,
   AlertaDiaria,
@@ -54,6 +53,7 @@ import {
 } from "./catalogo";
 import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
+import { obtenerUbicacion } from "./ubicacion";
 import { subirFotoReporte, supabase } from "./supabase";
 
 const RADIO_CERCANO_M = 2000;
@@ -457,10 +457,13 @@ export async function getLugaresGuardados(): Promise<LugarGuardado[]> {
   return [...lugaresGuardados];
 }
 
-// Fase 6: se reemplaza por la ubicación real del celular.
+// Interruptor «Usar ubicación de prueba» (/dev/datos)
+export { getUsarUbicacionPrueba, setUsarUbicacionPrueba } from "./ubicacion";
+
+// GPS del celular o la ubicación de prueba (src/data/ubicacion.ts, 6.1)
 export async function getUbicacionUsuario(): Promise<Coordenada> {
-  await esperar();
-  return ubicacionUsuario;
+  const [, ubicacion] = await Promise.all([esperar(), obtenerUbicacion()]);
+  return ubicacion;
 }
 
 // Del más cercano al más lejano
@@ -813,11 +816,11 @@ export async function getLineasSugeridas(lat: number, lng: number): Promise<Line
 
 // Por código, nombre o empresa, sin importar tildes ni mayúsculas.
 export async function buscarLineas(texto: string): Promise<LineaSugerida[]> {
-  await esperarConReportes();
+  const [, ubicacion] = await Promise.all([esperarConReportes(), obtenerUbicacion()]);
   const consulta = normalizar(texto);
   return lineas
     .filter((linea) => [linea.codigo, linea.nombre, linea.empresa].some((campo) => normalizar(campo).includes(consulta)))
-    .map((linea) => sugerir(linea, ubicacionUsuario.lat, ubicacionUsuario.lng));
+    .map((linea) => sugerir(linea, ubicacion.lat, ubicacion.lng));
 }
 
 // Tipos de reporte que se asocian al paradero más cercano
@@ -834,7 +837,7 @@ export async function crearReporte(borrador: BorradorReporte): Promise<Resultado
   if (!tipo) {
     throw new Error("El reporte no tiene tipo");
   }
-  const { lat, lng } = borrador.posicion ?? ubicacionUsuario;
+  const { lat, lng } = borrador.posicion ?? (await obtenerUbicacion());
   // Antes de insertar: si falla aquí (sin red) el reporte va a la cola sin
   // haberse guardado, así no se duplica al reenviarlo
   const usuario = await getUsuario();
@@ -1030,7 +1033,7 @@ const llegaAlDestino = (linea: Linea, subidaId: string, destino: Destino) =>
 // solo ese; si no, los favoritos (con todas sus líneas) y, para las líneas
 // favoritas, el paradero de su recorrido más cercano al usuario.
 export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<OpcionRutaAlerta[]> {
-  await esperar();
+  const [, ubicacion] = await Promise.all([esperar(), obtenerUbicacion()]);
   const subidas: { linea: Linea; paradero: Paradero }[] = [];
 
   const idsSubida = paraderoId ? [paraderoId] : [...paraderosMarcados];
@@ -1044,7 +1047,7 @@ export async function getOpcionesRutaAlerta(paraderoId?: string): Promise<Opcion
   if (!paraderoId) {
     for (const linea of lineas.filter((l) => favoritas.has(l.id))) {
       const recorrido = linea.recorridoIda.flatMap((id) => paraderos.find((p) => p.id === id) ?? []);
-      const paradero = masCercano(ubicacionUsuario.lat, ubicacionUsuario.lng, recorrido);
+      const paradero = masCercano(ubicacion.lat, ubicacion.lng, recorrido);
       if (paradero) {
         subidas.push({ linea, paradero });
       }

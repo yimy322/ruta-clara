@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, FilaAjuste, Header, ListItem } from "@/components";
 import { useColaReportes } from "@/context/ColaReportesContext";
-import { buscarRutas } from "@/data/repositorio";
+import { buscarRutas, getUsarUbicacionPrueba, setUsarUbicacionPrueba } from "@/data/repositorio";
 import { getSimulacion, setSimulacion, type Simulacion } from "@/data/simulacion";
 import { probarConexion, refrescarDemo, type EstadoConexion } from "@/data/supabase";
 import { radii, spacing, type Tema } from "@/theme";
@@ -44,6 +44,17 @@ export default function Datos() {
   const [opciones, setOpciones] = useState<OpcionRuta[] | null>(null);
   const [error, setError] = useState(false);
   const [simulacion, setEstadoSimulacion] = useState<Simulacion>(getSimulacion);
+  // Ubicación de prueba (6.1): undefined mientras se lee del teléfono
+  const [ubicacionPrueba, setUbicacionPrueba] = useState<boolean>();
+
+  useEffect(() => {
+    getUsarUbicacionPrueba().then(setUbicacionPrueba);
+  }, []);
+
+  const cambiarUbicacionPrueba = (valor: boolean) => {
+    setUbicacionPrueba(valor);
+    void setUsarUbicacionPrueba(valor);
+  };
   const { reintentar } = useColaReportes();
   // undefined = sin probar; null = probando
   const [conexion, setConexion] = useState<EstadoConexion | null>();
@@ -103,6 +114,12 @@ export default function Datos() {
               onValueChange={(valor) => cambiar(clave, valor)}
             />
           ))}
+          <FilaAjuste
+            titulo="Usar ubicación de prueba"
+            subtitulo="Puente Nuevo (El Agustino) en vez del GPS"
+            valor={ubicacionPrueba ?? true}
+            onValueChange={cambiarUbicacionPrueba}
+          />
         </View>
         <Text style={styles.seccion}>Supabase</Text>
         <View style={[styles.card, styles.conexion]}>

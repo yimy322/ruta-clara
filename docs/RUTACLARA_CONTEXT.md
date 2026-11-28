@@ -353,6 +353,7 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 66 | Recorridos como líneas rectas entre paraderos (sin servicio de rutas por calles) | [Claude Code, 27/11 → aprobado] |
 | 67 | Fase 6 solo con notificaciones locales; push remoto y ubicación en segundo plano fuera (development build) | [Claude Code, 27/11 → aprobado] |
 | 68 | 6.0: `Mapa` con `MapView` y las mismas props + `interactivo` (por defecto fijo; Inicio, Monitoreo y Mapa de seguridad se mueven). Encuadre por usuario/paraderos/zonas (las unidades no reencuadran). Zonas como `Circle` de 350 m / 220 m (supuesto). Mapa decorativo para el lector de pantalla | [Claude Code, 27/11 → aprobado] |
+| 69 | 6.1: ubicación en `src/data/ubicacion.ts` (GPS en primer plano, última conocida ≤ 60 s, memoria de 30 s); sin permiso o sin GPS se usa la de prueba (la app nunca queda sin ubicación; el permiso lo pide el banner de F1_04). «Usar ubicación de prueba» guardado en AsyncStorage, encendido por defecto y sin depender de `__DEV__` | [Claude Code, 27/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.

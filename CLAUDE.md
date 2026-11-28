@@ -90,7 +90,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Tiempo real: las pantallas que muestran reportes usan `useReportesEnVivo()` (/src/hooks): devuelve una `version` para las dependencias del efecto de carga o recibe el callback `cargar`.
 - Avisos sin leer: `NotificacionesContext` (`noLeidas`, `actualizarNoLeidas()`); llamar a `actualizarNoLeidas()` después de leer o crear notificaciones.
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
-- Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano).
+- Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano). Ubicación (6.1): `getUbicacionUsuario()` usa /src/data/ubicacion.ts (GPS o la de prueba de los mocks; interruptor «Usar ubicación de prueba» en /dev/datos, encendido por defecto).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 - Estados vacíos y de error (E1–E10): componente `EstadoPantalla`. Sin conexión, los reportes van a la cola de /src/data/colaReportes.ts (AsyncStorage) y `ColaReportesProvider` los reenvía al volver la red (NetInfo).
 - Tema dinámico (4.6): colores, sombras y tipografía salen de `useTema()` (/src/context/TemaContext.tsx); los estilos se escriben como `const crearEstilos = ({ colors }: Tema) => StyleSheet.create({...})` y se usan con `useEstilos(crearEstilos)`. Texto sobre amarillo: `colors.onYellow`. `spacing`, `radii`, `sizes`, `opacity` y `fonts` se importan directo de `@/theme`.

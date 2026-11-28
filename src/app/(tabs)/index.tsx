@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Bell, LocateFixed, Menu, Plus, Search, TriangleAlert } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -21,6 +21,7 @@ import {
   getParaderosCercanos,
   getResumenParadero,
   getUbicacionUsuario,
+  getUsarUbicacionPrueba,
   getUnidadesEnVivo,
 } from "@/data/repositorio";
 import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
@@ -54,6 +55,14 @@ export default function Inicio() {
 
   // Tiempo real: sube con cada reporte nuevo y vuelve a cargar el efecto
   const version = useReportesEnVivo();
+
+  // Al volver de /dev/datos con otra fuente de ubicación (GPS o de prueba), se recarga
+  const [ubicacionPrueba, setUbicacionPrueba] = useState<boolean>();
+  useFocusEffect(
+    useCallback(() => {
+      getUsarUbicacionPrueba().then(setUbicacionPrueba);
+    }, []),
+  );
 
   useEffect(() => {
     let activo = true;
@@ -95,7 +104,7 @@ export default function Inicio() {
     return () => {
       activo = false;
     };
-  }, [version]);
+  }, [version, permiso.concedido, ubicacionPrueba]);
 
   const alto = (setter: (valor: number) => void) => (e: LayoutChangeEvent) => setter(e.nativeEvent.layout.height);
 
