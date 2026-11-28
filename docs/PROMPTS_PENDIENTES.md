@@ -38,7 +38,11 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | ✅ (28/11) |
 | 21 | 7.1 · Reporte con tus palabras | ✅ ejecutado el 28/11 |
 | 22 | 7.2 · Asistente de viaje (si hay tiempo) | 🔨 **en prueba** |
-| — | Fase 8 | 🗺️ planificar con Claude Code cuando lleguemos |
+| 23 | 8.0 · Lista para la demo | 📝 |
+| 24 | 8.1 · README y repositorio | 📝 |
+| 25 | 8.2 · Evidencia de pruebas | 📝 |
+| 26 | 8.3 · PPT | 📝 |
+| 27 | 8.4 · Guion de la demo | 📝 |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:
 - `src/data/supabase.ts` es el único archivo que importa `@supabase/supabase-js`; las pantallas siguen usando solo `@/data/repositorio` y **las firmas no cambian**.
@@ -563,9 +567,89 @@ Al final tsc y lint. Primero el plan.
 
 ---
 
-## Fases sin prompt (planificar con Claude Code al llegar)
+## 23. Paso 8.0 · Lista para la demo
 
-- **Fase 8 · Entrega:** repositorio en GitHub con README; acceso (EAS Update + QR, o web en Vercel); prueba de usabilidad con la app real (guion: https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF); PPT; guion de la demo.
+```
+Fase 8, paso 0: dejar la app lista para la demo en vivo (decisiones 77–79).
+- supabase/migrations/008_demo.sql: trabajo de pg_cron «refrescar-demo» cada
+  30 min que llama a public.refrescar_demo() (como 006: se puede volver a
+  correr, desprograma antes de programar). El botón de /dev/datos queda de
+  respaldo.
+- Revisa los TODO y textos provisionales que se ven en la app (p. ej.
+  «Pronto podrás trazar el desvío») y propón qué hacer con cada uno.
+- No actualices paquetes (expo-doctor ya marca 7 parches pendientes: se
+  dejan así para no arriesgar la demo).
+Al final tsc, lint y expo-doctor. Primero el plan.
+```
+
+---
+
+## 24. Paso 8.1 · README y repositorio
+
+```
+Fase 8, paso 1: README.md en español para github.com/yimy322/ruta-clara.
+- Problema, público objetivo y propuesta de valor; modalidades del PF
+  (móvil iPhone, mapas interactivos, voz por dictado) y puntos de IA.
+- Funciones principales por flujo, con espacio para capturas.
+- Arquitectura: diagrama Mermaid (app → repositorio → Supabase: Auth,
+  Postgres + RLS, Realtime, Storage, pg_cron / Edge Function → Gemini) y
+  tecnologías.
+- Cómo correrlo: Expo Go, .env.local (solo claves públicas), SQL 001–008 en
+  orden y seed, plantilla de correo, Edge Function y sus secretos.
+- Accesibilidad, estructura de carpetas, enlace a docs/ y autor.
+- Revisa que el repositorio no tenga secretos (.env.local, claves).
+Primero el plan.
+```
+
+---
+
+## 25. Paso 8.2 · Evidencia de pruebas
+
+```
+Fase 8, paso 2: evidencia de pruebas de funcionamiento y de usabilidad.
+- docs/PRUEBAS.md: casos de prueba funcionales por flujo (Inicio, búsqueda y
+  viaje, reporte, IA, favoritos y alertas, notificaciones, cuenta,
+  accesibilidad, sin conexión): pasos, resultado esperado, columna de
+  resultado y fecha para llenar en el iPhone.
+- docs/USABILIDAD.md: plan de prueba con 3–5 personas basado en el guion de
+  D9 (https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF) actualizado a la app
+  real (T1 ruta y viaje, T2 reporte, T3 alerta, T4 reporte con IA), métricas
+  (éxito, tiempo, errores), SUS de 10 preguntas con su cálculo y plantilla
+  de resultados y hallazgos → mejoras.
+- Regla ética: los resultados no se inventan; los llena el usuario.
+Primero el plan.
+```
+
+---
+
+## 26. Paso 8.3 · PPT
+
+```
+Fase 8, paso 3: PPT como presentación Slides de claude.ai (decisión 78),
+descargable como .pptx o PDF. 12–15 diapositivas: portada, problema, público
+y propuesta de valor, modalidades, proceso de diseño (AP2 → alta
+fidelidad), arquitectura de información (mapa de navegación), interfaces
+principales, accesibilidad y diseño inclusivo, tecnologías y arquitectura,
+IA y agente, pruebas y usabilidad (resultados reales de docs/USABILIDAD.md),
+aprendizajes y demo. Capturas de Figma (alta fidelidad 69:441) con el MCP y
+del iPhone. Primero el plan.
+```
+
+---
+
+## 27. Paso 8.4 · Guion de la demo
+
+```
+Fase 8, paso 4: docs/DEMO.md con el guion de la demostración en vivo
+(5–7 min): Inicio → búsqueda y viaje → reporte con IA (dictado) → asistente
+de viaje → alerta → accesibilidad. Checklist previo (batería y datos, npx
+expo start, sesión iniciada, «Usar ubicación de prueba», permisos de
+ubicación y notificaciones, cuota de IA libre, nunca tocar «Llamar») y plan
+B (hotspot, reporte paso a paso si la IA falla, video de respaldo grabado
+con la grabación de pantalla del iPhone). Primero el plan.
+```
+
+---
 
 ## Plantilla de prompt (referencia)
 1. `Fase X, paso Y: <tema>.` + «El proyecto usa Expo SDK 58; instala con "npx expo install".»

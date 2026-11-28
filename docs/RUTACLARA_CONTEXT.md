@@ -71,7 +71,7 @@ Contexto de producto, diseño y decisiones técnicas de **RutaClara**. Actualiza
 
 ### Proyecto Final (enunciado PF 2026) — entrega pendiente, fecha ❓
 - **MVP funcional** que demuestre las interacciones principales; «no deberá limitarse al diseño de prototipos en Figma».
-- Modalidad elegida: **Interfaces móviles (iPhone)**; también encaja **mapas interactivos** cuando haya mapa real.
+- Modalidades: **Interfaces móviles (iPhone)**, **mapas interactivos** (mapa real de la Fase 6) y **voz** (dictado en las funciones de IA). Plan de entrega: ROADMAP Fase 8.
 - Requisitos: problema, público y propuesta de valor; diseño UX/UI; funcionalidades reales; navegación funcional; **integración de tecnologías, servicios o APIs**; usabilidad, accesibilidad y diseño inclusivo; **evidencia de pruebas de funcionamiento y evaluación básica de usabilidad**.
 - Herramientas sugeridas: GitHub, Vercel/Render, **Supabase**, APIs REST.
 - **Puntos adicionales:** integración de **IA** y **agentes de IA** con utilidad concreta y funcional.
@@ -361,6 +361,9 @@ Secciones: Componentes `69:442`, Flujo 1 `69:486`, Flujo 2 `69:890`, Flujo 3 `69
 | 74 | Fase 7: límite de 30 usos por usuario al día (tabla `uso_ia`) y 280 caracteres por texto, para cuidar la cuota gratuita. Voz = dictado del teclado del iPhone (sin librerías nuevas). En el plan gratuito Google puede usar los textos para mejorar sus productos: la pantalla avisa «No escribas datos personales» | [Claude Code, 27/11 → aprobado] |
 | 75 | 7.1: Edge Function con la Interactions API de Gemini (`interactions.create`, `system_instruction`, `response_format` con JSON Schema, `output_text`), modelo por defecto `gemini-3.5-flash-lite`. El servidor valida cada valor contra su lista y descarta líneas que no están en `lineas`; el texto del usuario va como dato, no como instrucciones. Errores: `limite` (429, nuestro límite), `ocupada` (503, cuota de Gemini o falla), `texto` (400). Entrada: Tile «Con tus palabras» en F2_01 → `/reporte/texto` (supuesto, sin frame); la nota de tránsito toma el texto (máx. 120) | [Claude Code, 28/11 → aprobado] |
 | 76 | 7.2: asistente de viaje = modo "viaje" de la misma Edge Function (cuota diaria compartida). Acciones `buscar_rutas` (abre F1_06 por nombre de destino o lugar) y `crear_alerta` (abre F3_03 con `destinoId`, `hora`, `minuto`, `dias`, `minutosAntes` como estado inicial; si ninguna ruta favorita llega al destino, hay que elegir una). La hora es la que dice el usuario y la ajusta en F3_03. Campo compartido `CampoIA`; entrada: chip «Con tus palabras» en F1_05 → `/asistente` (supuesto, sin frame) | [Claude Code, 28/11 → aprobado] |
+| 77 | Fase 8: la demo en vivo es en el iPhone del usuario con Expo Go (`npx expo start`); el acceso entregado es el repositorio de GitHub con README. Sin versión web (el mapa nativo y las notificaciones no funcionan en el navegador) | [Usuario, 28/11] |
+| 78 | Fase 8: la PPT se hace como presentación Slides de claude.ai, descargable como .pptx o PDF (el usuario usa Fedora, sin PowerPoint; se edita en LibreOffice Impress o Google Slides) | [Claude Code, 28/11 → aprobado] |
+| 79 | Fase 8: cron `refrescar-demo` cada 30 min (pg_cron) para que los reportes de ejemplo se vean siempre en vivo; el botón de /dev/datos queda de respaldo | [Claude Code, 28/11 → aprobado] |
 
 ## 11. Propuestas descartadas
 - Flutter + Firebase; SDK 54; borrar `src/`; `/app` en la raíz; componente Status Bar; forzar mocks para imitar Figma; `npm audit fix --force`; `--no-sandbox`; overlay nativo para F2_01; editar los estilos `RC/*` de los wireframes; radio de 8 para notificaciones.

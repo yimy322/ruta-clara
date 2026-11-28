@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** 7.0 y 7.1 ✅ (reporte con tus palabras); **7.2** (asistente de viaje) escrito, falta probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** 7.0 y 7.1 ✅ (reporte con tus palabras); **7.2** (asistente de viaje) escrito, falta probar. **Fase 8 (entrega) planificada el 28/11** según las indicaciones del PF.
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -66,7 +66,11 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 7.0 | Clave gratuita de Gemini y Edge Function `interpretar-reporte` (lo haces tú, guiado) | ✅ (28/11) |
 | 7.1 | Reporte con tus palabras (texto o dictado → borrador que el usuario confirma) | ✅ (28/11) |
 | 7.2 | Asistente de viaje: frase → acción propuesta (buscar rutas o crear alerta) | 🔨 **en prueba** |
-| 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
+| 8.0 | Lista para la demo: cron `refrescar-demo`, TODO visibles, validaciones | 📝 |
+| 8.1 | README y repositorio (cómo correrlo, arquitectura, sin secretos) | 📝 |
+| 8.2 | Evidencia de pruebas: `docs/PRUEBAS.md` y `docs/USABILIDAD.md` (tú haces las pruebas) | 📝 |
+| 8.3 | PPT (presentación Slides, descargable como .pptx o PDF) | 📝 |
+| 8.4 | Guion de la demo (`docs/DEMO.md`) | 📝 |
 
 ## Orden recomendado para el Proyecto Final
 
@@ -209,12 +213,26 @@ Puntos adicionales del Proyecto Final.
 
 **Fuera de la Fase 7:** grabación de voz propia (librería y transcripción), un agente que actúe sin confirmación y la IA en las notificaciones.
 
-## Fase 8 · Entrega final — 🗺️
-- Repositorio en GitHub con README actualizado.
-- Acceso al MVP: EAS Update + código QR para Expo Go, o build web en Vercel. **Pendiente decidir.**
-- Prueba de usabilidad con la app real (usar el guion de D9) y pruebas de funcionamiento.
-- PPT: proceso de diseño (wireframes → alta fidelidad), arquitectura de información, interfaces principales, tecnologías.
-- Guion de la demostración en vivo.
+## Fase 8 · Entrega final — 📝 (planificada el 28/11)
+Según las indicaciones oficiales («PF 2026», UTP · Interacción Hombre-Máquina). Proyecto individual, fecha ❓.
+
+**Qué pide el PF y cómo se cubre:**
+| Requisito | Cómo se cubre | Evidencia |
+|---|---|---|
+| Modalidad | **2 · Interfaces móviles (iPhone)**, también **6 · Mapas interactivos** (mapa real, pin arrastrable, centrar en mí, zonas de seguridad) y **3 · Voz** (dictado en «Con tus palabras») | PPT, README |
+| Problema, público y propuesta de valor | Transporte informal de Lima; pasajeros de combis y custers; información colaborativa en tiempo real | PPT, README |
+| Diseño UX/UI | Wireframes AP2 → alta fidelidad en Figma con sistema de diseño | PPT |
+| MVP funcional y navegación | Flujos 1–3, Supabase, tiempo real, ubicación, notificaciones | Demo, README |
+| Integración de tecnologías y APIs | Supabase (Auth, Postgres + RLS, Realtime, Storage, Edge Functions, pg_cron), Apple Maps, expo-location, expo-notifications, Gemini API | PPT, README |
+| Usabilidad, accesibilidad, diseño inclusivo | Tema oscuro y alto contraste, texto 200 %, reducir movimiento, señales sin color, lector de pantalla, estados E1–E10 | PPT, demo |
+| Pruebas de funcionamiento y usabilidad | **Falta** → 8.2 | `docs/PRUEBAS.md`, `docs/USABILIDAD.md`, PPT |
+| + IA | Reporte con tus palabras (lenguaje natural y voz → borrador) | Demo, PPT |
+| + Agente de IA | Asistente de viaje: interpreta, decide la acción y la ejecuta en la app (abre rutas o prepara la alerta) con confirmación humana | Demo, PPT |
+| Entregables | MVP (demo en el iPhone), PPT, repositorio github.com/yimy322/ruta-clara, demo en vivo | 8.1–8.4 |
+
+**Decisiones (CONTEXT 77–79):** demo en vivo en el iPhone con Expo Go; el acceso entregado es el repositorio de GitHub con README (sin web: el mapa nativo y las notificaciones no funcionan en el navegador). PPT como presentación web (Slides de claude.ai), descargable como .pptx o PDF; se edita en LibreOffice Impress o Google Slides si hace falta. Cron `refrescar-demo` cada 30 min para que los reportes de ejemplo se vean siempre en vivo.
+
+**Sub-pasos:** 8.0 lista para la demo → 8.1 README → 8.2 evidencia de pruebas (las haces tú con 3–5 personas) → 8.3 PPT → 8.4 guion de la demo. Prompts 23–27.
 
 ---
 
