@@ -46,6 +46,7 @@ Stack raíz sin header nativo (cada pantalla usa nuestro Header). Las tabs usan 
 | F2_05 · Espera en paradero | reporte/paradero.tsx | /reporte/paradero | Paso del modal (provisional) |
 | F2_06 · Tránsito / Trancadera | reporte/transito.tsx | /reporte/transito | Paso del modal (provisional) |
 | F2_07 · Reporte de seguridad | reporte/seguridad.tsx | /reporte/seguridad | Paso del modal |
+| — · Reporte con tus palabras (IA) | reporte/texto.tsx | /reporte/texto | Paso del modal (supuesto, sin frame; Tile «Con tus palabras» de F2_01) |
 | E3 · Reporte sin conexión | reporte/sin-conexion.tsx | /reporte/sin-conexion | Paso del modal, sin gesto atrás. Param `id` del reporte en cola (`useColaReportes()`) |
 | F2_08 · Confirmación y agradecimiento | reporte/gracias.tsx | /reporte/gracias | Paso del modal, sin gesto atrás. Recibe `puntos`, `total`, `personas` por params (también se abre desde F1_10) |
 | F3_04 · Centro de notificaciones | (tabs)/alertas.tsx | /alertas | Tab. Recarga al recibir foco; el punto rojo de la tab sale de `useNotificaciones()` |
@@ -92,6 +93,7 @@ Si `tsc` marca rutas nuevas como inválidas, arrancar `npx expo start` una vez p
 - Preferencias locales del dispositivo (AsyncStorage) en /src/data/preferencias.ts, separadas del repositorio; las pantallas las usan vía `usePreferencias()`.
 - Permiso de ubicación: hook `usePermisoUbicacion` en /src/hooks (se revisa al volver a primer plano). Ubicación (6.1): `getUbicacionUsuario()` usa /src/data/ubicacion.ts (GPS o la de prueba de los mocks; interruptor «Usar ubicación de prueba» en /dev/datos, encendido por defecto).
 - Notificaciones locales (6.3): /src/data/notificacionesLocales.ts (único que importa expo-notifications); recordatorios de alertas vía `sincronizarRecordatorios()` del repositorio; avisos de viaje con `useAvisoProgramado()` (/src/hooks). Permiso solo en contexto (`pedirPermisoNotificaciones()`).
+- IA (Fase 7): `interpretarReporte(texto)` del repositorio llama a la Edge Function `supabase/functions/interpretar-reporte` (Gemini gratuito; código Deno, excluido de tsc y ESLint). Solo propone un borrador; errores `SinConexionError` o `ErrorIA` (`limite`, `ocupada`, `texto`).
 - Formato de textos (pasaje, "hace X min", ETA) en /src/utils/formato.ts.
 - Estados vacíos y de error (E1–E10): componente `EstadoPantalla`. Sin conexión, los reportes van a la cola de /src/data/colaReportes.ts (AsyncStorage) y `ColaReportesProvider` los reenvía al volver la red (NetInfo).
 - Tema dinámico (4.6): colores, sombras y tipografía salen de `useTema()` (/src/context/TemaContext.tsx); los estilos se escriben como `const crearEstilos = ({ colors }: Tema) => StyleSheet.create({...})` y se usan con `useEstilos(crearEstilos)`. Texto sobre amarillo: `colors.onYellow`. `spacing`, `radii`, `sizes`, `opacity` y `fonts` se importan directo de `@/theme`.

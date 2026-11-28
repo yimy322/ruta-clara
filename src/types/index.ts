@@ -321,6 +321,22 @@ export type ModoReporte = "ubicacion" | "desvio";
 // Dónde está quien reporta respecto a la unidad
 export type EnUnidad = "a_bordo" | "paradero";
 
+// Lo que la IA entendió de un texto o dictado (7.1, Edge Function
+// interpretar-reporte). Solo trae valores válidos; lo que no entendió falta.
+export type InterpretacionReporte = {
+  entendido: boolean;
+  // Qué preguntar si no entendió
+  falta?: string;
+  tipo?: Exclude<TipoReporte, "valoracion">;
+  lineaId?: string;
+  ocupacion?: Ocupacion;
+  velocidad?: Velocidad;
+  espera?: TiempoEspera;
+  congestion?: NivelCongestion;
+  causas?: CausaTransito[];
+  seguridad?: TipoSeguridad;
+};
+
 // Reporte en armado a lo largo de los pasos del Flujo 2 (F2_01–F2_08)
 export type BorradorReporte = {
   tipo?: TipoReporte;

@@ -14,6 +14,7 @@ import type {
   Destino,
   Favoritos,
   Insignia,
+  InterpretacionReporte,
   Linea,
   LineaSugerida,
   LugarGuardado,
@@ -56,7 +57,7 @@ import { getAjustes } from "./preferencias";
 import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
 import { obtenerUbicacion } from "./ubicacion";
-import { subirFotoReporte, supabase } from "./supabase";
+import { interpretarReporte as interpretarConIA, subirFotoReporte, supabase } from "./supabase";
 
 const RADIO_CERCANO_M = 2000;
 // Un lugar guardado usa las rutas del destino conocido más cercano dentro de este radio // supuesto
@@ -466,6 +467,18 @@ export async function getLugaresGuardados(): Promise<LugarGuardado[]> {
   await esperar();
   return [...lugaresGuardados];
 }
+
+// Reporte con tus palabras (7.1): la IA propone un borrador; el usuario lo
+// confirma en los pasos de siempre. Errores: SinConexionError o ErrorIA.
+export async function interpretarReporte(texto: string): Promise<InterpretacionReporte> {
+  await esperar();
+  if (getSimulacion().forzarSinRed) {
+    throw new SinConexionError();
+  }
+  return interpretarConIA(texto);
+}
+
+export { ErrorIA, type MotivoErrorIA } from "./supabase";
 
 // Notificaciones locales (6.3)
 export { cancelarTodosLosAvisos, pedirPermisoNotificaciones } from "./notificacionesLocales";

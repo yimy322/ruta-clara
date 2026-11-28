@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
 import { AppState } from "react-native";
+
+import type { InterpretacionReporte } from "@/types";
 
 import { SinConexionError } from "./simulacion";
 
@@ -88,4 +90,47 @@ export async function subirFotoReporte(usuarioId: string, uri: string): Promise<
     throw sinRed ? new SinConexionError() : new Error(resultado.error.message);
   }
   return supabase.storage.from("fotos-reportes").getPublicUrl(ruta).data.publicUrl;
+}
+
+// Por qué la IA no pudo armar el reporte (7.1): límite diario, IA ocupada
+// (cuota gratuita agotada o falla de Gemini) o texto vacío o muy largo
+export type MotivoErrorIA = "limite" | "ocupada" | "texto";
+
+export class ErrorIA extends Error {
+  constructor(public motivo: MotivoErrorIA) {
+    super(`Error de IA: ${motivo}`);
+    this.name = "ErrorIA";
+  }
+}
+
+// Texto o dictado → borrador propuesto, con la Edge Function interpretar-reporte
+// (supabase/functions; Gemini gratuito). Sin red lanza SinConexionError; si la
+// función responde con error, ErrorIA.
+export async function interpretarReporte(texto: string): Promise<InterpretacionReporte> {
+  let resultado: Awaited<ReturnType<typeof supabase.functions.invoke<InterpretacionReporte>>>;
+  try {
+    resultado = await supabase.functions.invoke<InterpretacionReporte>("interpretar-reporte", { body: { texto } });
+  } catch {
+    throw new SinConexionError();
+  }
+  const { data, error } = resultado;
+  if (error instanceof FunctionsFetchError) {
+    throw new SinConexionError();
+  }
+  if (error instanceof FunctionsHttpError) {
+    let motivo: MotivoErrorIA = "ocupada";
+    try {
+      const cuerpo = await (error.context as Response).json();
+      if (cuerpo?.error === "limite" || cuerpo?.error === "texto") {
+        motivo = cuerpo.error;
+      }
+    } catch {
+      // Cuerpo ilegible: se trata como IA ocupada
+    }
+    throw new ErrorIA(motivo);
+  }
+  if (error instanceof FunctionsRelayError || error || !data) {
+    throw new ErrorIA("ocupada");
+  }
+  return data;
 }

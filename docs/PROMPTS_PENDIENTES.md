@@ -36,7 +36,7 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 19 | 6.2 · Mapa interactivo | ✅ ejecutado el 27/11 |
 | 20 | 6.3 · Notificaciones locales (si hay tiempo) | ✅ ejecutado el 27/11 |
 | — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | 📝 guía abajo |
-| 21 | 7.1 · Reporte con tus palabras | 📝 |
+| 21 | 7.1 · Reporte con tus palabras | 🔨 **en prueba** |
 | 22 | 7.2 · Asistente de viaje (si hay tiempo) | 📝 |
 | — | Fase 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
@@ -504,10 +504,10 @@ Al final tsc, lint y expo-doctor. Primero el plan.
 ## 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú, guiado)
 
 Antes del prompt 21. Claude Code escribe el código (`supabase/functions/interpretar-reporte/index.ts` y `supabase/migrations/007_ia.sql`) en el paso 7.1; tú lo subes:
-1. **aistudio.google.com:** entra con tu cuenta de Google → **Get API key** → crea la clave (plan gratuito, sin tarjeta; no actives la facturación). Anota el nombre del modelo **Flash** que aparece como gratuito. **No pegues la clave en el chat ni en la app.**
+1. **aistudio.google.com:** entra con tu cuenta de Google → **Get API key** → crea la clave (plan gratuito, sin tarjeta; no actives la facturación). El código usa `gemini-3.5-flash-lite` (gratuito al 28/11); si AI Studio ya no lo ofrece gratis, anota el nombre del modelo Flash gratuito. **No pegues la clave en el chat ni en la app.**
 2. **Supabase → Edge Functions → Secrets:** agrega `GEMINI_API_KEY` con esa clave (y `GEMINI_MODEL` solo si el modelo gratuito es distinto al del código).
 3. **SQL Editor:** ejecuta `supabase/migrations/007_ia.sql` (tabla `uso_ia` con el límite diario).
-4. **Edge Functions → Deploy a new function → Via editor:** nombre `interpretar-reporte`, pega el código y despliega. Deja activado «Verify JWT» (solo usuarios con sesión).
+4. **Edge Functions → Deploy a new function → Via editor:** nombre `interpretar-reporte`, pega todo `supabase/functions/interpretar-reporte/index.ts` y despliega. Deja activado «Verify JWT» (solo usuarios con sesión).
 5. Prueba con el botón **Test** del Dashboard (con sesión de un usuario) o desde la app en el paso 7.1.
 
 ---

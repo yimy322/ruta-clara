@@ -1,5 +1,5 @@
 import { useRouter, type Href } from "expo-router";
-import { Bus, ShieldAlert, Split, TrafficCone, Users, X } from "lucide-react-native";
+import { Bus, MessageSquareText, ShieldAlert, Split, TrafficCone, Users, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -107,6 +107,13 @@ export default function PanelReporte() {
               state="danger"
               fill
               onPress={() => empezar({ tipo: "seguridad" }, "/reporte/seguridad")}
+            />
+            {/* 7.1 (supuesto, sin frame): la IA arma el borrador desde un texto o dictado */}
+            <Tile
+              label="Con tus palabras"
+              icon={<MessageSquareText />}
+              fill
+              onPress={() => empezar({}, "/reporte/texto")}
             />
           </View>
 
