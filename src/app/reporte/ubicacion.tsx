@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,7 +11,7 @@ import { useReporte } from "@/context/ReporteContext";
 import { getLinea, getParaderoCercano, getUbicacionUsuario } from "@/data/repositorio";
 import { useEnviarReporte } from "@/hooks/useEnviarReporte";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
-import type { Linea, Paradero } from "@/types";
+import type { Coordenada, Linea, Paradero } from "@/types";
 import { etiquetaOcupacion, etiquetaVelocidad } from "@/utils/formato";
 
 // F2_04 · Confirmar ubicación (paso 3 de 3)
@@ -25,6 +25,8 @@ export default function ConfirmarUbicacion() {
 
   const [linea, setLinea] = useState<Linea | null>();
   const [paradero, setParadero] = useState<Paradero | null>();
+  // Centro con el que abre el mapa: lo ya elegido o la ubicación del usuario
+  const [inicio, setInicio] = useState<Coordenada>();
   const { enviar, enviando } = useEnviarReporte();
 
   useEffect(() => {
@@ -38,8 +40,22 @@ export default function ConfirmarUbicacion() {
     };
   }, [borrador.lineaId]);
 
-  // TODO Fase 6: mapa real que se arrastra bajo el pin fijo; el centro se
-  // guarda en borrador.posicion. Por ahora el pin marca la ubicación del usuario.
+  // Se lee una vez al abrir; después el mapa se mueve bajo el pin fijo
+  const posicionInicial = useRef(borrador.posicion);
+  useEffect(() => {
+    let activo = true;
+    (async () => {
+      const centro = posicionInicial.current ?? (await getUbicacionUsuario());
+      if (activo) {
+        setInicio(centro);
+      }
+    })();
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  // El centro del mapa es la posición del reporte; la dirección es la del paradero más cercano
   useEffect(() => {
     let activo = true;
     (async () => {
@@ -59,7 +75,9 @@ export default function ConfirmarUbicacion() {
 
   return (
     <View style={styles.screen}>
-      <Mapa estilo={StyleSheet.absoluteFill} />
+      {inicio && (
+        <Mapa estilo={StyleSheet.absoluteFill} centro={inicio} alMover={(posicion) => actualizar({ posicion })} />
+      )}
 
       <SafeAreaView style={styles.arriba} edges={["top", "left", "right"]}>
         <IconButton icon={<ArrowLeft />} accessibilityLabel="Volver" onPress={() => router.back()} />

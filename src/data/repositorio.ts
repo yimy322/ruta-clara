@@ -410,6 +410,12 @@ function resolverDestino(nombre: string): Destino | null {
 }
 
 // `origen` todavía no se usa: por ahora siempre es "Mi ubicación".
+// Destino buscado (nombre o lugar guardado) con sus coordenadas, para el mapa de F1_06
+export async function getDestino(nombre: string): Promise<Destino | null> {
+  await esperar();
+  return resolverDestino(nombre);
+}
+
 export async function buscarRutas(origen: string, destino: string): Promise<OpcionRuta[]> {
   await esperarConReportes();
   if (getSimulacion().forzarError) {

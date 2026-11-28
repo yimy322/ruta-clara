@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { Bell, LocateFixed, Menu, Plus, Search, TriangleAlert } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -13,6 +13,7 @@ import {
   Mapa,
   MenuLateral,
   type DatosCardParadero,
+  type MapaRef,
 } from "@/components";
 import {
   getActividadParadero,
@@ -40,6 +41,7 @@ export default function Inicio() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const permiso = usePermisoUbicacion();
+  const mapa = useRef<MapaRef>(null);
 
   const [usuario, setUsuario] = useState<Coordenada>();
   const [paraderos, setParaderos] = useState<Paradero[]>([]);
@@ -111,6 +113,7 @@ export default function Inicio() {
   return (
     <View style={styles.screen}>
       <Mapa
+        ref={mapa}
         estilo={StyleSheet.absoluteFill}
         interactivo
         usuario={usuario}
@@ -181,8 +184,10 @@ export default function Inicio() {
             <IconButton
               icon={<LocateFixed />}
               accessibilityLabel="Centrar en mi ubicación"
-              onPress={() => {
-                // TODO Fase 6: centrar el mapa real; el provisional ya encuadra al usuario
+              onPress={async () => {
+                const ubicacion = await getUbicacionUsuario();
+                setUsuario(ubicacion);
+                mapa.current?.centrarEn(ubicacion);
               }}
             />
             {/* El View deja que el botón se alinee a la derecha (Button usa alignSelf) */}

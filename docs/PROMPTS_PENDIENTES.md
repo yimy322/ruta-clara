@@ -32,8 +32,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 15 | 5.6 · Favoritos, alertas y notificaciones en la base (si hay tiempo) | ✅ ejecutado el 27/11 |
 | 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | ✅ ejecutado el 27/11 |
 | 17 | 6.0 · Mapa real | ✅ ejecutado el 27/11 |
-| 18 | 6.1 · Ubicación real | 🔨 **en prueba** |
-| 19 | 6.2 · Mapa interactivo | 📝 |
+| 18 | 6.1 · Ubicación real | ✅ ejecutado el 27/11 |
+| 19 | 6.2 · Mapa interactivo | 🔨 **en prueba** |
 | 20 | 6.3 · Notificaciones locales (si hay tiempo) | 📝 |
 | — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 

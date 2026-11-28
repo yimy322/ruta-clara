@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, CardRuta, Chip, EsqueletoRuta, EstadoPantalla, Header, Mapa, useToast } from "@/components";
-import { buscarRutas, getUbicacionUsuario } from "@/data/repositorio";
+import { buscarRutas, getDestino, getUbicacionUsuario } from "@/data/repositorio";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, OpcionRuta, TipoUnidad } from "@/types";
 import { etiquetaTipo } from "@/utils/formato";
@@ -39,6 +39,7 @@ export default function Rutas() {
   // Cambia para volver a pedir las rutas (botón Reintentar)
   const [intento, setIntento] = useState(0);
   const [usuario, setUsuario] = useState<Coordenada>();
+  const [punto, setPunto] = useState<Coordenada | null>(null);
   const [filtro, setFiltro] = useState<FiltroTipo>("todos");
   const [masBarato, setMasBarato] = useState(false);
 
@@ -49,6 +50,14 @@ export default function Rutas() {
       activo = false;
     };
   }, []);
+
+  useEffect(() => {
+    let activo = true;
+    getDestino(destino).then((data) => activo && setPunto(data));
+    return () => {
+      activo = false;
+    };
+  }, [destino]);
 
   useEffect(() => {
     let activo = true;
@@ -161,8 +170,8 @@ export default function Rutas() {
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
       <Header title={titulo} subtitle="Hoy, salir ahora · Hora punta" />
       <ScrollView contentContainerStyle={styles.contenido}>
-        {/* TODO Fase 6: trazos de las rutas y marcador del destino */}
-        <Mapa usuario={usuario} estilo={styles.mapa} />
+        {/* Una línea recta al destino: no hay trazado real de las rutas (decisión 70) */}
+        <Mapa usuario={usuario} destino={punto ?? undefined} etiqueta="Mini-mapa" estilo={styles.mapa} />
 
         <ScrollView
           horizontal

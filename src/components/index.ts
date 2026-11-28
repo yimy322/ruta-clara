@@ -15,7 +15,7 @@ export { Header } from "./Header";
 export { IconButton } from "./IconButton";
 export { ItemNotificacion } from "./ItemNotificacion";
 export { ListItem } from "./ListItem";
-export { Mapa } from "./Mapa";
+export { Mapa, type MapaRef } from "./Mapa";
 export { MenuLateral } from "./MenuLateral";
 export { OpcionGrande } from "./OpcionGrande";
 export { OpcionRadio } from "./OpcionRadio";

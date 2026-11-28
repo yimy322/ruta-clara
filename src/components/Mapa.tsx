@@ -1,5 +1,5 @@
 import { Bus, Clock, TriangleAlert } from "lucide-react-native";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from "react";
 import { StyleSheet, Text, View, type Insets, type StyleProp, type ViewStyle } from "react-native";
 import MapView, { Circle, Marker, Polyline, type Region } from "react-native-maps";
 
@@ -59,7 +59,19 @@ type MapaProps = {
   // Se puede mover y hacer zoom (pantallas de mapa completo). Por defecto
   // fijo, para no competir con el scroll de la pantalla
   interactivo?: boolean;
+  // Destino de la búsqueda (F1_06): marcador rojo y línea punteada recta desde el usuario
+  destino?: Coordenada;
+  // Centro inicial cuando no hay puntos que encuadrar (F2_04)
+  centro?: Coordenada;
+  // Al soltar el mapa tras moverlo: el nuevo centro (pin fijo de F2_04). Hace el mapa interactivo
+  alMover?: (centro: Coordenada) => void;
+  ref?: Ref<MapaRef>;
   estilo?: StyleProp<ViewStyle>;
+};
+
+// Control desde la pantalla («centrar en mí» de F1_04)
+export type MapaRef = {
+  centrarEn: (punto: Coordenada) => void;
 };
 
 // Lado mínimo de la región en grados (~550 m), para que un solo punto no llene el mapa
@@ -115,6 +127,10 @@ export function Mapa({
   zonas = [],
   margen,
   interactivo = false,
+  destino,
+  centro,
+  alMover,
+  ref,
   estilo,
 }: MapaProps) {
   const { colors, esquema, typography } = useTema();
@@ -126,8 +142,9 @@ export function Mapa({
 
   // Las unidades no cuentan para el encuadre: se mueven en tiempo real y el
   // mapa no debe saltar cada vez
-  const fijos: Coordenada[] = [...(usuario ? [usuario] : []), ...paraderos, ...zonas];
-  const region = calcularRegion(fijos.length > 0 ? fijos : unidades, usuario);
+  const fijos: Coordenada[] = [...(usuario ? [usuario] : []), ...(destino ? [destino] : []), ...paraderos, ...zonas];
+  const respaldo = unidades.length > 0 ? unidades : centro ? [centro] : [];
+  const region = calcularRegion(fijos.length > 0 ? fijos : respaldo, usuario ?? centro);
   const claveEncuadre = region
     ? [region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta].map((n) => n.toFixed(5)).join()
     : "";
@@ -143,6 +160,16 @@ export function Mapa({
     // region se recalcula en cada render; claveEncuadre resume sus valores
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [claveEncuadre, reducirMovimiento]);
+
+  useImperativeHandle(ref, () => ({
+    centrarEn: ({ lat, lng }) =>
+      mapa.current?.animateToRegion(
+        { latitude: lat, longitude: lng, latitudeDelta: SPAN_MINIMO, longitudeDelta: SPAN_MINIMO },
+        reducirMovimiento ? 0 : DURACION_ENCUADRE_MS,
+      ),
+  }));
+
+  const movible = interactivo || alMover != null;
 
   // Redibuja los marcadores un momento cuando cambia su contenido o el tema
   const claveMarcadores = [esquema, senales, ...unidades.map((u) => `${u.linea.id}:${u.etiqueta ?? ""}`)].join();
@@ -171,8 +198,18 @@ export function Mapa({
         initialRegion={region}
         mapPadding={{ top: margen?.top ?? 0, right: margen?.right ?? 0, bottom: margen?.bottom ?? 0, left: margen?.left ?? 0 }}
         userInterfaceStyle={esquema === "oscuro" ? "dark" : "light"}
-        scrollEnabled={interactivo}
-        zoomEnabled={interactivo}
+        scrollEnabled={movible}
+        zoomEnabled={movible}
+        // isGesture solo llega en Google Maps; en iOS cualquier fin de movimiento cuenta
+        onRegionChangeComplete={
+          alMover
+            ? (r, detalles) => {
+                if (detalles?.isGesture !== false) {
+                  alMover({ lat: r.latitude, lng: r.longitude });
+                }
+              }
+            : undefined
+        }
         rotateEnabled={false}
         pitchEnabled={false}
         showsPointsOfInterests={false}
@@ -220,6 +257,15 @@ export function Mapa({
             />
           ))}
 
+        {usuario && destino && (
+          <Polyline
+            coordinates={[coordenada(usuario), coordenada(destino)]}
+            strokeColor={colors.ink}
+            strokeWidth={sizes.mapRoute}
+            lineDashPattern={[sizes.mapDash, sizes.mapDash]}
+          />
+        )}
+
         {paraderos.map((paradero) => (
           <Marker key={paradero.id} coordinate={coordenada(paradero)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
             <View style={marcadorParadero === "P" ? styles.paraderoP : styles.paradero}>
@@ -231,6 +277,14 @@ export function Mapa({
             </View>
           </Marker>
         ))}
+
+        {destino && (
+          <Marker coordinate={coordenada(destino)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
+            <View style={styles.destino}>
+              <View style={styles.destinoCentro} />
+            </View>
+          </Marker>
+        )}
 
         {usuario && (
           <Marker coordinate={coordenada(usuario)} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={tracksViewChanges}>
@@ -305,6 +359,24 @@ const crearEstilos = ({ colors, shadows }: Tema) =>
       alignItems: "center",
       justifyContent: "center",
       ...shadows.pin,
+    },
+    // Destino (F1_06): punto rojo con anillo blanco y borde negro
+    destino: {
+      width: sizes.mapStopP,
+      height: sizes.mapStopP,
+      borderRadius: radii.pill,
+      backgroundColor: colors.surface,
+      borderWidth: borderWidths.regular,
+      borderColor: colors.ink,
+      alignItems: "center",
+      justifyContent: "center",
+      ...shadows.pin,
+    },
+    destinoCentro: {
+      width: sizes.mapStop / 2 + spacing.xs,
+      height: sizes.mapStop / 2 + spacing.xs,
+      borderRadius: radii.pill,
+      backgroundColor: colors.red,
     },
     paraderoLetra: {
       color: colors.surface,
