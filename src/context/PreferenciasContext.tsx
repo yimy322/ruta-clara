@@ -9,6 +9,7 @@ import {
   setOnboardingVisto,
   type Ajustes,
 } from "@/data/preferencias";
+import { sincronizarRecordatorios } from "@/data/repositorio";
 
 // Duración mínima de la pantalla de carga, para que no parpadee
 const CARGA_MINIMA_MS = 1500;
@@ -64,6 +65,10 @@ export function PreferenciasProvider({ children }: { children: ReactNode }) {
       setAjustes(nuevos).catch(() => {});
       return nuevos;
     });
+    // «Alertas de rutas» enciende o apaga los recordatorios locales (6.3)
+    if (clave === "alertasRutas") {
+      void sincronizarRecordatorios(valor as boolean);
+    }
   }, []);
 
   const value = useMemo(

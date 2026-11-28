@@ -38,7 +38,7 @@ import type {
   ViajeAlerta,
   ZonaSeguridad,
 } from "@/types";
-import { enmascararCorreo, enmascararTelefono } from "@/utils/formato";
+import { enmascararCorreo, enmascararTelefono, formatoHora } from "@/utils/formato";
 import { distanciaMetros } from "@/utils/geo";
 
 import {
@@ -51,6 +51,8 @@ import {
   rutasPorDestino,
   vias,
 } from "./catalogo";
+import { reprogramarRecordatorios } from "./notificacionesLocales";
+import { getAjustes } from "./preferencias";
 import { consultar, getSesionActual } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
 import { obtenerUbicacion } from "./ubicacion";
@@ -142,6 +144,8 @@ async function leerDatosUsuario(usuarioId: string) {
   );
   alertas.splice(0, alertas.length, ...(rAlertas.data as FilaAlerta[]).map(filaAAlerta));
   datosDe = usuarioId;
+  // Al entrar o abrir la app también quedan programadas las alertas ya guardadas
+  void sincronizarRecordatorios();
 }
 
 // Una vez por usuario. Sin red no falla: se usan los últimos datos leídos
@@ -462,6 +466,9 @@ export async function getLugaresGuardados(): Promise<LugarGuardado[]> {
   await esperar();
   return [...lugaresGuardados];
 }
+
+// Notificaciones locales (6.3)
+export { cancelarTodosLosAvisos, pedirPermisoNotificaciones } from "./notificacionesLocales";
 
 // Interruptor «Usar ubicación de prueba» (/dev/datos)
 export { getUsarUbicacionPrueba, setUsarUbicacionPrueba } from "./ubicacion";
@@ -999,6 +1006,7 @@ export async function guardarAlerta(datos: DatosAlerta): Promise<AlertaDiaria> {
   } else {
     alertas[i] = alerta;
   }
+  void sincronizarRecordatorios();
   return alerta;
 }
 
@@ -1009,6 +1017,35 @@ export async function eliminarAlerta(id: string): Promise<void> {
   if (i !== -1) {
     alertas.splice(i, 1);
   }
+  void sincronizarRecordatorios();
+}
+
+// Recordatorios locales de las alertas activas (6.3). Con «Alertas de rutas»
+// apagado (F3_05) no se programa ninguno. `encendidas` evita leer el ajuste
+// mientras se está guardando.
+export async function sincronizarRecordatorios(encendidas?: boolean): Promise<void> {
+  const activas = encendidas ?? (await getAjustes()).alertasRutas;
+  const lista = activas
+    ? alertas.flatMap((alerta) => {
+        const linea = lineas.find((l) => l.id === alerta.lineaId);
+        const paradero = paraderos.find((p) => p.id === alerta.paraderoId);
+        if (!alerta.activa || !linea || !paradero || alerta.dias.length === 0) {
+          return [];
+        }
+        return [
+          {
+            alertaId: alerta.id,
+            hora: alerta.hora,
+            minuto: alerta.minuto,
+            dias: alerta.dias,
+            minutosAntes: alerta.minutosAntes,
+            titulo: `Alerta · ${linea.nombre}`,
+            cuerpo: `Sales a las ${formatoHora(alerta.hora, alerta.minuto)} de ${paradero.nombre}: mira dónde viene tu carro`,
+          },
+        ];
+      })
+    : [];
+  await reprogramarRecordatorios(lista);
 }
 
 // Sentido de la línea en que el paradero del recorrido más cercano al destino

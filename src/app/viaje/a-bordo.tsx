@@ -10,6 +10,7 @@ import { BarraProgreso, Button, Header, Toggle, useToast } from "@/components";
 import { INTERVALO_PARADERO_MS } from "@/config/simulacion";
 import { idsRecorrido, useViaje } from "@/context/ViajeContext";
 import { getTramoViaje } from "@/data/repositorio";
+import { useAvisoProgramado } from "@/hooks/useAvisoProgramado";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { ParaderoTramo } from "@/types";
 import { formatearEta } from "@/utils/formato";
@@ -82,6 +83,14 @@ export default function ABordo() {
       mostrar("Bajas en el siguiente paradero");
     }
   }, [enCurso, avisar, ubicado, posicion, ultimo, mostrar]);
+
+  // Con la app en segundo plano, «Avísame para bajar» llega como notificación (6.3)
+  useAvisoProgramado(
+    "viaje:bajar",
+    enCurso && avisar && ubicado && posicion < ultimo - 1 ? ((ultimo - 1 - posicion) * INTERVALO_PARADERO_MS) / 1000 : null,
+    "Bajas en el siguiente paradero",
+    `Prepárate para bajar en ${tramo?.[ultimo]?.paradero.nombre ?? "tu paradero"}`,
+  );
 
   // Atrás o el gesto de volver terminarían el viaje sin querer: se confirma antes
   usePreventRemove(enCurso, () => {

@@ -33,8 +33,8 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 16 | 5.7 · Correos, fotos y borrado programado (si hay tiempo) | ✅ ejecutado el 27/11 |
 | 17 | 6.0 · Mapa real | ✅ ejecutado el 27/11 |
 | 18 | 6.1 · Ubicación real | ✅ ejecutado el 27/11 |
-| 19 | 6.2 · Mapa interactivo | 🔨 **en prueba** |
-| 20 | 6.3 · Notificaciones locales (si hay tiempo) | 📝 |
+| 19 | 6.2 · Mapa interactivo | ✅ ejecutado el 27/11 |
+| 20 | 6.3 · Notificaciones locales (si hay tiempo) | 🔨 **en prueba** |
 | — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:

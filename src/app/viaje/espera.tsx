@@ -9,6 +9,7 @@ import { Button, Chip, IconButton, Mapa, useToast } from "@/components";
 import { INTERVALO_ETA_MS } from "@/config/simulacion";
 import { useViaje } from "@/context/ViajeContext";
 import { getReportesCercanos, getUnidadEnCamino } from "@/data/repositorio";
+import { useAvisoProgramado } from "@/hooks/useAvisoProgramado";
 import { useReportesEnVivo } from "@/hooks/useReportesEnVivo";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Reporte, UnidadEnCamino } from "@/types";
@@ -105,6 +106,15 @@ export default function Espera() {
       mostrar("¡Tu carro está llegando!");
     }
   }, [etaMin, mostrar]);
+
+  // Con la app en segundo plano el aviso llega como notificación (6.3); se
+  // reprograma con cada tic de la simulación
+  useAvisoProgramado(
+    "viaje:llegando",
+    enCamino && etaMin > ETA_AVISO_MIN ? ((etaMin - ETA_AVISO_MIN) * INTERVALO_ETA_MS) / 1000 : null,
+    "¡Tu carro está llegando!",
+    `${viaje?.linea.nombre ?? "Tu carro"} llega a ${paradero?.nombre ?? "tu paradero"} en ${ETA_AVISO_MIN} min`,
+  );
 
   if (!viaje || !paradero) {
     return <Redirect href="/" />;

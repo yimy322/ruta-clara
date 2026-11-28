@@ -18,7 +18,14 @@ import {
 } from "@/components";
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { useViaje } from "@/context/ViajeContext";
-import { alternarFavorita, esFavorita, getLinea, getRecorrido, getUbicacionUsuario } from "@/data/repositorio";
+import {
+  alternarFavorita,
+  esFavorita,
+  getLinea,
+  getRecorrido,
+  getUbicacionUsuario,
+  pedirPermisoNotificaciones,
+} from "@/data/repositorio";
 import { borderWidths, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Coordenada, Linea, Paradero, Sentido } from "@/types";
 import { etiquetaTipo, formatearDistancia, formatearPasaje, textoRecorrido } from "@/utils/formato";
@@ -156,6 +163,8 @@ export default function DetalleRuta() {
     if (!paraderoEspera) {
       return;
     }
+    // Permiso en contexto: para avisar si el carro llega con la app cerrada (6.3)
+    void pedirPermisoNotificaciones();
     iniciarEspera(linea, paraderoEspera, destino, sentido);
     router.push("/viaje/espera");
   };

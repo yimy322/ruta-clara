@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { cancelarTodosLosAvisos } from "@/data/repositorio";
 import { cerrarSesionRemota, escucharSesion, prepararPerfil, type DatosSesion } from "@/data/sesion";
 
 // cargando = leyendo la sesión guardada o el nombre del perfil;
@@ -54,6 +55,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
   const cerrarSesion = useCallback(async () => {
     await cerrarSesionRemota();
+    // No deben llegar avisos de la cuenta que se cerró
+    await cancelarTodosLosAvisos();
     setPerfil(null);
   }, []);
 

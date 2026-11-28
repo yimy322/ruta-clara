@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
 import { Button, Chip, Header, IconButton, ListItem, Toggle, useToast } from "@/components";
-import { eliminarAlerta, getAlerta, getOpcionesRutaAlerta, guardarAlerta } from "@/data/repositorio";
+import { eliminarAlerta, getAlerta, getOpcionesRutaAlerta, guardarAlerta, pedirPermisoNotificaciones } from "@/data/repositorio";
 import { minTouch, opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { AlertaDiaria, MinutosAntes, OpcionRutaAlerta } from "@/types";
 import { formatoDias, formatoHora } from "@/utils/formato";
@@ -260,6 +260,8 @@ export default function Alerta() {
     }
     setGuardando(true);
     try {
+      // Permiso en contexto: el recordatorio llega como notificación local (6.3)
+      const conPermiso = await pedirPermisoNotificaciones();
       await guardarAlerta({
         id: alerta?.id,
         lineaId: opcion.linea.id,
@@ -273,7 +275,10 @@ export default function Alerta() {
         seguridad: form.seguridad,
         activa: alerta?.activa ?? true,
       });
-      mostrar(`Alerta guardada · ${formatoDias(form.dias)} ${formatoHora(form.hora, form.minuto)}`);
+      mostrar(
+        `Alerta guardada · ${formatoDias(form.dias)} ${formatoHora(form.hora, form.minuto)}` +
+          (conPermiso ? "" : " · activa las notificaciones en Ajustes del iPhone"),
+      );
       setCerrando(true);
     } catch {
       Alert.alert("No se pudo guardar", "Revisa tu conexión e inténtalo otra vez.", [
