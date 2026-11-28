@@ -13,6 +13,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Modal,
   PanResponder,
@@ -153,8 +154,13 @@ export function MenuLateral({ visible, onCerrar }: MenuLateralProps) {
       return;
     }
     if (item.accion === "offline") {
-      // TODO Fase 5: descarga de mapas y cola sin conexión
-      cerrarY(() => mostrar("Modo offline disponible pronto"));
+      // La cola sin conexión (E3) ya funciona: se explica cómo
+      cerrarY(() =>
+        Alert.alert(
+          "Sin conexión",
+          "Si te quedas sin señal, tus reportes se guardan en el teléfono y se envían solos cuando vuelva la conexión.",
+        ),
+      );
       return;
     }
     cerrarY(async () => {

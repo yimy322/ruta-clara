@@ -71,6 +71,7 @@ export default function ConfirmarUbicacion() {
   }, [borrador.posicion]);
 
   const aBordo = borrador.enUnidad === "a_bordo";
+  const desvio = borrador.modo === "desvio";
   const enVivo = aBordo && borrador.compartirEnVivo;
 
   return (
@@ -84,13 +85,16 @@ export default function ConfirmarUbicacion() {
         <View style={styles.paso}>
           <Text style={[typography.overline, styles.muted]}>Paso 3 de 3</Text>
           <Text style={[typography.captionStrong, styles.ink]} accessibilityRole="header">
-            Confirma dónde está
+            {desvio ? "Confirma dónde se desvió" : "Confirma dónde está"}
           </Text>
         </View>
       </SafeAreaView>
 
       <View style={styles.centro} pointerEvents="none">
-        {linea && <PinUnidad etiqueta={linea.nombre} pista="arrastra el mapa para ajustar" />}
+        {linea && <PinUnidad
+            etiqueta={linea.nombre}
+            pista={desvio ? "arrastra el mapa al punto del desvío" : "arrastra el mapa para ajustar"}
+          />}
       </View>
 
       <SafeAreaView edges={["left", "right"]}>

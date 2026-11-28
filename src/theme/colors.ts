@@ -13,7 +13,7 @@ export const paletaClara = {
   scrim: "rgba(0, 0, 0, 0.45)",
   // Pista del Toggle apagado (3,3:1 sobre tarjeta)
   controlOff: "#8E8D87",
-  // Mapa provisional: fondo, manzanas, parques y avenidas
+  // Mapa: fondo del contenedor del mapa, manzanas, parques y avenidas
   map: "#ECEAE3",
   block: "#E3E0D6",
   park: "#DCE5D3",

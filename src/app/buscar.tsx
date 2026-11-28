@@ -141,7 +141,7 @@ export default function Buscar() {
               label="Elegir el destino en el mapa"
               variant="secondary"
               fullWidth
-              // TODO Fase 6: elegir el destino tocando el mapa real
+              // Fuera del MVP: elegir el destino tocando el mapa
               onPress={() => mostrar("Elegir en el mapa estará disponible pronto")}
             />
           }

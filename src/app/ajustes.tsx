@@ -145,8 +145,8 @@ export default function Ajustes() {
         <FilaAjuste
           titulo="Ayuda y preguntas frecuentes"
           simple
-          // TODO: pantalla de ayuda (sin frame en Figma)
-          onPress={() => mostrar("Ayuda estará disponible pronto")}
+          // Sin frame de ayuda en Figma: se atiende por WhatsApp
+          onPress={contactar}
         />
         <FilaAjuste titulo="Contáctanos (WhatsApp)" simple onPress={contactar} />
 

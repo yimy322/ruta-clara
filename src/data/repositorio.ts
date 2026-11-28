@@ -55,7 +55,7 @@ import {
 } from "./catalogo";
 import { reprogramarRecordatorios } from "./notificacionesLocales";
 import { getAjustes } from "./preferencias";
-import { consultar, getSesionActual } from "./sesion";
+import { consultar, getSesionActual, guardarNombre } from "./sesion";
 import { getSimulacion, SinConexionError } from "./simulacion";
 import { obtenerUbicacion } from "./ubicacion";
 import {
@@ -781,6 +781,21 @@ export async function getUsuario(): Promise<Usuario> {
 // Cuenta (D1–D5): perfil de Supabase y correo de la sesión, enmascarados.
 // Pendiente (5.7): un proceso programado borra la cuenta al vencer el
 // periodo de gracia y envía el comprobante por correo.
+// Largo máximo del nombre (igual que en /ingresar/nombre)
+const LARGO_MAXIMO_NOMBRE = 40;
+
+// Cambia el nombre del perfil (D1 · Mi cuenta). Vacío lanza Error; sin red,
+// SinConexionError.
+export async function cambiarNombre(nombre: string): Promise<void> {
+  await esperar();
+  const limpio = nombre.trim().slice(0, LARGO_MAXIMO_NOMBRE);
+  if (!limpio) {
+    throw new Error("El nombre no puede quedar vacío");
+  }
+  const { usuarioId } = await sesionActual();
+  await guardarNombre(usuarioId, limpio);
+}
+
 export async function getCuenta(): Promise<Cuenta> {
   await esperar();
   if (getSimulacion().forzarError) {

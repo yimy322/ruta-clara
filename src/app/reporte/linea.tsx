@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, View
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { BarraProgreso, Button, Header, ListItem, useToast } from "@/components";
+import { BarraProgreso, Button, Header, ListItem } from "@/components";
 import { CALLE_USUARIO } from "@/config/simulacion";
 import { useReporte } from "@/context/ReporteContext";
 import { buscarLineas, getLineasSugeridas, getUbicacionUsuario } from "@/data/repositorio";
@@ -26,7 +26,6 @@ export default function ElegirLinea() {
   const styles = useEstilos(crearEstilos);
 
   const router = useRouter();
-  const { mostrar } = useToast();
   const { borrador, actualizar } = useReporte();
 
   const [texto, setTexto] = useState("");
@@ -67,12 +66,8 @@ export default function ElegirLinea() {
 
   const elegir = (linea: Linea) => {
     actualizar({ lineaId: linea.id });
-    if (borrador.modo === "desvio") {
-      // TODO: paso para trazar el desvío en el mapa
-      mostrar("Pronto podrás trazar el desvío");
-      return;
-    }
-    router.push("/reporte/estado");
+    // Desvío: no hay estado del carro; se marca dónde se desvió (F2_04)
+    router.push(borrador.modo === "desvio" ? "/reporte/ubicacion" : "/reporte/estado");
   };
 
   const noEncuentro = () => {

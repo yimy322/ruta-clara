@@ -203,7 +203,7 @@ export default function DetalleRuta() {
                   label="Avísame cuando vuelva"
                   variant="secondary"
                   fullWidth
-                  // TODO Fase 5: suscripción real al estado de la línea
+                  // Fuera del MVP: suscripción al estado de la línea
                   onPress={() => mostrar(`Te avisaremos cuando ${linea.nombre} vuelva`)}
                 />
               </>

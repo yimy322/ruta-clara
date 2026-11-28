@@ -1,11 +1,11 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { ChevronRight, Clock, Download, Trash, UserRound, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Button, PantallaCuenta, TarjetaCuenta, useToast } from "@/components";
 import { useEstilos, useTema } from "@/context/TemaContext";
-import { cancelarEliminacion, getCuenta } from "@/data/repositorio";
+import { cambiarNombre, cancelarEliminacion, getCuenta } from "@/data/repositorio";
 import { opacity, radii, sizes, spacing, type Tema } from "@/theme";
 import type { Cuenta } from "@/types";
 import { formatearFechaLarga, formatearPuntos } from "@/utils/formato";
@@ -43,8 +43,42 @@ export default function MiCuenta() {
     pedirCuenta();
   };
 
-  // supuesto: Figma no dibuja la edición de datos ni la descarga
+  // supuesto: Figma no dibuja la edición de datos ni la descarga (fuera del MVP
+  // salvo el nombre)
   const pronto = (que: string) => () => mostrar(`${que} estará disponible pronto`);
+
+  // Editar el nombre (8.0): cuadro de texto del sistema (solo iOS; el MVP es para iPhone)
+  const editarNombre = () => {
+    if (Platform.OS !== "ios" || !cuenta) {
+      pronto("Editar tu nombre")();
+      return;
+    }
+    Alert.prompt(
+      "Tu nombre",
+      "Así te verán en tus logros. Tus reportes se siguen publicando sin tu nombre.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Guardar",
+          onPress: async (valor?: string) => {
+            if (!valor?.trim()) {
+              mostrar("Escribe tu nombre para guardarlo");
+              return;
+            }
+            try {
+              await cambiarNombre(valor);
+              mostrar("Nombre actualizado");
+              pedirCuenta();
+            } catch {
+              mostrar("No se pudo guardar. Revisa tu conexión.");
+            }
+          },
+        },
+      ],
+      "plain-text",
+      cuenta.nombre,
+    );
+  };
 
   const desactivarOEliminar = () => {
     if (cuenta?.eliminacionEl) {
@@ -129,7 +163,7 @@ export default function MiCuenta() {
         Datos de la cuenta
       </Text>
       <TarjetaCuenta estilo={styles.lista}>
-        <Fila etiqueta="Nombre" valor={cuenta.nombre} onPress={pronto("Editar tu nombre")} />
+        <Fila etiqueta="Nombre" valor={cuenta.nombre} onPress={editarNombre} />
         <Fila etiqueta="Celular" valor={cuenta.telefono} onPress={pronto("Cambiar tu celular")} />
         <Fila etiqueta="Correo" valor={cuenta.correo} onPress={pronto("Cambiar tu correo")} />
       </TarjetaCuenta>
