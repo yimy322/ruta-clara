@@ -14,7 +14,7 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 
 ## Dónde estamos
 
-- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. Fase 6 (mapa y ubicación reales) planificada el 27/11: 6.0 ✅ (mapa real), 6.1 ✅ (ubicación real), 6.2 ✅ (mapa interactivo); **6.3** (notificaciones locales) escrito, falta probar.
+- **Código (Expo):** completos los Flujos 1, 2 y 3 (hasta el **paso 4.4**) y los tokens y componentes de alta fidelidad (4.5A). Todas las pantallas existentes en alta fidelidad (4.5B y 4.5C). Estados E1–E10 implementados (4.7). Tema dinámico y módulo de accesibilidad listos (4.6 + 4.8). Cuenta y eliminación de cuenta lista (4.9). **Fase 4 completa.** **Fase 5 (Supabase) completa** (26–27/11): proyecto y cliente, esquema con RLS, login con código por correo, perfil y cuenta, reportes reales en tiempo real, favoritos/alertas/avisos, fotos en Storage y borrado programado. **Fase 6 (mapa y ubicación reales) completa** (27/11): mapa real, ubicación del celular, mapa interactivo y notificaciones locales. **Fase 7 (IA) planificada el 27/11:** sigue 7.0 (clave y Edge Function, lo haces tú) y 7.1 (reporte con tus palabras).
 - **Diseño (Figma):** **alta fidelidad terminada** en la página «RutaClara · Alta fidelidad» (incluye todo lo del AP3). Desde ahora **la referencia visual para el código es la alta fidelidad**, no los wireframes.
 - **Académico:** AP2 y AP3 entregados. Queda el **Proyecto Final**: un **MVP funcional** (no solo Figma), PPT, repositorio o acceso, y demostración en vivo. Fecha de entrega: **❓ por confirmar**.
 
@@ -62,8 +62,10 @@ Actualizado: **26 de noviembre de 2026**. Fases y pasos con su estado real. **El
 | 6.0 | Mapa real (`react-native-maps`) con las mismas props de `Mapa` | ✅ (27/11) |
 | 6.1 | Ubicación real del celular (con «Usar ubicación de prueba» para la demo) | ✅ (27/11) |
 | 6.2 | Mapa interactivo: arrastrar en F2_04, centrar en mí, destino en F1_06 | ✅ (27/11) |
-| 6.3 | Notificaciones locales (llegada, bajar, recordatorio de alertas) | 🔨 **en prueba** |
-| 7 | Inteligencia artificial (puntos adicionales del Proyecto Final) | 🗺️ propuesta |
+| 6.3 | Notificaciones locales (llegada, bajar, recordatorio de alertas) | ✅ (27/11) |
+| 7.0 | Clave gratuita de Gemini y Edge Function `interpretar-reporte` (lo haces tú, guiado) | 📝 |
+| 7.1 | Reporte con tus palabras (texto o dictado → borrador que el usuario confirma) | 📝 |
+| 7.2 | Asistente de viaje: frase → acción propuesta (buscar rutas o crear alerta) | 📝 si hay tiempo |
 | 8 | Entrega final: despliegue, prueba de usabilidad, PPT y demo | 🗺️ |
 
 ## Orden recomendado para el Proyecto Final
@@ -187,7 +189,7 @@ El catálogo se lee una vez (`src/data/catalogo.ts`) y queda guardado en el tel�
 
 Flujo: onboarding → `/ingresar` (correo) → `/ingresar/codigo` (6 dígitos) → la primera vez `/ingresar/nombre` → Inicio. La sesión queda guardada; «Cerrar sesión», «Desactivar» (D3) y «Entendido» (D5) cierran la sesión de Supabase.
 
-## Fase 6 · Mapa y ubicación reales — 📝 (planificada el 27/11)
+## Fase 6 · Mapa y ubicación reales — ✅ (27/11)
 **Hechos (docs de Expo SDK 58, 27/11):** `react-native-maps` funciona en Expo Go en iOS (Apple Maps) y Android **sin API key** (`npx expo install react-native-maps`); `expo-maps` necesita *development build* e iOS 17 (descartado). `expo-location` (ya instalado): ubicación en primer plano en Expo Go; segundo plano necesita *development build*. `expo-notifications`: notificaciones **locales** sí en Expo Go; push remoto no (Android).
 
 **Decisiones (CONTEXT 63–67):** mapa con `react-native-maps`; se acepta el fondo de Apple/Google Maps (Figma no se puede aplicar en Apple Maps) y los marcadores, chips y zonas mantienen el estilo RutaClara; «Usar ubicación de prueba» encendido por defecto para la demo; recorridos como líneas rectas entre paraderos; solo notificaciones locales.
@@ -196,11 +198,16 @@ Flujo: onboarding → `/ingresar` (correo) → `/ingresar/codigo` (6 dígitos) �
 
 **Fuera de la Fase 6:** trazo por calles reales (servicio de rutas), ubicación en segundo plano y push remoto (*development build*).
 
-## Fase 7 · Inteligencia artificial — 🗺️ propuesta (sin aprobar)
-Puntos adicionales del Proyecto Final. Dos ideas con utilidad concreta:
-- **Reporte por voz o texto libre:** «La 50 viene llena por Javier Prado» → la IA lo convierte en un borrador de reporte (línea, ocupación, ubicación) que el usuario confirma.
-- **Agente de viaje:** «Quiero llegar al Jockey a las 8 y que me avises» → el agente usa herramientas (`buscarRutas`, `iniciarEspera`, `guardarAlerta`) y pide confirmación antes de actuar.
-- La clave de la API va en el servidor (Supabase Edge Function), nunca en la app.
+## Fase 7 · Inteligencia artificial — 📝 (planificada el 27/11)
+Puntos adicionales del Proyecto Final.
+
+**Hechos:** el curso pide una IA **gratuita** → **Google Gemini API, plan gratuito** (Google AI Studio, sin tarjeta; sin activar facturación no se cobra). Se llama desde una **Supabase Edge Function** (Deno, SDK oficial `npm:@google/genai`) creada en el editor del Dashboard (sin CLI). La clave `GEMINI_API_KEY` va como secreto de Supabase. La salida estructurada (`responseSchema`, JSON Schema) devuelve solo valores válidos del borrador. Límites gratuitos por proyecto (por minuto y por día, reinicio a medianoche del Pacífico); el modelo Flash exacto se confirma en AI Studio. El dictado del teclado del iPhone sirve como entrada por voz sin librerías nuevas y funciona en Expo Go.
+
+**Decisiones (CONTEXT 72–74):** la IA solo **propone**: completa el borrador y abre la pantalla de siempre, y el usuario confirma (la IA nunca envía reportes ni crea alertas). Gemini Flash del plan gratuito (configurable con `GEMINI_MODEL`) y salida estructurada; si la cuota se agota (429) o falla, la app ofrece «Reportar paso a paso». Límite de 30 usos por usuario al día y 280 caracteres por texto, para cuidar la cuota. Aviso «No escribas datos personales» (en el plan gratuito Google puede usar los textos). Voz = dictado del teclado.
+
+**Sub-pasos:** 7.0 clave gratuita y Edge Function (guía en PROMPTS_PENDIENTES) → 7.1 reporte con tus palabras → 7.2 asistente de viaje (si hay tiempo). Prompts 21–22.
+
+**Fuera de la Fase 7:** grabación de voz propia (librería y transcripción), un agente que actúe sin confirmación y la IA en las notificaciones.
 
 ## Fase 8 · Entrega final — 🗺️
 - Repositorio en GitHub con README actualizado.

@@ -34,8 +34,11 @@ Actualizado: **26 de noviembre de 2026**. Prompts para Claude Code **que todaví
 | 17 | 6.0 · Mapa real | ✅ ejecutado el 27/11 |
 | 18 | 6.1 · Ubicación real | ✅ ejecutado el 27/11 |
 | 19 | 6.2 · Mapa interactivo | ✅ ejecutado el 27/11 |
-| 20 | 6.3 · Notificaciones locales (si hay tiempo) | 🔨 **en prueba** |
-| — | Fases 6, 7 y 8 | 🗺️ planificar con Claude Code cuando lleguemos |
+| 20 | 6.3 · Notificaciones locales (si hay tiempo) | ✅ ejecutado el 27/11 |
+| — | 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú) | 📝 guía abajo |
+| 21 | 7.1 · Reporte con tus palabras | 📝 |
+| 22 | 7.2 · Asistente de viaje (si hay tiempo) | 📝 |
+| — | Fase 8 | 🗺️ planificar con Claude Code cuando lleguemos |
 
 **Fase 5 (plan del 26/11):** entrega en menos de 3 semanas → 5.0–5.5 son lo que se ve en la demo; 5.6 y 5.7 solo si hay tiempo. Reglas comunes:
 - `src/data/supabase.ts` es el único archivo que importa `@supabase/supabase-js`; las pantallas siguen usando solo `@/data/repositorio` y **las firmas no cambian**.
@@ -498,9 +501,70 @@ Al final tsc, lint y expo-doctor. Primero el plan.
 
 ---
 
+## 7.0 · Clave gratuita de Gemini y Edge Function (lo haces tú, guiado)
+
+Antes del prompt 21. Claude Code escribe el código (`supabase/functions/interpretar-reporte/index.ts` y `supabase/migrations/007_ia.sql`) en el paso 7.1; tú lo subes:
+1. **aistudio.google.com:** entra con tu cuenta de Google → **Get API key** → crea la clave (plan gratuito, sin tarjeta; no actives la facturación). Anota el nombre del modelo **Flash** que aparece como gratuito. **No pegues la clave en el chat ni en la app.**
+2. **Supabase → Edge Functions → Secrets:** agrega `GEMINI_API_KEY` con esa clave (y `GEMINI_MODEL` solo si el modelo gratuito es distinto al del código).
+3. **SQL Editor:** ejecuta `supabase/migrations/007_ia.sql` (tabla `uso_ia` con el límite diario).
+4. **Edge Functions → Deploy a new function → Via editor:** nombre `interpretar-reporte`, pega el código y despliega. Deja activado «Verify JWT» (solo usuarios con sesión).
+5. Prueba con el botón **Test** del Dashboard (con sesión de un usuario) o desde la app en el paso 7.1.
+
+---
+
+## 21. Paso 7.1 · Reporte con tus palabras
+
+```
+Fase 7, paso 1: reporte con tus palabras (IA). El proyecto usa Expo SDK 58;
+no instales librerías nuevas en la app.
+- Edge Function supabase/functions/interpretar-reporte/index.ts (Deno, IA
+  gratuita: Gemini API con el SDK oficial npm:@google/genai, clave en el
+  secreto GEMINI_API_KEY, modelo Flash del plan gratuito en una constante o
+  en el secreto GEMINI_MODEL): exige sesión, máx. 280 caracteres y 30 usos
+  por usuario al día (tabla uso_ia en supabase/migrations/007_ia.sql con
+  RLS). Salida estructurada (responseSchema) con los valores cerrados de
+  BorradorReporte (tipo, lineaId del catálogo, ocupacion, velocidad, espera,
+  congestion, causas, seguridad) + entendido y falta. Si Gemini responde 429
+  o falla: error «La IA está ocupada». Revisa la documentación actual del
+  SDK @google/genai antes de escribirla.
+- src/data/supabase.ts: interpretarReporte(texto) con functions.invoke;
+  el repositorio la expone y traduce errores (sin red, límite, no entendí).
+- F2_01 (reporte/index.tsx): opción «Cuéntalo con tus palabras» →
+  reporte/texto.tsx (supuesto, sin frame: componentes existentes). Campo de
+  texto con pista «Ej.: La 50 viene llena por Javier Prado · usa el
+  micrófono del teclado para dictar», botón «Armar reporte», estado
+  «Entendiendo tu reporte…». Con la respuesta: actualizar(...) del borrador y
+  navegar al paso que corresponde con las opciones ya marcadas; el usuario
+  confirma como siempre (la IA nunca envía). Si no entendió, se llegó al
+  límite o la IA está ocupada: mensaje + «Reportar paso a paso». Nota bajo
+  el campo: «No escribas datos personales».
+- Seguridad: pasa por reporte/seguridad.tsx como siempre (nunca tocar
+  «Llamar» en pruebas).
+Al final tsc y lint, y la guía para subir la función (7.0). Primero el plan.
+```
+
+---
+
+## 22. Paso 7.2 · Asistente de viaje (si hay tiempo)
+
+```
+Fase 7, paso 2: asistente de viaje. Misma Edge Function con un modo
+"viaje": una frase («Quiero llegar al Jockey a las 8 y que me avises») →
+acción propuesta con salida estructurada: buscar_rutas (destinoId del
+catálogo) o crear_alerta (destino, hora, minuto, dias, minutosAntes).
+- Entrada: botón en el buscador de F1_05 (buscar.tsx), mismo campo de texto
+  y dictado que en 7.1.
+- La app abre la pantalla con los datos llenos: F1_06 (/rutas con destino) o
+  F3_03 (/alerta con los campos precargados); el usuario confirma. Nada se
+  guarda sin confirmación.
+- Mismos límites y errores que en 7.1.
+Al final tsc y lint. Primero el plan.
+```
+
+---
+
 ## Fases sin prompt (planificar con Claude Code al llegar)
 
-- **Fase 7 · IA (puntos adicionales):** propuesta: reporte por voz o texto libre que la IA convierte en borrador confirmable, y/o agente de viaje con herramientas (`buscarRutas`, `iniciarEspera`, `guardarAlerta`) que pide confirmación antes de actuar. El modelo se llama desde una Supabase Edge Function.
 - **Fase 8 · Entrega:** repositorio en GitHub con README; acceso (EAS Update + QR, o web en Vercel); prueba de usabilidad con la app real (guion: https://claude.ai/artifact/PW6XL7MeJCXTYdc61sMJiF); PPT; guion de la demo.
 
 ## Plantilla de prompt (referencia)
